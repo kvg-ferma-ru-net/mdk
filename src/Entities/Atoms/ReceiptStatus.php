@@ -1,0 +1,120 @@
+<?php
+
+namespace Innokassa\MDK\Entities\Atoms;
+
+use Innokassa\MDK\Entities\AtomAbstract;
+
+/**
+ * Статусы чека на основании ответов от сервера фискализации
+ */
+class ReceiptStatus extends AtomAbstract
+{
+    /** Чек подготовлен, но еще не отправлен */
+    const PREPARED  = 0;
+
+    /** Нет ошибок, чек фискализирован */
+    const COMPLETED  = 1;
+
+    /** Нет ошибок, ждем пока чек фискализируется, нужно проверить статус */
+    const WAIT       = 2;
+
+    /** 
+     * Нет ошибок, чек отправлен на сервер, надеемся на фискализацию,
+     * но что там с чеком не известно, потому что сервер ответил некорректно, 
+     * нужно проверить статус 
+     */
+    const ASSUME     = 3;
+
+    /** Возникли проблемы с доступом к кассе, но надо попробовать еще раз пробить чек */
+    const REPEAT     = 4;
+
+    /** Ошибка фискализации */
+    const ERROR      = 5;
+
+    //######################################################################
+
+    /**
+     * @param integer $code код ответа сервера фискализации или одно из значений констант
+     */
+    public function __construct(int $code)
+    {
+        switch($code)
+        {
+            case self::PREPARED:
+                $this->code = self::PREPARED;
+                $this->name = 'Чек подготовлен, но еще не отправлен';
+                return;
+            case self::COMPLETED:
+                $this->code = self::COMPLETED;
+                $this->name = 'Чек фискализирован';
+                return;
+            case self::WAIT:
+                $this->code = self::WAIT;
+                $this->name = 'Чек в очереди';
+                return;
+            case self::ASSUME:
+                $this->code = self::ASSUME;
+                $this->name = 'Чек отправлен на сервер';
+                return;
+            case self::REPEAT:
+                $this->code = self::REPEAT;
+                $this->name = 'Ошибка авторизации, помещен в отложенную очередь';
+                return;
+            case self::ERROR:
+                $this->code = self::ERROR;
+                $this->name = 'Ошибка фискализации';
+                return;
+            default:
+                break;
+        }
+
+        // все ОК
+        if($code == 200 || $code == 201)
+        {
+            $this->code = self::COMPLETED;
+            $this->name = 'Чек фискализирован';
+        }
+
+        // пробовать еще раз фискализировать с тем же КИ (чек принят сервером)
+        else if($code >= 202 && $code < 300)
+        {
+            $this->code = self::WAIT;
+            $this->name = 'Чек в очереди';
+        }
+
+        // пробовать еще раз фискализировать с тем же КИ (чек отправлен на сервер, но не известно что с там с ним)
+        else if($code >= 500 && $code < 600)
+        {
+            $this->code = self::ASSUME;
+            $this->name = 'Чек отправлен на сервер';
+        }
+
+        // проблемы авторизации, надо попробовать фискализировать еще раз, но с большим периодом времени
+        else if($code == 401 || $code == 402 || $code == 404)
+        {
+            $this->code = self::REPEAT;
+            $this->name = 'Ошибка авторизации, помещен в отложенную очередь';
+        }
+
+        // [400, 500) - ошибки, повторять фискализировать дальше нельзя
+        else
+        {
+            $this->code = self::ERROR;
+            $this->name = 'Ошибка фискализации';
+        }
+    }
+
+    static public function all(): array
+    {
+        $a = [];
+
+        $a[] = new self(self::PREPARED);
+        $a[] = new self(self::COMPLETED);
+        $a[] = new self(self::WAIT);
+        $a[] = new self(self::ASSUME);
+        $a[] = new self(self::REPEAT);
+        $a[] = new self(self::ERROR);
+
+        return $a;
+    }
+};

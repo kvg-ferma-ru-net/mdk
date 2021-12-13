@@ -1,0 +1,5 @@
+examples
+vendor
+composer.lock
+.phpunit.cache
+coverage-report-html
