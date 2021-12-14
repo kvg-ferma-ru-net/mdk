@@ -19,7 +19,7 @@
     },
     "scripts": {
         "test-unit": "vendor/bin/phpunit --colors=always --coverage-html coverage-report-html --bootstrap tests/Unit/bootstrap.php tests/Unit/",
-        "test-integration": "vendor/bin/phpunit --colors=always --coverage-html coverage-report-html --bootstrap tests/Integration/bootstrap.php tests/Integration/",
+        "test-integration": "vendor/bin/phpunit --colors=always --bootstrap tests/Integration/bootstrap.php tests/Integration/",
         "test-system": "vendor/bin/phpunit --colors=always --bootstrap tests/System/bootstrap.php tests/System/"
     }
 }
