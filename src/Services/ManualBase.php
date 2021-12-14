@@ -9,7 +9,7 @@ use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
 
-use Innokassa\MDK\Services\FiscalizeProcAbstract;
+use Innokassa\MDK\Services\ServiceBaseAbstract;
 use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Settings\SettingsInterface;
 
@@ -22,7 +22,7 @@ use Innokassa\MDK\Exceptions\Services\ManualException;
 /**
  * Базовая реализация ManualInterface
  */
-class ManualBase extends FiscalizeProcAbstract implements ManualInterface
+class ManualBase extends ServiceBaseAbstract implements ManualInterface
 {
     public function __construct(
         ReceiptStorageInterface $receiptStorage, 
@@ -56,25 +56,11 @@ class ManualBase extends FiscalizeProcAbstract implements ManualInterface
                 ->setOrderId($orderId);
         $receipt = $this->supplementReceipt($receipt);
 
-        /*for($i=0; $i<10; ++$i)
-        {
-            try{
-                $receipt = $this->transfer->sendReceipt($receipt);
-                break;
-            }
-            catch(TransferException $e){
-                if((new ReceiptStatus($e->getCode()))->getCode() == ReceiptStatus::ERROR)
-                    throw new ManualException($e->getMessage());
-                if($e->getCode() == 409)
-                    $receipt->setUUID(new UUID());
-            }
-        }*/
-
         try{
-            $this->proc($this->transfer, $receipt);
+            $this->fiscalizeProc($receipt);
         }
         catch(TransferException $e){
-            throw new ManualException($e->getMessage());
+            throw new ManualException($e->getMessage(), $e->getCode());
         }
         
         $this->receiptStorage->save($receipt);
@@ -121,19 +107,11 @@ class ManualBase extends FiscalizeProcAbstract implements ManualInterface
         if($amountNewRefund > $amountBalance)
             throw new ManualException("Cумма нового возврата '$amountNewRefund' превышает остаток по заказу '$amountBalance'");
 
-        /*try{
-            $receipt = $this->transfer->sendReceipt($receipt);
-        }
-        catch(TransferException $e){
-            if((new ReceiptStatus($e->getCode()))->getCode() == ReceiptStatus::ERROR)
-                throw new ManualException($e->getMessage());
-        }*/
-
         try{
-            $this->proc($this->transfer, $receipt);
+            $this->fiscalizeProc($receipt);
         }
         catch(TransferException $e){
-            throw new ManualException($e->getMessage());
+            throw new ManualException($e->getMessage(), $e->getCode());
         }
         
         $this->receiptStorage->save($receipt);
@@ -146,7 +124,6 @@ class ManualBase extends FiscalizeProcAbstract implements ManualInterface
     //######################################################################
 
     private $receiptStorage;
-    private $transfer;
     private $settings;
 
     //######################################################################

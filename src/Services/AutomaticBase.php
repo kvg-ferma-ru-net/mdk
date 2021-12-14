@@ -2,26 +2,26 @@
 
 namespace Innokassa\MDK\Services;
 
+use Innokassa\MDK\Entities\Atoms\ReceiptType;
+use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Entities\Receipt;
+use Innokassa\MDK\Entities\ReceiptAdapterInterface;
 
 use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Storage\ReceiptFilter;
-use Innokassa\MDK\Entities\Atoms\ReceiptType;
+use Innokassa\MDK\Storage\ReceiptStorageInterface;
 
 use Innokassa\MDK\Settings\SettingsInterface;
-use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
-use Innokassa\MDK\Exceptions\TransferException;
-use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 
-use Innokassa\MDK\Storage\ReceiptStorageInterface;
-use Innokassa\MDK\Entities\ReceiptAdapterInterface;
-use Innokassa\MDK\Services\FiscalizeProcAbstract;
+use Innokassa\MDK\Services\ServiceBaseAbstract;
+
+use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Exceptions\Services\AutomaticException;
 
 /**
  * Базовая реализация AutomaticInterface
  */
-class AutomaticBase extends FiscalizeProcAbstract implements AutomaticInterface 
+class AutomaticBase extends ServiceBaseAbstract implements AutomaticInterface 
 {
     public function __construct(
         SettingsInterface $settings,
@@ -83,10 +83,10 @@ class AutomaticBase extends FiscalizeProcAbstract implements AutomaticInterface
         $receipt->setCashbox($this->settings->getCashbox());
 
         try{
-            $this->proc($this->transfer, $receipt);
+            $this->fiscalizeProc($receipt);
         }
         catch(TransferException $e){
-            throw new AutomaticException($e->getMessage());
+            throw new AutomaticException($e->getMessage(), $e->getCode());
         }
 
         $this->receiptStorage->save($receipt);
@@ -100,6 +100,5 @@ class AutomaticBase extends FiscalizeProcAbstract implements AutomaticInterface
 
     private $settings = null;
     private $receiptStorage = null;
-    private $transfer = null;
     private $receiptAdapter = null;
 };
