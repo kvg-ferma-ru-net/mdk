@@ -152,27 +152,9 @@ class Transfer implements TransferInterface
     /**
      * @inheritDoc
      */
-    public function renderReceipt(Receipt $receipt): string
+    public function getReceiptLink(Receipt $receipt): string
     {
-        $this->client
-            ->reset()
-            ->write(NetClientInterface::PATH, self::API_URL."/c_groups/".$this->cashbox."/receipts/".$receipt->getUUID()->get()."/html-debug")
-            ->write(NetClientInterface::HEAD, $this->headers);
-
-        try{
-            $this->client->send();
-        }
-        catch(NetConnectException $e){
-            throw new TransferException($e->getMessage(), $e->getCode());
-        }
-
-        $responseCode = $this->client->read(NetClientInterface::CODE);
-        $responseBody = $this->client->read(NetClientInterface::BODY);
-
-        if($responseCode != 200)
-            throw new TransferException($responseBody, $responseCode);
-
-        return $this->client->read(NetClientInterface::BODY);
+        return self::API_URL."/receipt/show/".$receipt->getUUID()->get();
     }
 
     //######################################################################

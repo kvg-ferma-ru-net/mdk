@@ -46,14 +46,10 @@ interface TransferInterface
     public function getReceipt(Receipt $receipt): Receipt;
 
     /**
-     * Получить html рендер чека
-     * 
-     * @link https://api.kassavoblake.com/v2/docs/pangaea_api.html#c_groups__c_group_id__receipts__receipt_id__html_debug_get
-     * 
-     * @throws TransferException
+     * Получить ссылку на рендер чека (без проверки статуса чека)
      *
      * @param Receipt $receipt
      * @return string
      */
-    public function renderReceipt(Receipt $receipt): string;
+    public function getReceiptLink(Receipt $receipt): string;
 };

@@ -5,17 +5,21 @@ namespace Innokassa\MDK\Services;
 use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Settings\SettingsInterface;
+use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Exceptions\SettingsException;
 use Innokassa\MDK\Exceptions\TransferException;
+use Innokassa\MDK\Storage\ReceiptStorageInterface;
+use Innokassa\MDK\Exceptions\Services\PrinterException;
 
 /**
  * Базовая реализация ConnectorInterface
  */
 class ConnectorBase implements ConnectorInterface
 {
-    public function __construct(TransferInterface $transfer)
+    public function __construct(ReceiptStorageInterface $receiptStorage, TransferInterface $transfer)
     {
         $this->transfer = $transfer;
+        $this->receiptStorage = $receiptStorage;
     }
 
     /**
@@ -57,9 +61,24 @@ class ConnectorBase implements ConnectorInterface
         return true;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getReceiptLink(int $checkId): string
+    {
+        if(!($receipt = $this->receiptStorage->getOne($checkId)))
+			throw new PrinterException("Не найден чек #{$checkId}");
+
+		if($receipt->getStatus()->getCode() != ReceiptStatus::COMPLETED)
+			throw new PrinterException("Чек #{$checkId} еще не фискализирован, но поставлен в очередь");
+
+        return $this->transfer->getReceiptLink($receipt);
+    }
+
     //######################################################################
     // PRIVATE
     //######################################################################
 
     private $transfer = null;
+    private $receiptStorage = null;
 };

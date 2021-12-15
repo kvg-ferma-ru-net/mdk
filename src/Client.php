@@ -25,7 +25,6 @@ class Client
         AutomaticInterface $atomatic,
         ManualInterface $manual,
         PipelineInterface $pipeline,
-        PrinterInterface $printer,
         ConnectorInterface $connector
     )
     {
@@ -36,7 +35,6 @@ class Client
         $this->atomatic = $atomatic;
         $this->manual = $manual;
         $this->pipeline = $pipeline;
-        $this->printer = $printer;
         $this->connector = $connector;
     }
 
@@ -73,16 +71,6 @@ class Client
     }
 
     /**
-     * Получить сервис печати чеков
-     *
-     * @return PrinterInterface
-     */
-    public function servicePrinter(): PrinterInterface
-    {
-        return $this->printer;
-    }
-
-    /**
      * Получить сервис тестирования соединения с сервермо фискализации
      *
      * @return ConnectorInterface
@@ -116,6 +104,5 @@ class Client
     private $atomatic;
     private $manual;
     private $pipeline;
-    private $printer;
     private $connector;
 };
