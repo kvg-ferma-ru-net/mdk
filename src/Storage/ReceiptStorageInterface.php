@@ -29,9 +29,9 @@ interface ReceiptStorageInterface
      * @throws StorageException
      *
      * @param integer $id
-     * @return ReceiptInterface
+     * @return Receipt|null
      */
-    public function getOne(int $id): Receipt;
+    public function getOne(int $id): ?Receipt;
 
     /**
      * Извлечение коллекции чеков
