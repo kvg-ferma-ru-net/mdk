@@ -1,12 +1,15 @@
 {
     "name": "innokassa/mdk",
-    "description": "PHP Module Development Kit for Innokassa",
+    "description": "PHP Module Development Kit for Pangaea Server by Innokassa",
+    "version": "1.0.0",
     "type": "library",
-    "license": "",
+    "license": "MIT",
+    "homepage": "https://innokassa.ru/",
     "authors": [
         {
-            "name": "Innokassa",
-            "email": "dev@innokassa.ru"
+            "name": "Buturlin Vitaliy (Byurrer)",
+            "email": "byurrer@mail.ru",
+            "homepage": "https://byurrer.ru/"
         }
     ],
     "autoload": {
@@ -19,7 +22,7 @@
     },
     "scripts": {
         "test-unit": "vendor/bin/phpunit --colors=always --coverage-html coverage-report-html --bootstrap tests/Unit/bootstrap.php tests/Unit/",
-        "test-integration": "vendor/bin/phpunit --colors=always --bootstrap tests/Integration/bootstrap.php tests/Integration/",
+        "test-server": "vendor/bin/phpunit --colors=always --bootstrap tests/Server/bootstrap.php tests/Server/",
         "test-system": "vendor/bin/phpunit --colors=always --bootstrap tests/System/bootstrap.php tests/System/"
     }
 }
