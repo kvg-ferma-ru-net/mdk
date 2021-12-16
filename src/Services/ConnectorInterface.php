@@ -5,7 +5,7 @@ namespace Innokassa\MDK\Services;
 use Innokassa\MDK\Settings\SettingsInterface;
 
 /**
- * Интерфейс сервиса работы соединения с сервером фискализации
+ * Интерфейс сервиса тестирования соединения и настроек
  */
 interface ConnectorInterface
 {
@@ -16,14 +16,4 @@ interface ConnectorInterface
      * @return bool true в случае успеха
      */
     public function testSettings(SettingsInterface $settings): bool;
-
-    /**
-     * Получить ссылку на чек
-     *
-     * @throws PrinterException
-     * 
-     * @param integer $idReceipt
-     * @return string
-     */
-    public function getReceiptLink(int $idReceipt): string;
 };

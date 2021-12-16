@@ -93,11 +93,12 @@ class SystemTest extends TestCase
         $automatic = new AutomaticBase(self::$settings, self::$storage, $transfer, self::$adapter);
         $manual = new ManualBase(self::$storage, $transfer, self::$settings);
         $pipeline = new PipelineBase(self::$storage, $transfer);
-        $connector = new ConnectorBase(self::$storage, $transfer);
+        $printer = new PrinterBase(self::$storage, $transfer);
+        $connector = new ConnectorBase($transfer);
         
         self::$client = new Client(
             self::$settings, self::$adapter, self::$storage,
-            $automatic, $manual, $pipeline, $connector
+            $automatic, $manual, $pipeline, $printer, $connector
         );
     }
 
@@ -364,7 +365,7 @@ class SystemTest extends TestCase
             $settings->getActorToken(), 
             $settings->getCashbox()
         );
-        $connector = new ConnectorBase(self::$storage, $transfer);
+        $connector = new ConnectorBase($transfer);
 
         $this->expectException(SettingsException::class);
         $connector->testSettings($settings);
@@ -391,7 +392,7 @@ class SystemTest extends TestCase
             $settings->getActorToken(), 
             $settings->getCashbox()
         );
-        $connector = new ConnectorBase(self::$storage, $transfer);
+        $connector = new ConnectorBase($transfer);
 
         $this->expectException(SettingsException::class);
         $connector->testSettings($settings);

@@ -4,15 +4,16 @@ use Innokassa\MDK\Client;
 
 use Innokassa\MDK\Net\Transfer;
 use PHPUnit\Framework\TestCase;
+use Innokassa\MDK\Net\ConverterV2;
+use Innokassa\MDK\Net\NetClientCurl;
+use Innokassa\MDK\Services\ManualBase;
+use Innokassa\MDK\Services\PrinterBase;
+use Innokassa\MDK\Services\PipelineBase;
 use Innokassa\MDK\Services\AutomaticBase;
+use Innokassa\MDK\Services\ConnectorBase;
 use Innokassa\MDK\Settings\SettingsInterface;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Entities\ReceiptAdapterInterface;
-use Innokassa\MDK\Net\ConverterV2;
-use Innokassa\MDK\Net\NetClientCurl;
-use Innokassa\MDK\Services\ConnectorBase;
-use Innokassa\MDK\Services\ManualBase;
-use Innokassa\MDK\Services\PipelineBase;
 
 /**
  * @uses Innokassa\MDK\Client
@@ -21,6 +22,7 @@ use Innokassa\MDK\Services\PipelineBase;
  * @uses Innokassa\MDK\Services\AutomaticBase
  * @uses Innokassa\MDK\Services\ConnectorBase
  * @uses Innokassa\MDK\Services\ManualBase
+ * @uses Innokassa\MDK\Services\PrinterBase
  * @uses Innokassa\MDK\Services\PipelineBase
  */
 class ClientTest extends TestCase
@@ -30,6 +32,7 @@ class ClientTest extends TestCase
      * @covers Innokassa\MDK\Client::serviceAutomatic
      * @covers Innokassa\MDK\Client::serviceManual
      * @covers Innokassa\MDK\Client::servicePipeline
+     * @covers Innokassa\MDK\Client::servicePrinter
      * @covers Innokassa\MDK\Client::serviceConnector
      * 
      * @covers Innokassa\MDK\Client::componentSettings
@@ -47,16 +50,18 @@ class ClientTest extends TestCase
         $automatic = new AutomaticBase($settings, $storage, $transfer, $adapter);
         $manual = new ManualBase($storage, $transfer, $settings);
         $pipeline = new PipelineBase($storage, $transfer);
-        $connector = new ConnectorBase($storage, $transfer);
+        $connector = new ConnectorBase($transfer);
+        $printer = new PrinterBase($storage, $transfer);
         
         $client = new Client(
             $settings, $adapter, $storage,
-            $automatic, $manual, $pipeline, $connector
+            $automatic, $manual, $pipeline, $printer, $connector
         );
 
         $this->assertSame($automatic, $client->serviceAutomatic());
         $this->assertSame($manual, $client->serviceManual());
         $this->assertSame($pipeline, $client->servicePipeline());
+        $this->assertSame($printer, $client->servicePrinter());
         $this->assertSame($connector, $client->serviceConnector());
 
         $this->assertSame($settings, $client->componentSettings());

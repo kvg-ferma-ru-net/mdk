@@ -32,12 +32,9 @@ class ConnectorBaseFakeTest extends TestCase
     private $client;
     private $converter;
     private $settings;
-    private $storage;
 
     protected function setUp(): void
     {
-        $this->storage = $this->createMock(ReceiptStorageInterface::class);
-
         $this->client = $this->createMock(NetClientInterface::class);
         $this->client->method('send')
             ->will($this->returnSelf());
@@ -81,7 +78,7 @@ class ConnectorBaseFakeTest extends TestCase
             $this->settings->getActorToken(), 
             $this->settings->getCashbox()
         );
-        $connector = new ConnectorBase($this->storage, $transfer);
+        $connector = new ConnectorBase($transfer);
         $this->assertTrue($connector->testSettings($this->settings));
     }
 
@@ -103,7 +100,7 @@ class ConnectorBaseFakeTest extends TestCase
             $this->settings->getActorToken(), 
             $this->settings->getCashbox()
         );
-        $connector = new ConnectorBase($this->storage, $transfer);
+        $connector = new ConnectorBase($transfer);
         $this->expectException(SettingsException::class);
         $connector->testSettings($this->settings);
     }
@@ -124,7 +121,7 @@ class ConnectorBaseFakeTest extends TestCase
             $this->settings->getActorToken(), 
             $this->settings->getCashbox()
         );
-        $connector = new ConnectorBase($this->storage, $transfer);
+        $connector = new ConnectorBase($transfer);
         $this->expectException(SettingsException::class);
         $connector->testSettings($this->settings);
     }
@@ -149,7 +146,7 @@ class ConnectorBaseFakeTest extends TestCase
             $this->settings->getActorToken(), 
             $this->settings->getCashbox()
         );
-        $connector = new ConnectorBase($this->storage, $transfer);
+        $connector = new ConnectorBase($transfer);
         $this->expectException(SettingsException::class);
         $connector->testSettings($this->settings);
     }
@@ -174,79 +171,8 @@ class ConnectorBaseFakeTest extends TestCase
             $this->settings->getActorToken(), 
             $this->settings->getCashbox()
         );
-        $connector = new ConnectorBase($this->storage, $transfer);
+        $connector = new ConnectorBase($transfer);
         $this->expectException(SettingsException::class);
         $connector->testSettings($this->settings);
-    }
-
-    //######################################################################
-
-    /**
-     * @covers Innokassa\MDK\Services\ConnectorBase::__construct
-     * @covers Innokassa\MDK\Services\ConnectorBase::getReceiptLink
-     */
-    public function testGetReceiptLinkSuccess()
-    {
-        $receipt = new Receipt();
-        $receipt->setStatus(new ReceiptStatus(ReceiptStatus::COMPLETED));
-        $this->storage->method('getOne')
-            ->willReturn($receipt);
-
-        $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            $this->settings->getActorId(), 
-            $this->settings->getActorToken(), 
-            $this->settings->getCashbox()
-        );
-        $connector = new ConnectorBase($this->storage, $transfer);
-        $this->assertIsString($connector->getReceiptLink(1));
-
-        /*$this->expectException(SettingsException::class);
-        $connector->getReceiptLink($this->settings);*/
-    }
-
-    /**
-     * @covers Innokassa\MDK\Services\ConnectorBase::__construct
-     * @covers Innokassa\MDK\Services\ConnectorBase::getReceiptLink
-     */
-    public function testGetReceiptLinkFailNotFound()
-    {
-        $this->storage->method('getOne')
-            ->willReturn(null);
-
-        $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            $this->settings->getActorId(), 
-            $this->settings->getActorToken(), 
-            $this->settings->getCashbox()
-        );
-        $connector = new ConnectorBase($this->storage, $transfer);
-        $this->expectException(PrinterException::class);
-        $connector->getReceiptLink(1);
-    }
-
-    /**
-     * @covers Innokassa\MDK\Services\ConnectorBase::__construct
-     * @covers Innokassa\MDK\Services\ConnectorBase::getReceiptLink
-     */
-    public function testGetReceiptLinkFailNotCompleted()
-    {
-        $receipt = new Receipt();
-        $receipt->setStatus(new ReceiptStatus(ReceiptStatus::WAIT));
-        $this->storage->method('getOne')
-            ->willReturn($receipt);
-
-        $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            $this->settings->getActorId(), 
-            $this->settings->getActorToken(), 
-            $this->settings->getCashbox()
-        );
-        $connector = new ConnectorBase($this->storage, $transfer);
-        $this->expectException(PrinterException::class);
-        $connector->getReceiptLink(1);
     }
 };
