@@ -63,9 +63,13 @@ class PipelineBase implements PipelineInterface
     {
         usleep(rand(0, 750000));
 
-		$receipts = $this->receiptStorage->getCollection(
+        $receiptsPrepared = $this->receiptStorage->getCollection(
+            (new ReceiptFilter())->setStatus(ReceiptStatus::PREPARED)
+        );
+		$receiptsRepeat = $this->receiptStorage->getCollection(
             (new ReceiptFilter())->setStatus(ReceiptStatus::REPEAT)
         );
+        $receipts = $receiptsPrepared->merge($receiptsRepeat);
 
 		foreach($receipts as $receipt)
 		{

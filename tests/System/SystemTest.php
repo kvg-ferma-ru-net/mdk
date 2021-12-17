@@ -237,6 +237,10 @@ class SystemTest extends TestCase
 
     /**
      * @covers Innokassa\MDK\Services\PipelineBase
+     * @depends testManual
+     * @depends testAutomatic
+     * @depends testAutomaticAfterManual
+     * @depends testStorage
      */
     public function testPipelineSuccess()
     {
@@ -245,7 +249,7 @@ class SystemTest extends TestCase
 
         /*
             создадим два одинаковых чека для заказа 5, пробьем и специально установим статус WAIT, 
-            в тестах будем ждать COMPLETED
+            в тестах будем ждать COMPLETED | WAIT
         */
         $orderId = 5;
         $items = self::$adapter->getItems($orderId, ReceiptSubType::PRE);
@@ -262,11 +266,20 @@ class SystemTest extends TestCase
         self::$storage->save($receiptComing);
         $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
 
+        /*
+            создадим чек для заказа 3, присвоим ему статус PREPARED (подготовлен, но соединение с сервером не удалось), в тестах будем ждать COMPLETED | WAIT
+        */
+        $orderId = 3;
+        $receiptComing = $manual->fiscalize($orderId, $items, $notify, $amount);
+        $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::PREPARED));
+        self::$storage->save($receiptComing);
+        $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
+
 
         /*
             создадим чек для заказа 4, пробьем и специально установим статус REPEAT, 
             чтобы при updateUnaccepted получить 409 от сервера,
-            в тестах будем ждать COMPLETED
+            в тестах будем ждать COMPLETED | WAIT
         */
         $orderId = 4;
         $items = self::$adapter->getItems($orderId, ReceiptSubType::PRE);
