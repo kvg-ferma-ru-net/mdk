@@ -40,9 +40,17 @@ class PipelineBase implements PipelineInterface
             try{
                 $receipt = $this->transfer->getReceipt($receipt);
             }
-            catch(TransferException $e){}
+            catch(TransferException $e){
 
-			$this->receiptStorage->save($receipt);
+                // если чека с таким uuid нет на сервере, тогда заканчиваем работу цикла (не проверяем статус чека для обрыва цикла)
+                if($e->getCode() == 404)
+                    continue;
+            }
+            finally{
+                // в любом случае сохраняем чек
+                $this->receiptStorage->save($receipt);
+            }
+			
 
             /* 
                 если чек необходимо повторно отправить или сервер ответил 500-ыми ошибками -

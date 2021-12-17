@@ -56,7 +56,7 @@ class PipelineBaseFakeTest extends TestCase
      * @covers Innokassa\MDK\Services\PipelineBase::__construct
      * @covers Innokassa\MDK\Services\PipelineBase::updateAccepted
      */
-    public function testUpdateAcceptedSuccess()
+    public function testUpdateAcceptedSuccess200()
     {
         $receipts = new ReceiptCollection();
         $receipts[] = new Receipt();
@@ -82,6 +82,46 @@ class PipelineBaseFakeTest extends TestCase
 
         $this->assertSame(ReceiptStatus::COMPLETED, $receipts[0]->getStatus()->getCode());
         $this->assertSame(ReceiptStatus::COMPLETED, $receipts[1]->getStatus()->getCode());
+    }
+
+    /**
+     * @covers Innokassa\MDK\Services\PipelineBase::__construct
+     * @covers Innokassa\MDK\Services\PipelineBase::updateAccepted
+     */
+    public function testUpdateAcceptedSuccess404()
+    {
+        $receipts = new ReceiptCollection();
+        $receipts[] = new Receipt();
+        $receipts[] = new Receipt();
+        $this->storage
+            ->method('getCollection')
+            ->will($this->onConsecutiveCalls($receipts, new ReceiptCollection()));
+        $this->storage
+            ->expects($this->exactly(2))
+            ->method('save')
+            ->withConsecutive(
+                [$this->identicalTo($receipts[0])],
+                [$this->identicalTo($receipts[1])]
+            );
+
+        $this->client->method('read')
+            ->will($this->returnValueMap([
+                [NetClientInterface::BODY, '{}'],
+                [NetClientInterface::CODE, 404]
+            ]));
+
+        $transfer = new Transfer(
+            $this->client, 
+            $this->converter, 
+            TEST_ACTOR_ID, 
+            TEST_ACTOR_TOKEN, 
+            TEST_CASHBOX_WITHOUT_AGENT
+        );
+        $pipeline = new PipelineBase($this->storage, $transfer);
+        $pipeline->updateAccepted();
+
+        $this->assertSame(ReceiptStatus::REPEAT, $receipts[0]->getStatus()->getCode());
+        $this->assertSame(ReceiptStatus::REPEAT, $receipts[1]->getStatus()->getCode());
     }
 
     /**
