@@ -242,6 +242,30 @@ class AutomaticBaseFakeTest extends TestCase
         $this->assertInstanceOf(Receipt::class, $receipt);
     }
 
+    /**
+     * @covers Innokassa\MDK\Services\AutomaticBase::__construct
+     * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
+     * @covers Innokassa\MDK\Services\ServiceBaseAbstract::fiscalizeProc
+     */
+    public function testFiscalizeSuccessServerError()
+    {
+        $this->settings->method('getOnly2')
+            ->willReturn(false);
+
+        $this->storage
+            ->method('getCollection')
+            ->willReturn(new ReceiptCollection());
+
+        $this->transfer
+            ->method('sendReceipt')
+            ->will($this->throwException(new TransferException('', 500)));
+
+        $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
+
+        $receipt = $automatic->fiscalize('0');
+        $this->assertInstanceOf(Receipt::class, $receipt);
+    }
+
     //######################################################################
 
     /**

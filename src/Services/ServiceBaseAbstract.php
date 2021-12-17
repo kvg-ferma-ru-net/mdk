@@ -30,10 +30,21 @@ abstract class ServiceBaseAbstract
                 break;
             }
             catch(TransferException $e){
+
+                // если чек с таким uuid уже есть - устанавливаем новый
                 if($e->getCode() == 409)
                     $receipt->setUUID(new UUID());
+
+                // если чек с ошибками - прокидываем исключение
                 else if((new ReceiptStatus($e->getCode()))->getCode() == ReceiptStatus::ERROR)
                     throw $e;
+
+                /* иначе ситуации:
+                    - чек имет статус REPEAT или ASSUME
+                    - связь с сервером не удалась
+                */
+                else
+                    break;
             }
         }
     }
