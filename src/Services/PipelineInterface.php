@@ -8,16 +8,16 @@ namespace Innokassa\MDK\Services;
 interface PipelineInterface
 {
     /**
-     * Обновление статуса чеков, которые были приняты сервером (ReceiptStatus::WAIT | ReceiptStatus::ASSUME), но еще не пробились
+     * Обновление статуса чеков, которые были приняты сервером (WAIT | ASSUME), но еще не пробились
      *
-     * @return void
+     * @return bool
      */
-    public function updateAccepted();
+    public function updateAccepted(): bool;
 
     /**
-     * Повторная отправка на фискализацию чеков, которые не были приняты сервером по причинам отказа доступа
+     * Повторная отправка на фискализацию чеков, которые не были приняты сервером по причинам отказа доступа или связи с сервером не было
      *
-     * @return void
+     * @return bool
      */
-    public function updateUnaccepted();
+    public function updateUnaccepted(): bool;
 };
