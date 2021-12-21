@@ -22,6 +22,7 @@ class BaseCollectionTest extends TestCase
      * @covers Innokassa\MDK\Collections\BaseCollection::current
      * @covers Innokassa\MDK\Collections\BaseCollection::rewind
      * @covers Innokassa\MDK\Collections\BaseCollection::next
+     * @covers Innokassa\MDK\Collections\BaseCollection::shuffle
      */
     public function test()
     {
@@ -63,5 +64,8 @@ class BaseCollectionTest extends TestCase
         $this->assertSame(0, $collection->key());
         $this->assertTrue($collection->valid());
         $this->assertSame('str1', $collection->current());
+
+        $this->assertTrue($collection->shuffle());
+        $this->assertSame(2, $collection->count());
     }
 };
