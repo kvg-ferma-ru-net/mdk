@@ -13,6 +13,7 @@ use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 class ReceiptFilterTest extends TestCase
 {
     /**
+     * @covers Innokassa\MDK\Storage\ReceiptFilter::setId
      * @covers Innokassa\MDK\Storage\ReceiptFilter::setType
      * @covers Innokassa\MDK\Storage\ReceiptFilter::setSubType
      * @covers Innokassa\MDK\Storage\ReceiptFilter::setStatus
@@ -25,22 +26,42 @@ class ReceiptFilterTest extends TestCase
         $filter->setType(ReceiptType::COMING);
         $this->assertSame(
             [
-                'type' => ReceiptType::COMING,
+                'type' => [
+                    'value' => ReceiptType::COMING,
+                    'op' => ReceiptFilter::OP_EQ
+                ]
             ],
             $filter->toArray()
         );
 
         $filter = new ReceiptFilter();
-        $filter->setType(ReceiptType::COMING);
-        $filter->setSubType(ReceiptSubType::FULL);
-        $filter->setStatus(ReceiptStatus::COMPLETED);
+        $filter->setType(ReceiptType::COMING, ReceiptFilter::OP_GT);
+        $filter->setSubType(ReceiptSubType::FULL, ReceiptFilter::OP_LT);
+        $filter->setStatus(ReceiptStatus::COMPLETED, ReceiptFilter::OP_NOTEQ);
         $filter->setOrderId('0');
-        $this->assertSame(
+        $filter->setId('0', ReceiptFilter::OP_GT);
+        $this->assertEquals(
             [
-                'type' => ReceiptType::COMING,
-                'subType' => ReceiptSubType::FULL,
-                'status' => ReceiptStatus::COMPLETED,
-                'orderId' => '0'
+                'type' => [
+                    'value' => ReceiptType::COMING,
+                    'op' => ReceiptFilter::OP_GT
+                ],
+                'subType' => [
+                    'value' => ReceiptSubType::FULL,
+                    'op' => ReceiptFilter::OP_LT
+                ],
+                'status' => [
+                    'value' => ReceiptStatus::COMPLETED,
+                    'op' => ReceiptFilter::OP_NOTEQ
+                ],
+                'orderId' => [
+                    'value' => '0',
+                    'op' => ReceiptFilter::OP_EQ
+                ],
+                'id' => [
+                    'value' => '0',
+                    'op' => ReceiptFilter::OP_GT
+                ]
             ],
             $filter->toArray()
         );

@@ -39,7 +39,8 @@ interface ReceiptStorageInterface
      * @throws StorageException
      *
      * @param ReceiptFilter $filter
+     * @param int $limit
      * @return ReceiptCollection
      */
-    public function getCollection(ReceiptFilter $filter): ReceiptCollection;
+    public function getCollection(ReceiptFilter $filter, int $limit=0): ReceiptCollection;
 };

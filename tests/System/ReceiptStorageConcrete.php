@@ -41,16 +41,20 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
         return $this->conv->receiptFromArray($a);
     }
 
-    public function getCollection(ReceiptFilter $filter): ReceiptCollection
+    public function getCollection(ReceiptFilter $filter, int $limit=0): ReceiptCollection
     {
         $aWhere = $filter->toArray();
         $aWhere2 = [];
         foreach($aWhere as $key => $value)
-            $aWhere2[] = "$key='$value'";
+        {
+            $val = $value['value'];
+            $op = $value['op'];
+            $aWhere2[] = "{$key}{$op}'{$val}'";
+        }
 
         $where = implode(' AND ', $aWhere2);
 
-        $a = $this->selectArray($where);
+        $a = $this->selectArray($where, $limit);
         $receipts = new ReceiptCollection();
 
         foreach($a as $aReceipt)
@@ -109,9 +113,11 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
         return $this->db->query($sql, true)[0];
     }
 
-    private function selectArray(string $where): array
+    private function selectArray(string $where, int $limit): array
     {
         $sql = "SELECT * FROM `receipts` WHERE $where";
+        if($limit > 0)
+            $sql .= " LIMIT $limit";
         return $this->db->query($sql, true);
     }
 };
