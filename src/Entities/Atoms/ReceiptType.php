@@ -53,6 +53,9 @@ class ReceiptType extends AtomAbstract
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     static public function all(): array
     {
         $a = [];

@@ -4,7 +4,7 @@ use Innokassa\MDK\Client;
 
 use Innokassa\MDK\Net\Transfer;
 use PHPUnit\Framework\TestCase;
-use Innokassa\MDK\Net\ConverterV2;
+use Innokassa\MDK\Net\ConverterApi;
 use Innokassa\MDK\Net\NetClientCurl;
 use Innokassa\MDK\Services\ManualBase;
 use Innokassa\MDK\Services\PrinterBase;
@@ -45,7 +45,7 @@ class ClientTest extends TestCase
         $storage = $this->createMock(ReceiptStorageInterface::class);
         $adapter = $this->createMock(ReceiptAdapterInterface::class);
 
-        $transfer = new Transfer(new NetClientCurl(), new ConverterV2(), '0', '0', '0');
+        $transfer = new Transfer(new NetClientCurl(), new ConverterApi(), '0', '0', '0');
 
         $automatic = new AutomaticBase($settings, $storage, $transfer, $adapter);
         $manual = new ManualBase($storage, $transfer, $settings);

@@ -6,7 +6,7 @@ use Innokassa\MDK\Entities\UUID;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Entities\ReceiptItem;
 
-use Innokassa\MDK\Storage\ConverterBase;
+use Innokassa\MDK\Storage\ConverterStorage;
 use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\Primitives\Amount;
@@ -18,7 +18,7 @@ use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Exceptions\ConverterException;
 
 /**
- * @uses Innokassa\MDK\Storage\ConverterBase
+ * @uses Innokassa\MDK\Storage\ConverterStorage
  * @uses Innokassa\MDK\Entities\Primitives\Notify
  * @uses Innokassa\MDK\Collections\BaseCollection
  * @uses Innokassa\MDK\Entities\AtomAbstract
@@ -36,14 +36,14 @@ use Innokassa\MDK\Exceptions\ConverterException;
  * @uses Innokassa\MDK\Entities\UUID
  * @uses Innokassa\MDK\Entities\Primitives\Customer
  */
-class ConverterBaseTest extends TestCase
+class ConverterStorageTest extends TestCase
 {
     /**
-     * @covers Innokassa\MDK\Storage\ConverterBase::receiptToArray
+     * @covers Innokassa\MDK\Storage\ConverterStorage::receiptToArray
      */
     public function testReceiptToArray()
     {
-        $conv = new ConverterBase();
+        $conv = new ConverterStorage();
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -99,11 +99,11 @@ class ConverterBaseTest extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Storage\ConverterBase::receiptToArray
+     * @covers Innokassa\MDK\Storage\ConverterStorage::receiptToArray
      */
     public function testReceiptToArrayFailItems()
     {
-        $conv = new ConverterBase();
+        $conv = new ConverterStorage();
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -118,11 +118,11 @@ class ConverterBaseTest extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Storage\ConverterBase::receiptToArray
+     * @covers Innokassa\MDK\Storage\ConverterStorage::receiptToArray
      */
     public function testReceiptToArrayFailTaxation()
     {
-        $conv = new ConverterBase();
+        $conv = new ConverterStorage();
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -141,11 +141,11 @@ class ConverterBaseTest extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Storage\ConverterBase::receiptToArray
+     * @covers Innokassa\MDK\Storage\ConverterStorage::receiptToArray
      */
     public function testReceiptToArrayFailAmount()
     {
-        $conv = new ConverterBase();
+        $conv = new ConverterStorage();
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -164,11 +164,11 @@ class ConverterBaseTest extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Storage\ConverterBase::receiptToArray
+     * @covers Innokassa\MDK\Storage\ConverterStorage::receiptToArray
      */
     public function testReceiptToArrayFailNotify()
     {
-        $conv = new ConverterBase();
+        $conv = new ConverterStorage();
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -187,11 +187,11 @@ class ConverterBaseTest extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Storage\ConverterBase::receiptToArray
+     * @covers Innokassa\MDK\Storage\ConverterStorage::receiptToArray
      */
     public function testReceiptToArrayFailLocation()
     {
-        $conv = new ConverterBase();
+        $conv = new ConverterStorage();
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -212,11 +212,11 @@ class ConverterBaseTest extends TestCase
     //**********************************************************************
 
     /**
-     * @covers Innokassa\MDK\Storage\ConverterBase::receiptFromArray
+     * @covers Innokassa\MDK\Storage\ConverterStorage::receiptFromArray
      */
     public function testReceiptFromArray()
     {
-        $conv = new ConverterBase();
+        $conv = new ConverterStorage();
         $uuid = new UUID();
         $a = [
             'id' => 0,
@@ -267,21 +267,21 @@ class ConverterBaseTest extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Storage\ConverterBase::receiptFromArray
+     * @covers Innokassa\MDK\Storage\ConverterStorage::receiptFromArray
      */
     public function testReceiptFromArrayFailEmpty()
     {
         $this->expectException(ConverterException::class);
-        $conv = new ConverterBase();
+        $conv = new ConverterStorage();
         $conv->receiptFromArray([]);
     }
 
     /**
-     * @covers Innokassa\MDK\Storage\ConverterBase::receiptFromArray
+     * @covers Innokassa\MDK\Storage\ConverterStorage::receiptFromArray
      */
     public function testReceiptFromArrayFailPartial()
     {
-        $conv = new ConverterBase();
+        $conv = new ConverterStorage();
 
         $a = [
             'id' => 0,
@@ -298,11 +298,11 @@ class ConverterBaseTest extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Storage\ConverterBase::receiptFromArray
+     * @covers Innokassa\MDK\Storage\ConverterStorage::receiptFromArray
      */
     public function testReceiptFromArrayFailInvalid()
     {
-        $conv = new ConverterBase();
+        $conv = new ConverterStorage();
         $a = [
             'id' => 0,
             'uuid' => '',

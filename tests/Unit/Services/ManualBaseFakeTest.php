@@ -38,7 +38,7 @@ use Innokassa\MDK\Exceptions\Services\ManualException;
  * @uses Innokassa\MDK\Entities\Atoms\Taxation
  * @uses Innokassa\MDK\Entities\Atoms\Vat
  * @uses Innokassa\MDK\Storage\ReceiptFilter
- * @uses Innokassa\MDK\Services\ServiceBaseAbstract
+ * @uses Innokassa\MDK\Services\FiscalizationBaseAbstract
  * @uses Innokassa\MDK\Exceptions\TransferException
  */
 class ManualBaseFakeTest extends TestCase

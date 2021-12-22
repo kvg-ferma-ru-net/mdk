@@ -22,10 +22,15 @@ interface ManualInterface
      * @param string $orderId
      * @param ReceiptItemCollection $items
      * @param Notify $notify
-     * @param Amount $amount
+     * @param Amount|null $amount для конкретизации сумм расчета, либо null и вся сумма будет Amount::CASHLESS
      * @return Receipt
      */
-    public function fiscalize(string $orderId, ReceiptItemCollection $items, Notify $notify, Amount $amount=null): Receipt;
+    public function fiscalize(
+        string $orderId, 
+        ReceiptItemCollection $items, 
+        Notify $notify, 
+        Amount $amount=null
+    ): Receipt;
 
     /**
      * Фискализация возврата по заказу
@@ -38,8 +43,13 @@ interface ManualInterface
      * @param string $orderId
      * @param ReceiptItemCollection $items
      * @param Notify $notify
-     * @param Amount $amount
-     * @return ReceiptInterface
+     * @param Amount|null $amount для конкретизации сумм расчета, либо null и вся сумма будет Amount::CASHLESS
+     * @return Receipt
      */
-    public function refund(string $orderId, ReceiptItemCollection $items, Notify $notify, Amount $amount=null): Receipt;
+    public function refund(
+        string $orderId, 
+        ReceiptItemCollection $items, 
+        Notify $notify, 
+        Amount $amount=null
+    ): Receipt;
 };

@@ -8,11 +8,9 @@ use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
-
-use Innokassa\MDK\Services\ServiceBaseAbstract;
+use Innokassa\MDK\Services\FiscalizationBaseAbstract;
 use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Settings\SettingsInterface;
-
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Storage\ReceiptFilter;
 
@@ -22,7 +20,7 @@ use Innokassa\MDK\Exceptions\Services\ManualException;
 /**
  * Базовая реализация ManualInterface
  */
-class ManualBase extends ServiceBaseAbstract implements ManualInterface
+class ManualBase extends FiscalizationBaseAbstract implements ManualInterface
 {
     public function __construct(
         ReceiptStorageInterface $receiptStorage, 
@@ -56,10 +54,12 @@ class ManualBase extends ServiceBaseAbstract implements ManualInterface
                 ->setOrderId($orderId);
         $receipt = $this->supplementReceipt($receipt);
 
-        try{
+        try
+        {
             $this->fiscalizeProc($receipt);
         }
-        catch(TransferException $e){
+        catch(TransferException $e)
+        {
             throw new ManualException($e->getMessage(), $e->getCode());
         }
         
@@ -107,10 +107,12 @@ class ManualBase extends ServiceBaseAbstract implements ManualInterface
         if($amountNewRefund > $amountBalance)
             throw new ManualException("Cумма нового возврата '$amountNewRefund' превышает остаток по заказу '$amountBalance'");
 
-        try{
+        try
+        {
             $this->fiscalizeProc($receipt);
         }
-        catch(TransferException $e){
+        catch(TransferException $e)
+        {
             throw new ManualException($e->getMessage(), $e->getCode());
         }
         

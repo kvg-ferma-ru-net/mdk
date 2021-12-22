@@ -7,15 +7,18 @@ namespace Innokassa\MDK\Storage;
  */
 class ReceiptFilter
 {
-    const OP_EQ = '=';
-    const OP_NOTEQ = '!=';
-    const OP_GT = '>';
-    const OP_LT = '<';
+    const OP_EQ     = '=';
+    const OP_NOTEQ  = '!=';
+    const OP_GT     = '>';
+    const OP_LT     = '<';
+
+    //######################################################################
 
     /**
      * Установить id чека
      *
      * @param integer $id локальный id чека
+     * @param string $op операция сравнения
      * @return self
      */
     public function setId(int $id, string $op=self::OP_EQ): self
@@ -31,6 +34,7 @@ class ReceiptFilter
      * Установить тип чека
      *
      * @param integer $type из констант ReceiptType
+     * @param string $op операция сравнения
      * @return self
      */
     public function setType(int $type, string $op=self::OP_EQ): self
@@ -46,6 +50,7 @@ class ReceiptFilter
      * Установить подтип чека
      *
      * @param integer $subType из констант ReceiptSubType
+     * @param string $op операция сравнения
      * @return self
      */
     public function setSubType(int $subType, string $op=self::OP_EQ): self
@@ -61,6 +66,7 @@ class ReceiptFilter
      * Установить статус чека
      *
      * @param integer $status из констант ReceiptStatus
+     * @param string $op операция сравнения
      * @return self
      */
     public function setStatus(int $status, string $op=self::OP_EQ): self
@@ -76,6 +82,7 @@ class ReceiptFilter
      * Установить идентификатор заказа
      *
      * @param string $orderId
+     * @param string $op операция сравнения
      * @return self
      */
     public function setOrderId(string $orderId, string $op=self::OP_EQ): self

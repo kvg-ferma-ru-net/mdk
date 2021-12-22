@@ -42,7 +42,7 @@ interface NetClientInterface
     /**
      * Отправка данных
      *
-     * @throws NetConnectException проблемы соединения с сервером либо с настройками http запроса
+     * @throws NetConnectException проблемы соединения с сервером либо с настройками запроса
      * @return self
      */
     public function send(): self;

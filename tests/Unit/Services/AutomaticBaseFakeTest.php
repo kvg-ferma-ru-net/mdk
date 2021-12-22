@@ -42,7 +42,7 @@ use Innokassa\MDK\Exceptions\Services\AutomaticException;
  * @uses Innokassa\MDK\Entities\Atoms\Vat
  * @uses Innokassa\MDK\Storage\ReceiptFilter
  * @uses Innokassa\MDK\Entities\Primitives\Customer
- * @uses Innokassa\MDK\Services\ServiceBaseAbstract
+ * @uses Innokassa\MDK\Services\FiscalizationBaseAbstract
  * @uses Innokassa\MDK\Exceptions\TransferException
  */
 class AutomaticBaseFakeTest extends TestCase
@@ -216,7 +216,7 @@ class AutomaticBaseFakeTest extends TestCase
     /**
      * @covers Innokassa\MDK\Services\AutomaticBase::__construct
      * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
-     * @covers Innokassa\MDK\Services\ServiceBaseAbstract::fiscalizeProc
+     * @covers Innokassa\MDK\Services\FiscalizationBaseAbstract::fiscalizeProc
      */
     public function testFiscalizeSuccessNotUniqUUID()
     {
@@ -245,7 +245,7 @@ class AutomaticBaseFakeTest extends TestCase
     /**
      * @covers Innokassa\MDK\Services\AutomaticBase::__construct
      * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
-     * @covers Innokassa\MDK\Services\ServiceBaseAbstract::fiscalizeProc
+     * @covers Innokassa\MDK\Services\FiscalizationBaseAbstract::fiscalizeProc
      */
     public function testFiscalizeSuccessServerError()
     {
@@ -271,7 +271,7 @@ class AutomaticBaseFakeTest extends TestCase
     /**
      * @covers Innokassa\MDK\Services\AutomaticBase::__construct
      * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
-     * @covers Innokassa\MDK\Services\ServiceBaseAbstract::fiscalizeProc
+     * @covers Innokassa\MDK\Services\FiscalizationBaseAbstract::fiscalizeProc
      */
     public function testFiscalizeFailReceipt()
     {

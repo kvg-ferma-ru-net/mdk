@@ -14,7 +14,7 @@ class UUID
     public function __construct(string $uuid=null)
     {
         if($uuid !== null)
-        {//c2b5df2d9ab5444d9fcd26b42e2a53e3
+        {
             if(!preg_match("/([a-fA-F0-9]){32}/", $uuid))
                 throw new InvalidArgumentException("invalid uuid '$uuid'");
 
@@ -34,7 +34,7 @@ class UUID
     }
 
     /**
-     * Строковое представление
+     * Получить строковое представление
      *
      * @return string
      */

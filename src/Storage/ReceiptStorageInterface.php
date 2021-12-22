@@ -17,7 +17,7 @@ interface ReceiptStorageInterface
      * @throws StorageException
      *
      * @param Receipt $receipt
-     * @return int
+     * @return int идентификатор в хранилище
      */
     public function save(Receipt $receipt): int;
 
@@ -39,7 +39,7 @@ interface ReceiptStorageInterface
      * @throws StorageException
      *
      * @param ReceiptFilter $filter
-     * @param int $limit
+     * @param int $limit лимит выборки, 0 - нет лимита
      * @return ReceiptCollection
      */
     public function getCollection(ReceiptFilter $filter, int $limit=0): ReceiptCollection;

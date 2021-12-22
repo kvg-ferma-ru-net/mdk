@@ -6,14 +6,11 @@ use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Entities\Atoms\Vat;
 use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
-use Innokassa\MDK\Entities\Atoms\PaymentMethod;
 use Innokassa\MDK\Entities\Primitives\Customer;
-
-use Innokassa\MDK\Exceptions\ConverterException;
-
-use Innokassa\MDK\Entities\Atoms\ReceiptItemType;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
+
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
+use Innokassa\MDK\Exceptions\ConverterException;
 
 /**
  * Интерфейс конвертера сущностей в массив и обратно
@@ -65,7 +62,7 @@ abstract class ConverterAbstract
     }
 
     /**
-     * array => ReceiptITemCollection
+     * array => ReceiptItemCollection
      * 
      * @throws ConverterException
      *
@@ -130,7 +127,8 @@ abstract class ConverterAbstract
         if($diff = array_diff($requiredFields, array_keys($a)))
             throw new ConverterException('not complete array for create receipt item, lacks fields ['.implode(', ',$diff).']');
 
-        try{
+        try
+        {
             $item = new ReceiptItem();
             $item
                 ->setType($a['type'])
@@ -141,7 +139,8 @@ abstract class ConverterAbstract
                 ->setPaymentMethod($a['payment_method'])
                 ->setVat(new Vat($a['vat']));
         }
-        catch(InvalidArgumentException $e){
+        catch(InvalidArgumentException $e)
+        {
             throw new ConverterException($e->getMessage());
         }
         
@@ -205,14 +204,16 @@ abstract class ConverterAbstract
             'barter' => Amount::BARTER
         ];
         
-        try{
+        try
+        {
             foreach($fields as $field => $const)
             {
                 if(isset($a[$field]))
                     $amount->set($const, $a[$field]);
             }
         }
-        catch(InvalidArgumentException $e){
+        catch(InvalidArgumentException $e)
+        {
             throw new ConverterException('invalid array => amount: '.$e->getMessage());
         }
 
@@ -258,14 +259,16 @@ abstract class ConverterAbstract
     {
         $notify = new Notify();
 
-        try{
+        try
+        {
             if(isset($a['email']))
                 $notify->setEmail($a['email']);
 
             if(isset($a['phone']))
                 $notify->setPhone($a['phone']);
         }
-        catch(InvalidArgumentException $e){
+        catch(InvalidArgumentException $e)
+        {
             throw new ConverterException($e->getMessage());
         }
 
@@ -315,7 +318,8 @@ abstract class ConverterAbstract
         if(!isset($a['name']) && !isset($a['tin']))
             throw new ConverterException('invalid array => customer');
 
-        try{
+        try
+        {
             $customer = new Customer();
 
             if(isset($a['name']))
@@ -324,7 +328,8 @@ abstract class ConverterAbstract
             if(isset($a['tin']))
                 $customer->setTin($a['tin']);
         }
-        catch(InvalidArgumentException $e){
+        catch(InvalidArgumentException $e)
+        {
             throw new ConverterException($e->getMessage());
         }
 

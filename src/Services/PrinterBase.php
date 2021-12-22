@@ -3,11 +3,11 @@
 namespace Innokassa\MDK\Services;
 
 use Innokassa\MDK\Entities\Receipt;
+use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Services\PrinterInterface;
-use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
-
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
+
 use Innokassa\MDK\Exceptions\Services\PrinterException;
 
 /**

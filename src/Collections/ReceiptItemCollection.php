@@ -3,12 +3,12 @@
 namespace Innokassa\MDK\Collections;
 
 /**
- * Коллекция позиций заказа
+ * Коллекция позиций чека
  */
 class ReceiptItemCollection extends BaseCollection
 {
     /**
-     * Получить общую сумму за все позиции
+     * Получить общую сумму всех позиции
      *
      * @return float
      */

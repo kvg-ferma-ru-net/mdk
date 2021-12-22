@@ -8,14 +8,14 @@ use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
 
 /**
- * Адаптер чеков, реализуется на стороне конкретной интеграции
+ * Адаптер чеков из заказов, реализуется на стороне конкретной интеграции
  */
 interface ReceiptAdapterInterface
 {
     /**
      * Получить коллекцию позиций заказа
      * 
-     * @throws InvalidArgumentException если неверный $subType
+     * @throws InvalidArgumentException
      *
      * @param string $orderId
      * @param int $subType подтип создаваемого чека (ReceiptSubType::PRE || ReceiptSubType::FULL)
@@ -26,7 +26,7 @@ interface ReceiptAdapterInterface
     /**
      * Получить данные об оплате
      * 
-     * @throws InvalidArgumentException если неверный $subType
+     * @throws InvalidArgumentException
      *
      * @param string $orderId
      * @param int $subType подтип создаваемого чека (ReceiptSubType::PRE || ReceiptSubType::FULL)

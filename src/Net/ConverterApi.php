@@ -9,11 +9,11 @@ use Innokassa\MDK\Entities\Primitives\Notify;
 use Innokassa\MDK\Exceptions\ConverterException;
 
 /**
- * Реализация интерфейса ConverterAbstract для Pangaea v2 
+ * Реализация интерфейса ConverterAbstract для Pangaea API v2 
  * 
  * @link https://api.kassavoblake.com/v2/docs/pangaea_api.html
  */
-class ConverterV2 extends ConverterAbstract
+class ConverterApi extends ConverterAbstract
 {
     /**
      * @inheritDoc
@@ -62,6 +62,9 @@ class ConverterV2 extends ConverterAbstract
 
     //######################################################################
 
+    /**
+     * @inheritDoc
+     */
     public function notifyToArray(Notify $notify): array
     {
         $a = [];
@@ -84,6 +87,9 @@ class ConverterV2 extends ConverterAbstract
         return $a;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function notifyFromArray(array $a): Notify
     {
         throw new ConverterException('unsuported '.__CLASS__.'::'.__METHOD__);

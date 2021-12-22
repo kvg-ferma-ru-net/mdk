@@ -96,7 +96,7 @@ class ReceiptStatus extends AtomAbstract
             $this->name = 'Ошибка авторизации, помещен в отложенную очередь';
         }
 
-        // [400, 500) - ошибки, повторять фискализировать дальше нельзя
+        // [400, 500) - ошибки, повторять фискализизацию с такими же данными нельзя
         else
         {
             $this->code = self::ERROR;
@@ -104,6 +104,9 @@ class ReceiptStatus extends AtomAbstract
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     static public function all(): array
     {
         $a = [];

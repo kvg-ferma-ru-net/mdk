@@ -85,6 +85,9 @@ class Vat extends AtomAbstract
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     static public function all(): array
     {
         $a = [];

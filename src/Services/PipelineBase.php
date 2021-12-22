@@ -4,11 +4,11 @@ namespace Innokassa\MDK\Services;
 
 use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Storage\ReceiptFilter;
-use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
-use Innokassa\MDK\Exceptions\TransferException;
-
-use Innokassa\MDK\Collections\ReceiptCollection;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
+use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
+use Innokassa\MDK\Collections\ReceiptCollection;
+
+use Innokassa\MDK\Exceptions\TransferException;
 
 /**
  * Базовая реализация PipelineInterface.
@@ -17,10 +17,10 @@ use Innokassa\MDK\Storage\ReceiptStorageInterface;
 class PipelineBase implements PipelineInterface
 {
     /** Лок файл для обработки очереди принятых чеков */
-    const LOCK_FILE_ACCEPTED = '../../.updateAccepted';
+    const LOCK_FILE_ACCEPTED = __DIR__.'/../../.updateAccepted';
 
     /** Лок файл для обработки непринятых чеков */
-    const LOCK_FILE_UNACCEPTED = '../../.updateUnaccepted';
+    const LOCK_FILE_UNACCEPTED = __DIR__.'/../../.updateUnaccepted';
 
     /** Максимальное количество последовательных вызовов, при превышении которого обработка прервется */
     const MAX_COUNT_ERR = 10;

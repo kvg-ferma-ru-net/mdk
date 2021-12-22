@@ -4,16 +4,16 @@ namespace Innokassa\MDK\Storage;
 
 use Innokassa\MDK\Entities\UUID;
 use Innokassa\MDK\Entities\Receipt;
-
 use Innokassa\MDK\Entities\ConverterAbstract;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
+
 use Innokassa\MDK\Exceptions\ConverterException;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
  * Базовая реализация интерфейса для хранилища (БД) 
  */
-class ConverterBase extends ConverterAbstract
+class ConverterStorage extends ConverterAbstract
 {
     /**
      * @inheritDoc
@@ -87,9 +87,9 @@ class ConverterBase extends ConverterAbstract
         if($diff = array_diff($fields, array_keys($a)))
             throw new ConverterException('not complete array for create receipt, lacks fields ['.implode(', ',$diff).']');
 
-        try{
+        try
+        {
             $receipt = new Receipt();
-            
             $receipt
                 ->setId($a['id'])
                 ->setUUID(new UUID($a['uuid']))
@@ -108,7 +108,8 @@ class ConverterBase extends ConverterAbstract
             if(isset($a['customer']))
                 $receipt->setCustomer($this->customerFromArray($a['customer']));
         }
-        catch(InvalidArgumentException $e){
+        catch(InvalidArgumentException $e)
+        {
             throw new ConverterException($e->getMessage());
         }
 

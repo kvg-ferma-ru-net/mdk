@@ -4,6 +4,9 @@ namespace Innokassa\MDK\Net;
 
 use Innokassa\MDK\Exceptions\NetConnectException;
 
+/**
+ * Реаизация NetClientInterface с использованием curl
+ */
 class NetClientCurl implements NetClientInterface
 {
     public function __construct()
@@ -16,6 +19,9 @@ class NetClientCurl implements NetClientInterface
         curl_close($this->curl);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function write(int $code, $data): NetClientInterface
     {
         switch($code)
@@ -39,6 +45,9 @@ class NetClientCurl implements NetClientInterface
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function send(): NetClientInterface
     {
         curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, 0);
@@ -56,6 +65,9 @@ class NetClientCurl implements NetClientInterface
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function read(int $code)
     {
         switch($code)
@@ -71,6 +83,9 @@ class NetClientCurl implements NetClientInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function reset(): NetClientInterface
     {
         curl_reset($this->curl);

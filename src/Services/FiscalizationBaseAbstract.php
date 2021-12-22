@@ -5,12 +5,13 @@ namespace Innokassa\MDK\Services;
 use Innokassa\MDK\Entities\UUID;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
+
 use Innokassa\MDK\Exceptions\TransferException;
 
 /**
- * Абстрактный сервис фискализации
+ * Базовый абстрактный класс фискализации
  */
-abstract class ServiceBaseAbstract
+abstract class FiscalizationBaseAbstract
 {
     /**
      * Процедура отправки нового чека.
@@ -25,12 +26,13 @@ abstract class ServiceBaseAbstract
     {
         for($i=0; $i<10; ++$i)
         {
-            try{
+            try
+            {
                 $receipt = $this->transfer->sendReceipt($receipt);
                 break;
             }
-            catch(TransferException $e){
-
+            catch(TransferException $e)
+            {
                 // если чек с таким uuid уже есть - устанавливаем новый
                 if($e->getCode() == 409)
                     $receipt->setUUID(new UUID());

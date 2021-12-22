@@ -18,14 +18,18 @@ class Notify
         if($value === null)
             return;
 
-        try{
+        try
+        {
             $this->setEmail($value);
-        } catch(InvalidArgumentException $e)
+        }
+        catch(InvalidArgumentException $e)
         {}
 
-        try{
+        try
+        {
             $this->setPhone($value);
-        } catch(InvalidArgumentException $e)
+        }
+        catch(InvalidArgumentException $e)
         {}
 
         if(!$this->email && !$this->phone)

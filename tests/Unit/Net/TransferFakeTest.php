@@ -128,10 +128,12 @@ class TransferFakeTest extends TestCase
         $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
         $receipt = new Receipt();
 
-        try{
+        try
+        {
             $transfer->getReceipt($receipt);
         }
-        catch(TransferException $e){
+        catch(TransferException $e)
+        {
             $this->assertEquals(18, $e->getCode());
             $this->assertEquals(ReceiptStatus::PREPARED, $receipt->getStatus()->getCode());
         }
@@ -152,10 +154,12 @@ class TransferFakeTest extends TestCase
         $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
         $receipt = new Receipt();
 
-        try{
+        try
+        {
             $transfer->getReceipt($receipt);
         }
-        catch(TransferException $e){
+        catch(TransferException $e)
+        {
             $this->assertEquals(401, $e->getCode());
             $this->assertEquals(ReceiptStatus::REPEAT, $receipt->getStatus()->getCode());
         }
@@ -220,10 +224,12 @@ class TransferFakeTest extends TestCase
         $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
         $receipt = new Receipt();
 
-        try{
+        try
+        {
             $transfer->sendReceipt($receipt, false);
         }
-        catch(TransferException $e){
+        catch(TransferException $e)
+        {
             $this->assertEquals(18, $e->getCode());
             $this->assertEquals(ReceiptStatus::PREPARED, $receipt->getStatus()->getCode());
         }
@@ -247,10 +253,12 @@ class TransferFakeTest extends TestCase
         $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
         $receipt = new Receipt();
 
-        try{
+        try
+        {
             $transfer->sendReceipt($receipt, false);
         }
-        catch(TransferException $e){
+        catch(TransferException $e)
+        {
             $this->assertEquals(401, $e->getCode());
             $this->assertEquals(ReceiptStatus::REPEAT, $receipt->getStatus()->getCode());
         }
@@ -268,10 +276,12 @@ class TransferFakeTest extends TestCase
         $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
         $receipt = new Receipt();
         
-        try{
+        try
+        {
             $transfer->sendReceipt($receipt, false);
         }
-        catch(TransferException $e){
+        catch(TransferException $e)
+        {
             $this->assertEquals(ReceiptStatus::ERROR, $e->getCode());
             $this->assertEquals(ReceiptStatus::ERROR, $receipt->getStatus()->getCode());
         }

@@ -5,7 +5,7 @@ namespace Innokassa\MDK\Net;
 use Innokassa\MDK\Entities\Receipt;
 
 /**
- * Трансфер чеков для Pangaea API 2 
+ * Трансфер для взаимодействия с сервером фискализации Pangaea API v2 
  * @link https://api.kassavoblake.com/v2/docs/pangaea_api.html
  */
 interface TransferInterface
@@ -29,9 +29,10 @@ interface TransferInterface
      * @throws TransferException
      * 
      * @param Receipt $receipt
+     * @param bool $needAgent нужно ли использовать агентский запрос, для этого касса должна быть агентской, а в позициях чека должны быть агентские данные
      * @return Receipt
      */
-    public function sendReceipt(Receipt $receipt, $needAgent=false): Receipt;
+    public function sendReceipt(Receipt $receipt, bool $needAgent=false): Receipt;
 
     /**
      * Получение информации о чеке

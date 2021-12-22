@@ -10,7 +10,7 @@ use Innokassa\MDK\Entities\Receipt;
 class ReceiptCollection extends BaseCollection
 {
     /**
-     * Получить общую сумму за все позиции всех чеков
+     * Получить общую сумму всех позиции всех чеков
      *
      * @return float
      */
@@ -24,7 +24,7 @@ class ReceiptCollection extends BaseCollection
     }
 
     /**
-     * Объединить коллекции
+     * Добавить данные из другой коллекции
      *
      * @param ReceiptCollection $collection
      * @return self
@@ -38,10 +38,11 @@ class ReceiptCollection extends BaseCollection
     /**
      * Получить чек по типу
      *
-     * @param string $typeReceipt тип чека из Receipt::TYPE_
-     * @return Receipt
+     * @param integer $typeReceipt тип чека из ReceiptType
+     * @param integer|null $subType подтип чека из ReceiptSubType
+     * @return Receipt|null
      */
-    public function getByType(string $typeReceipt, int $subType=null): ?Receipt
+    public function getByType(int $typeReceipt, int $subType=null): ?Receipt
     {
         foreach($this->objects as $key => $receipt)
         {

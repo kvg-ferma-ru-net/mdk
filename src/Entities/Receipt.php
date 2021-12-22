@@ -3,17 +3,14 @@
 namespace Innokassa\MDK\Entities;
 
 use Innokassa\MDK\Entities\UUID;
-
 use Innokassa\MDK\Entities\ReceiptItem;
+use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
+use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Entities\Atoms\Taxation;
-
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
-use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
-
 use Innokassa\MDK\Entities\Primitives\Customer;
-use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
 
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
@@ -23,9 +20,6 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
  */
 class Receipt
 {
-    /**
-     * @throws InvalidArgumentException
-     */
     public function __construct()
     {
         $this->uuid = new UUID();
@@ -111,7 +105,7 @@ class Receipt
     //**********************************************************************
 
     /**
-     * Установить идентификатор сайта
+     * Установить идентификатор сайта, если интеграция должна поддерживать мультисайтовость
      *
      * @param string $siteId
      * @return self

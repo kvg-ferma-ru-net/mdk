@@ -5,6 +5,7 @@ namespace Innokassa\MDK\Services;
 use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Settings\SettingsInterface;
+
 use Innokassa\MDK\Exceptions\SettingsException;
 use Innokassa\MDK\Exceptions\TransferException;
 
@@ -23,10 +24,12 @@ class ConnectorBase implements ConnectorInterface
      */
     public function testSettings(SettingsInterface $settings): bool
     {
-        try{
+        try
+        {
             $response = $this->transfer->getCashBox();
         }
-        catch(TransferException $e){
+        catch(TransferException $e)
+        {
             if($e->getCode() >= 500)
                 throw new SettingsException('Сервер временно недоступен, попробуйте позже', $e->getCode());
             else

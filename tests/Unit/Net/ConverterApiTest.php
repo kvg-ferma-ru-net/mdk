@@ -2,7 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-use Innokassa\MDK\Net\ConverterV2;
+use Innokassa\MDK\Net\ConverterApi;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Entities\ReceiptItem;
 
@@ -32,15 +32,15 @@ use Innokassa\MDK\Exceptions\ConverterException;
  * @uses Innokassa\MDK\Entities\UUID
  * @uses Innokassa\MDK\Entities\Primitives\Customer
  */
-class ConverterV2Test extends TestCase
+class ConverterApiTest extends TestCase
 {
     /**
-     * @covers Innokassa\MDK\Net\ConverterV2::receiptToArray
-     * @covers Innokassa\MDK\Net\ConverterV2::notifyToArray
+     * @covers Innokassa\MDK\Net\ConverterApi::receiptToArray
+     * @covers Innokassa\MDK\Net\ConverterApi::notifyToArray
      */
     public function testReceiptToArray()
     {
-        $conv = new ConverterV2();
+        $conv = new ConverterApi();
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -89,11 +89,11 @@ class ConverterV2Test extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Net\ConverterV2::receiptToArray
+     * @covers Innokassa\MDK\Net\ConverterApi::receiptToArray
      */
     public function testReceiptToArrayFailItems()
     {
-        $conv = new ConverterV2();
+        $conv = new ConverterApi();
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -108,11 +108,11 @@ class ConverterV2Test extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Net\ConverterV2::receiptToArray
+     * @covers Innokassa\MDK\Net\ConverterApi::receiptToArray
      */
     public function testReceiptToArrayFailTaxation()
     {
-        $conv = new ConverterV2();
+        $conv = new ConverterApi();
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -131,11 +131,11 @@ class ConverterV2Test extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Net\ConverterV2::receiptToArray
+     * @covers Innokassa\MDK\Net\ConverterApi::receiptToArray
      */
     public function testReceiptToArrayFailAmount()
     {
-        $conv = new ConverterV2();
+        $conv = new ConverterApi();
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -154,11 +154,11 @@ class ConverterV2Test extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Net\ConverterV2::receiptToArray
+     * @covers Innokassa\MDK\Net\ConverterApi::receiptToArray
      */
     public function testReceiptToArrayFailNotify()
     {
-        $conv = new ConverterV2();
+        $conv = new ConverterApi();
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -177,11 +177,11 @@ class ConverterV2Test extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Net\ConverterV2::receiptToArray
+     * @covers Innokassa\MDK\Net\ConverterApi::receiptToArray
      */
     public function testReceiptToArrayFailLocation()
     {
-        $conv = new ConverterV2();
+        $conv = new ConverterApi();
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -202,23 +202,23 @@ class ConverterV2Test extends TestCase
     //**********************************************************************
 
     /**
-     * @covers Innokassa\MDK\Net\ConverterV2::receiptFromArray
+     * @covers Innokassa\MDK\Net\ConverterApi::receiptFromArray
      */
     public function testReceiptFromArray()
     {
         $this->expectException(ConverterException::class);
-        $conv = new ConverterV2();
+        $conv = new ConverterApi();
         $conv->receiptFromArray([]);
     }
 
     //######################################################################
 
     /**
-     * @covers Innokassa\MDK\Net\ConverterV2::notifyToArray
+     * @covers Innokassa\MDK\Net\ConverterApi::notifyToArray
      */
     public function testNotifyToArray()
     {
-        $conv = new ConverterV2();
+        $conv = new ConverterApi();
         $notify = new Notify();
         $notify
             ->setEmail('box@domain.zone')
@@ -240,24 +240,24 @@ class ConverterV2Test extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Net\ConverterV2::notifyToArray
+     * @covers Innokassa\MDK\Net\ConverterApi::notifyToArray
      */
     public function testNotifyToArrayFail()
     {
         $this->expectException(ConverterException::class);
-        $conv = new ConverterV2();
+        $conv = new ConverterApi();
         $conv->notifyToArray(new Notify());
     }
 
     //**********************************************************************
 
     /**
-     * @covers Innokassa\MDK\Net\ConverterV2::notifyFromArray
+     * @covers Innokassa\MDK\Net\ConverterApi::notifyFromArray
      */
     public function testNotifyFromArray()
     {
         $this->expectException(ConverterException::class);
-        $conv = new ConverterV2();
+        $conv = new ConverterApi();
         $conv->notifyFromArray([]);
     }
 };

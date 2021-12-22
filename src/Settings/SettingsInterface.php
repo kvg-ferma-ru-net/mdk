@@ -50,13 +50,6 @@ interface SettingsInterface
     public function getOnly2(): bool;
 
     /**
-     * Является ли касса агентской
-     *
-     * @return boolean
-     */
-    public function getAgent(): bool;
-
-    /**
      * Получить произвольную настройку
      *
      * @param string $name название настройки

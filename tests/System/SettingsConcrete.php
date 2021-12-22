@@ -40,11 +40,6 @@ class SettingsConcrete implements SettingsInterface
         return boolval($this->get('only2'));
     }
 
-    public function getAgent(): bool
-    {
-        return boolval($this->get('agent'));
-    }
-
     public function get(string $name)
     {
         if(isset($this->aSettings[$name]) && strlen($this->aSettings[$name]) > 0)

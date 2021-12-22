@@ -30,7 +30,7 @@ class ReceiptSubType extends AtomAbstract
     {
         switch ($code) {
             case self::HAND:
-                $this->name = 'Чек создан вручную';
+                $this->name = 'Ручной';
                 $this->code = $code;
                 break;
             case self::PRE:
@@ -38,7 +38,7 @@ class ReceiptSubType extends AtomAbstract
                 $this->code = $code;
                 break;
             case self::FULL:
-                $this->name = 'Полный расчет';
+                $this->name = 'Расчет';
                 $this->code = $code;
                 break;
             default:
@@ -46,6 +46,9 @@ class ReceiptSubType extends AtomAbstract
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     static public function all(): array
     {
         $a = [];

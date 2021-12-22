@@ -10,9 +10,9 @@ use Innokassa\MDK\Settings\SettingsInterface;
 interface ConnectorInterface
 {
     /**
-     * Тестирование настроек модуля на соответствие данным кассы
+     * Тестирование соединения и настроек модуля на соответствие данным кассы
      *
-     * @throws SettingsExceptionв случае некорректности настроек
+     * @throws SettingsException
      * @return bool true в случае успеха
      */
     public function testSettings(SettingsInterface $settings): bool;

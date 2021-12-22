@@ -142,6 +142,9 @@ class ReceiptItemType extends AtomAbstract
         $this->code = $code;
     }
 
+    /**
+     * @inheritDoc
+     */
     static public function all(): array
     {
         $a = [];

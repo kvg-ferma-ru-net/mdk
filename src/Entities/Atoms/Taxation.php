@@ -7,7 +7,7 @@ use Innokassa\MDK\Entities\AtomAbstract;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
- * Тип чека
+ * Налогообложение
  */
 class Taxation extends AtomAbstract
 {
@@ -51,12 +51,15 @@ class Taxation extends AtomAbstract
                 $this->name = 'ПСН';
                 break;
             default:
-                throw new InvalidArgumentException("invalid receipt taxation '$code'");
+                throw new InvalidArgumentException("invalid taxation '$code'");
         }
         
         $this->code = $code;
     }
 
+    /**
+     * @inheritDoc
+     */
     static public function all(): array
     {
         $a = [];

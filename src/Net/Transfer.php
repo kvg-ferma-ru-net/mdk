@@ -2,10 +2,10 @@
 
 namespace Innokassa\MDK\Net;
 
-use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Net\NetClientInterface;
-use Innokassa\MDK\Entities\ConverterAbstract;
 
+use Innokassa\MDK\Entities\Receipt;
+use Innokassa\MDK\Entities\ConverterAbstract;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 
 use Innokassa\MDK\Exceptions\TransferException;
@@ -56,10 +56,12 @@ class Transfer implements TransferInterface
             ->write(NetClientInterface::PATH, self::API_URL."/c_groups/".$this->cashbox)
             ->write(NetClientInterface::HEAD, $this->headers);
 
-        try{
+        try
+        {
             $this->client->send();
         }
-        catch(NetConnectException $e){
+        catch(NetConnectException $e)
+        {
             throw new TransferException($e->getMessage(), $e->getCode());
         }
 
@@ -75,12 +77,14 @@ class Transfer implements TransferInterface
     /**
      * @inheritDoc
      */
-    public function sendReceipt(Receipt $receipt, $needAgent=false): Receipt
+    public function sendReceipt(Receipt $receipt, bool $needAgent=false): Receipt
     {
-        try{
+        try
+        {
             $body = $this->converter->receiptToArray($receipt);
         }
-        catch(ConverterException $e){
+        catch(ConverterException $e)
+        {
             $receipt->setStatus(new ReceiptStatus(ReceiptStatus::ERROR));
             throw new TransferException('converter error: '.$e->getMessage(), ReceiptStatus::ERROR);
         }
@@ -93,18 +97,18 @@ class Transfer implements TransferInterface
             ->write(NetClientInterface::TYPE, 'POST')
             ->write(NetClientInterface::BODY, json_encode($body, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP));
 
-        try{
+        try
+        {
             $this->client->send();
         }
-        catch(NetConnectException $e){
+        catch(NetConnectException $e)
+        {
             $receipt->setStatus(new ReceiptStatus(ReceiptStatus::PREPARED));
             throw new TransferException($e->getMessage(), $e->getCode());
         }
 
         $responseCode = $this->client->read(NetClientInterface::CODE);
         $responseBody = $this->client->read(NetClientInterface::BODY);
-
-        //print_r([$responseCode, $responseBody]);
 
         $receipt->setStatus(new ReceiptStatus($responseCode));
 
@@ -126,18 +130,18 @@ class Transfer implements TransferInterface
             ->write(NetClientInterface::PATH, self::API_URL."/c_groups/".$this->cashbox."/receipts/".$receipt->getUUID()->get())
             ->write(NetClientInterface::HEAD, $this->headers);
 
-        try{
+        try
+        {
             $this->client->send();
         }
-        catch(NetConnectException $e){
+        catch(NetConnectException $e)
+        {
             $receipt->setStatus(new ReceiptStatus(ReceiptStatus::PREPARED));
             throw new TransferException($e->getMessage(), $e->getCode());
         }
 
         $responseCode = $this->client->read(NetClientInterface::CODE);
         $responseBody = $this->client->read(NetClientInterface::BODY);
-
-        //print_r([$responseCode, $responseBody]);
 
         $receipt->setStatus(new ReceiptStatus($responseCode));
 

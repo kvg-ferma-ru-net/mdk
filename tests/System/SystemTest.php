@@ -3,14 +3,14 @@
 use Innokassa\MDK\Client;
 use Innokassa\MDK\Net\Transfer;
 use PHPUnit\Framework\TestCase;
-use Innokassa\MDK\Net\ConverterV2;
+use Innokassa\MDK\Net\ConverterApi;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Net\NetClientCurl;
 use Innokassa\MDK\Services\ManualBase;
 use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Services\PrinterBase;
 use Innokassa\MDK\Services\PipelineBase;
-use Innokassa\MDK\Storage\ConverterBase;
+use Innokassa\MDK\Storage\ConverterStorage;
 use Innokassa\MDK\Storage\ReceiptFilter;
 use Innokassa\MDK\Services\AutomaticBase;
 use Innokassa\MDK\Services\ConnectorBase;
@@ -45,13 +45,13 @@ use Innokassa\MDK\Exceptions\Services\AutomaticException;
  * @uses Innokassa\MDK\Entities\Receipt
  * @uses Innokassa\MDK\Entities\ReceiptItem
  * @uses Innokassa\MDK\Entities\UUID
- * @uses Innokassa\MDK\Storage\ConverterBase
+ * @uses Innokassa\MDK\Storage\ConverterStorage
  * @uses Innokassa\MDK\Storage\ReceiptFilter
  * @uses Innokassa\MDK\Client
  * @uses Innokassa\MDK\Collections\ReceiptCollection
  * @uses Innokassa\MDK\Collections\ReceiptItemCollection
  * @uses Innokassa\MDK\Exceptions\TransferException
- * @uses Innokassa\MDK\Net\ConverterV2
+ * @uses Innokassa\MDK\Net\ConverterApi
  * @uses Innokassa\MDK\Net\NetClientCurl
  * @uses Innokassa\MDK\Net\Transfer
  * @uses Innokassa\MDK\Services\ManualBase
@@ -79,12 +79,12 @@ class SystemTest extends TestCase
             'agent' => false,
         ]);
 
-        self::$storage = new ReceiptStorageConcrete(new ConverterBase(), self::$db);
+        self::$storage = new ReceiptStorageConcrete(new ConverterStorage(), self::$db);
         self::$adapter = new ReceiptAdapterConcrete(self::$db);
 
         $transfer = new Transfer(
             new NetClientCurl(), 
-            new ConverterV2(), 
+            new ConverterApi(), 
             self::$settings->getActorId(), 
             self::$settings->getActorToken(), 
             self::$settings->getCashbox()
@@ -373,7 +373,7 @@ class SystemTest extends TestCase
         ]);
         $transfer = new Transfer(
             new NetClientCurl(), 
-            new ConverterV2(), 
+            new ConverterApi(), 
             $settings->getActorId(), 
             $settings->getActorToken(), 
             $settings->getCashbox()
@@ -400,7 +400,7 @@ class SystemTest extends TestCase
         ]);
         $transfer = new Transfer(
             new NetClientCurl(), 
-            new ConverterV2(), 
+            new ConverterApi(), 
             $settings->getActorId(), 
             $settings->getActorToken(), 
             $settings->getCashbox()
