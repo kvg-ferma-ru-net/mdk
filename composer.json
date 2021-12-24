@@ -12,6 +12,9 @@
             "homepage": "https://byurrer.ru/"
         }
     ],
+    "require": {
+        "php": ">=7.1"
+    },
     "autoload": {
         "psr-4": {
             "Innokassa\\MDK\\": "src"
