@@ -24,8 +24,7 @@ class NetClientCurl implements NetClientInterface
      */
     public function write(int $code, $data): NetClientInterface
     {
-        switch($code)
-        {
+        switch ($code) {
             case static::PATH:
                 curl_setopt($this->curl, CURLOPT_URL, $data);
                 break;
@@ -59,8 +58,9 @@ class NetClientCurl implements NetClientInterface
 
         $this->response = curl_exec($this->curl);
 
-        if(curl_errno($this->curl) != 0)
+        if (curl_errno($this->curl) != 0) {
             throw new NetConnectException(curl_error($this->curl), curl_errno($this->curl));
+        }
 
         return $this;
     }
@@ -70,8 +70,7 @@ class NetClientCurl implements NetClientInterface
      */
     public function read(int $code)
     {
-        switch($code)
-        {
+        switch ($code) {
             case static::CODE:
                 return curl_getinfo($this->curl, CURLINFO_RESPONSE_CODE);
             case static::BODY:
@@ -100,4 +99,4 @@ class NetClientCurl implements NetClientInterface
 
     private $curl = null;
     private $response = '';
-};
+}

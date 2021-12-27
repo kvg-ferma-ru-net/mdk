@@ -10,19 +10,19 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 class Amount
 {
     /** Оплата наличными */
-    const CASH = 1;
+    public const CASH = 1;
 
     /** Оплата безналичными */
-    const CASHLESS = 2;
+    public const CASHLESS = 2;
 
     /** Оплата предоплатой */
-    const PREPAYMENT = 3;
+    public const PREPAYMENT = 3;
 
     /** Оплата постоплатой */
-    const POSTPAYMENT = 4;
+    public const POSTPAYMENT = 4;
 
     /** Оплата встречным представлением */
-    CONST BARTER = 5;
+    public const BARTER = 5;
 
     //######################################################################
 
@@ -31,10 +31,11 @@ class Amount
      * @param integer|null $type из констант класса
      * @param float|null $sum сумма
      */
-    public function __construct(int $type=null, float $sum=null)
+    public function __construct(int $type = null, float $sum = null)
     {
-        if(is_numeric($type) && is_numeric($sum))
+        if (is_numeric($type) && is_numeric($sum)) {
             $this->set($type, $sum);
+        }
     }
 
     /**
@@ -47,11 +48,11 @@ class Amount
      */
     public function set(int $type, float $sum): self
     {
-        if($sum < 0)
+        if ($sum < 0) {
             throw new InvalidArgumentException("invalid amount sum '$sum'");
+        }
 
-        switch($type)
-        {
+        switch ($type) {
             case Amount::CASH:
                 $this->cash = $sum;
                 break;
@@ -83,8 +84,7 @@ class Amount
      */
     public function get(int $type): ?float
     {
-        switch($type)
-        {
+        switch ($type) {
             case Amount::CASH:
                 return $this->cash;
             case Amount::CASHLESS:
@@ -109,4 +109,4 @@ class Amount
     private $prepayment = null;
     private $postpayment = null;
     private $barter = null;
-};
+}

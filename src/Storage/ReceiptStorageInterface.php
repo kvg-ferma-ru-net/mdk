@@ -13,7 +13,7 @@ interface ReceiptStorageInterface
 {
     /**
      * Сохранение чека
-     * 
+     *
      * @throws StorageException
      *
      * @param Receipt $receipt
@@ -25,7 +25,7 @@ interface ReceiptStorageInterface
 
     /**
      * Извлечение одного чека
-     * 
+     *
      * @throws StorageException
      *
      * @param integer $id
@@ -35,12 +35,12 @@ interface ReceiptStorageInterface
 
     /**
      * Извлечение коллекции чеков
-     * 
+     *
      * @throws StorageException
      *
      * @param ReceiptFilter $filter
      * @param int $limit лимит выборки, 0 - нет лимита
      * @return ReceiptCollection
      */
-    public function getCollection(ReceiptFilter $filter, int $limit=0): ReceiptCollection;
-};
+    public function getCollection(ReceiptFilter $filter, int $limit = 0): ReceiptCollection;
+}

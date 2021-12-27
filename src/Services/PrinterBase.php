@@ -7,7 +7,6 @@ use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Services\PrinterInterface;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
-
 use Innokassa\MDK\Exceptions\Services\PrinterException;
 
 /**
@@ -26,11 +25,13 @@ class PrinterBase implements PrinterInterface
      */
     public function getLinkVerify(int $idReceipt): string
     {
-        if(!($receipt = $this->receiptStorage->getOne($idReceipt)))
-			throw new PrinterException("Не найден чек #{$idReceipt}");
+        if (!($receipt = $this->receiptStorage->getOne($idReceipt))) {
+            throw new PrinterException("Не найден чек #{$idReceipt}");
+        }
 
-		if($receipt->getStatus()->getCode() != ReceiptStatus::COMPLETED)
-			throw new PrinterException("Чек #{$idReceipt} еще не фискализирован, но поставлен в очередь");
+        if ($receipt->getStatus()->getCode() != ReceiptStatus::COMPLETED) {
+            throw new PrinterException("Чек #{$idReceipt} еще не фискализирован, но поставлен в очередь");
+        }
 
         return $this->transfer->getReceiptLink($receipt);
     }
@@ -49,4 +50,4 @@ class PrinterBase implements PrinterInterface
 
     private $receiptStorage = null;
     private $transfer = null;
-};
+}

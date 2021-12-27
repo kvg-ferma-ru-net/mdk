@@ -3,7 +3,6 @@
 namespace Innokassa\MDK\Entities\Atoms;
 
 use Innokassa\MDK\Entities\AtomAbstract;
-
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
@@ -12,61 +11,61 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 class ReceiptItemType extends AtomAbstract
 {
     /** Товар */
-    const PRODUCT = 1;
+    public const PRODUCT = 1;
 
     /** Акцизный товар */
-    const EXCISE = 2;
+    public const EXCISE = 2;
 
     /** Работа */
-    const WORK = 3;
+    public const WORK = 3;
 
     /** Услуга */
-    const SERVICE = 4;
+    public const SERVICE = 4;
 
     /** Ставка азартной игры */
-    const GAMING_BET = 5;
+    public const GAMING_BET = 5;
 
     /** Выигрыш азартной игры */
-    const GAMING_WIN = 6;
+    public const GAMING_WIN = 6;
 
     /** Лотерейный билет */
-    const LOTTERY_TICKET = 7;
+    public const LOTTERY_TICKET = 7;
 
     /** Выигрыш лотереи */
-    const LOTTERY_WIN = 8;
+    public const LOTTERY_WIN = 8;
 
     /** РИД */
-    const RIA = 9;
+    public const RIA = 9;
 
     /** Платеж */
-    const PAYMENT = 10;
+    public const PAYMENT = 10;
 
     /** Вознаграждение агента */
-    const AGENT_COMMISSION = 11;
+    public const AGENT_COMMISSION = 11;
 
     /** Составной предмет расчета */
-    const COMPOSITE = 12;
+    public const COMPOSITE = 12;
 
     /** Иной предмет расчета */
-    const OTHER = 13;
+    public const OTHER = 13;
 
     /** Имущественное право */
-    const PROPERTY_RIGHT = 14;
+    public const PROPERTY_RIGHT = 14;
 
     /** Внереализационный доход */
-    const OUTSTANDING_INCOME = 15;
+    public const OUTSTANDING_INCOME = 15;
 
     /** Страховой взнос */
-    const INSURANCE_FEE = 16;
+    public const INSURANCE_FEE = 16;
 
     /** Торговый сбор */
-    const TRADING_FEES = 17;
+    public const TRADING_FEES = 17;
 
     /** Курортный сбор */
-    const RESORT_FEE = 18;
+    public const RESORT_FEE = 18;
 
     /** Залог */
-    const PLEDGE = 19;
+    public const PLEDGE = 19;
 
     //######################################################################
 
@@ -76,8 +75,7 @@ class ReceiptItemType extends AtomAbstract
      */
     public function __construct(int $code)
     {
-        switch($code)
-        {
+        switch ($code) {
             case self::PRODUCT:
                 $this->name = 'Товар';
                 break;
@@ -145,7 +143,7 @@ class ReceiptItemType extends AtomAbstract
     /**
      * @inheritDoc
      */
-    static public function all(): array
+    public static function all(): array
     {
         $a = [];
 
@@ -171,4 +169,4 @@ class ReceiptItemType extends AtomAbstract
 
         return $a;
     }
-};
+}

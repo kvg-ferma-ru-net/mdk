@@ -7,10 +7,10 @@ namespace Innokassa\MDK\Storage;
  */
 class ReceiptFilter
 {
-    const OP_EQ     = '=';
-    const OP_NOTEQ  = '!=';
-    const OP_GT     = '>';
-    const OP_LT     = '<';
+    public const OP_EQ     = '=';
+    public const OP_NOTEQ  = '!=';
+    public const OP_GT     = '>';
+    public const OP_LT     = '<';
 
     //######################################################################
 
@@ -21,7 +21,7 @@ class ReceiptFilter
      * @param string $op операция сравнения
      * @return self
      */
-    public function setId(int $id, string $op=self::OP_EQ): self
+    public function setId(int $id, string $op = self::OP_EQ): self
     {
         $this->id = [
             'value' => $id,
@@ -37,7 +37,7 @@ class ReceiptFilter
      * @param string $op операция сравнения
      * @return self
      */
-    public function setType(int $type, string $op=self::OP_EQ): self
+    public function setType(int $type, string $op = self::OP_EQ): self
     {
         $this->type = [
             'value' => $type,
@@ -53,7 +53,7 @@ class ReceiptFilter
      * @param string $op операция сравнения
      * @return self
      */
-    public function setSubType(int $subType, string $op=self::OP_EQ): self
+    public function setSubType(int $subType, string $op = self::OP_EQ): self
     {
         $this->subType = [
             'value' => $subType,
@@ -69,7 +69,7 @@ class ReceiptFilter
      * @param string $op операция сравнения
      * @return self
      */
-    public function setStatus(int $status, string $op=self::OP_EQ): self
+    public function setStatus(int $status, string $op = self::OP_EQ): self
     {
         $this->status = [
             'value' => $status,
@@ -85,7 +85,7 @@ class ReceiptFilter
      * @param string $op операция сравнения
      * @return self
      */
-    public function setOrderId(string $orderId, string $op=self::OP_EQ): self
+    public function setOrderId(string $orderId, string $op = self::OP_EQ): self
     {
         $this->orderId = [
             'value' => $orderId,
@@ -97,7 +97,8 @@ class ReceiptFilter
     //######################################################################
 
     /**
-     * Преобразовать данные фильтра в ассоциативный массив WHERE условия, где ключ название столбца, а значение - ассоциативный массив [value => value, op => op]
+     * Преобразовать данные фильтра в ассоциативный массив WHERE условия,
+     * где ключ название столбца, а значение - ассоциативный массив [value => value, op => op]
      *
      * @return array
      */
@@ -106,10 +107,10 @@ class ReceiptFilter
         $fields = array_keys(get_object_vars($this));
 
         $a = [];
-        foreach($fields as $field)
-        {
-            if(!is_null($this->$field))
+        foreach ($fields as $field) {
+            if (!is_null($this->$field)) {
                 $a[$field] = $this->$field;
+            }
         }
 
         return $a;
@@ -124,4 +125,4 @@ class ReceiptFilter
     private $subType = null;
     private $status = null;
     private $orderId = null;
-};
+}

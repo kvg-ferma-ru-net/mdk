@@ -16,10 +16,10 @@ interface AutomaticInterface
      * @throws TransferException
      * @throws StorageException
      * @throws AutomaticException
-     * 
+     *
      * @param integer $orderId
      * @param integer|null $receiptSubType подтип чека для конкретизации, либо null для автоматического определения типа
      * @return Receipt
      */
-    public function fiscalize(string $orderId, int $receiptSubType=null): Receipt;
-};
+    public function fiscalize(string $orderId, int $receiptSubType = null): Receipt;
+}

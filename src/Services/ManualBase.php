@@ -13,7 +13,6 @@ use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Settings\SettingsInterface;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Storage\ReceiptFilter;
-
 use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Exceptions\Services\ManualException;
 
@@ -23,11 +22,10 @@ use Innokassa\MDK\Exceptions\Services\ManualException;
 class ManualBase extends FiscalizationBaseAbstract implements ManualInterface
 {
     public function __construct(
-        ReceiptStorageInterface $receiptStorage, 
+        ReceiptStorageInterface $receiptStorage,
         TransferInterface $transfer,
         SettingsInterface $settings
-    )
-    {
+    ) {
         $this->receiptStorage = $receiptStorage;
         $this->transfer = $transfer;
         $this->settings = $settings;
@@ -37,32 +35,28 @@ class ManualBase extends FiscalizationBaseAbstract implements ManualInterface
      * @inheritDoc
      */
     public function fiscalize(
-        string $orderId, 
-        ReceiptItemCollection $items, 
-        Notify $notify, 
-        Amount $amount=null
-    ): Receipt
-    {
+        string $orderId,
+        ReceiptItemCollection $items,
+        Notify $notify,
+        Amount $amount = null
+    ): Receipt {
         $receipt = new Receipt();
         $receipt->setType(ReceiptType::COMING)
-                ->setSubType(ReceiptSubType::HAND)
-                ->setItems($items)
-                ->setNotify($notify)
-                ->setAmount(
-                    ($amount ? $amount : new Amount(Amount::CASHLESS, $items->getAmount()))
-                )
-                ->setOrderId($orderId);
+            ->setSubType(ReceiptSubType::HAND)
+            ->setItems($items)
+            ->setNotify($notify)
+            ->setAmount(
+                ($amount ? $amount : new Amount(Amount::CASHLESS, $items->getAmount()))
+            )
+            ->setOrderId($orderId);
         $receipt = $this->supplementReceipt($receipt);
 
-        try
-        {
+        try {
             $this->fiscalizeProc($receipt);
-        }
-        catch(TransferException $e)
-        {
+        } catch (TransferException $e) {
             throw new ManualException($e->getMessage(), $e->getCode());
         }
-        
+
         $this->receiptStorage->save($receipt);
 
         return $receipt;
@@ -72,21 +66,20 @@ class ManualBase extends FiscalizationBaseAbstract implements ManualInterface
      * @inheritDoc
      */
     public function refund(
-        string $orderId, 
-        ReceiptItemCollection $items, 
-        Notify $notify, 
-        Amount $amount=null
-    ): Receipt
-    {
+        string $orderId,
+        ReceiptItemCollection $items,
+        Notify $notify,
+        Amount $amount = null
+    ): Receipt {
         $receipt = new Receipt();
         $receipt->setType(ReceiptType::REFUND_COMING)
-                ->setSubType(ReceiptSubType::HAND)
-                ->setItems($items)
-                ->setNotify($notify)
-                ->setAmount(
-                    ($amount ? $amount : new Amount(Amount::CASHLESS, $items->getAmount()))
-                )
-                ->setOrderId($orderId);
+            ->setSubType(ReceiptSubType::HAND)
+            ->setItems($items)
+            ->setNotify($notify)
+            ->setAmount(
+                ($amount ? $amount : new Amount(Amount::CASHLESS, $items->getAmount()))
+            )
+            ->setOrderId($orderId);
         $receipt = $this->supplementReceipt($receipt);
 
         $receiptsComing = $this->receiptStorage->getCollection(
@@ -104,18 +97,18 @@ class ManualBase extends FiscalizationBaseAbstract implements ManualInterface
         $amountBalance = $receiptsComing->getAmount() - $receiptsRefund->getAmount();
 
         // если сумма нового возврата превышает остаток по заказу - нельзя пробить чек возврата
-        if($amountNewRefund > $amountBalance)
-            throw new ManualException("Cумма нового возврата '$amountNewRefund' превышает остаток по заказу '$amountBalance'");
-
-        try
-        {
-            $this->fiscalizeProc($receipt);
+        if ($amountNewRefund > $amountBalance) {
+            throw new ManualException(
+                "Cумма нового возврата '$amountNewRefund' превышает остаток по заказу '$amountBalance'"
+            );
         }
-        catch(TransferException $e)
-        {
+
+        try {
+            $this->fiscalizeProc($receipt);
+        } catch (TransferException $e) {
             throw new ManualException($e->getMessage(), $e->getCode());
         }
-        
+
         $this->receiptStorage->save($receipt);
 
         return $receipt;
@@ -132,7 +125,7 @@ class ManualBase extends FiscalizationBaseAbstract implements ManualInterface
 
     /**
      * Дополнение чека данными из настроек
-     * 
+     *
      * @throws InvalidArgumentException
      *
      * @param Receipt $receipt
@@ -146,4 +139,4 @@ class ManualBase extends FiscalizationBaseAbstract implements ManualInterface
 
         return $receipt;
     }
-};
+}

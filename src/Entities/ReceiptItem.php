@@ -5,7 +5,6 @@ namespace Innokassa\MDK\Entities;
 use Innokassa\MDK\Entities\Atoms\Vat;
 use Innokassa\MDK\Entities\Atoms\PaymentMethod;
 use Innokassa\MDK\Entities\Atoms\ReceiptItemType;
-
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
@@ -24,7 +23,7 @@ class ReceiptItem
 
     /**
      * Установить тип позиции
-     * 
+     *
      * @throws InvalidArgumentException
      *
      * @param int $type из констант ReceiptItemType
@@ -45,25 +44,27 @@ class ReceiptItem
     {
         return ($this->type ? $this->type->getCode() : null);
     }
-    
+
     //**********************************************************************
 
     /**
      * Установить название позиции
      *
      * @throws InvalidArgumentException
-     * 
+     *
      * @param string $name название позиции длиной [1, 128]
      * @return self
      */
     public function setName(string $name): self
     {
         $name = trim($name);
-        if($name == '')
+        if ($name == '') {
             throw new InvalidArgumentException("invalid receipt item name '$name'");
+        }
 
-        if(mb_strlen($name) > 128)
+        if (mb_strlen($name) > 128) {
             throw new InvalidArgumentException("invalid receipt item name '$name' max length 128");
+        }
 
         $this->name = $name;
         return $this;
@@ -85,14 +86,15 @@ class ReceiptItem
      * Установить цену позиции за единицу предмета расчета
      *
      * @throws InvalidArgumentException
-     * 
+     *
      * @param float $price >0
      * @return self
      */
     public function setPrice(float $price): self
     {
-        if($price <= 0)
+        if ($price <= 0) {
             throw new InvalidArgumentException("invalid receipt item price '$price'");
+        }
 
         $this->price = $price;
         return $this;
@@ -114,14 +116,15 @@ class ReceiptItem
      * Установить количество предметов расчета, с учетом скидок, наценок и НДС
      *
      * @throws InvalidArgumentException
-     * 
+     *
      * @param float $quantity >0
      * @return self
      */
     public function setQuantity(float $quantity): self
     {
-        if($quantity <= 0)
+        if ($quantity <= 0) {
             throw new InvalidArgumentException("invalid receipt item quantity '$quantity'");
+        }
 
         $this->quantity = $quantity;
         return $this;
@@ -143,18 +146,21 @@ class ReceiptItem
      * Установить стоимость предмета расчета с учетом скидок и наценок.
      * Устанавливать необходимо после установки price и quantity.
      * Не является обязательным, так как может быть автоматически сформировано из price * quantity.
-     * Однако рекомендуется для проверки правильных вычислений скидок/наценок/НДС 
+     * Однако рекомендуется для проверки правильных вычислений скидок/наценок/НДС
      * в случае если система не считает их автоматически
-     * 
+     *
      * @throws InvalidArgumentException если amount != (price * quantity)
-     * 
+     *
      * @param float $amount >0
      * @return self
      */
     public function setAmount(float $amount): self
     {
-        if($amount != ($this->price * $this->quantity))
-            throw new InvalidArgumentException("receipt item amount ($amount) deffers from price($this->price) * quantity($this->quantity)");
+        if ($amount != ($this->price * $this->quantity)) {
+            throw new InvalidArgumentException(
+                "receipt item amount ($amount) deffers from price($this->price) * quantity($this->quantity)"
+            );
+        }
 
         $this->amount = $amount;
         return $this;
@@ -230,4 +236,4 @@ class ReceiptItem
     private $amount = 0.0;
     private $vat = null;
     private $paymentMethod = null;
-};
+}

@@ -3,7 +3,6 @@
 namespace Innokassa\MDK\Entities\Atoms;
 
 use Innokassa\MDK\Entities\AtomAbstract;
-
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
@@ -12,25 +11,25 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 class PaymentMethod extends AtomAbstract
 {
     /** Полная предварительная оплата до момента передачи предмета расчета */
-    const PREPAYMENT_FULL = 1;
+    public const PREPAYMENT_FULL = 1;
 
     /** Частичная предварительная оплата до момента передачи предмета расчета */
-    const PREPAYMENT_PART = 2;
+    public const PREPAYMENT_PART = 2;
 
     /** Аванс */
-    const ADVANCE = 3;
+    public const ADVANCE = 3;
 
     /** Полная оплата, в том числе с учетом аванса (предварительной оплаты) в момент передачи предмета расчета */
-    const PAYMENT_FULL = 4;
+    public const PAYMENT_FULL = 4;
 
     /** Частичный расчет в кредит - частичная оплата предмета расчета в момент его передачи с последующей оплатой в кредит */
-    const CREDIT_PART = 5;
+    public const CREDIT_PART = 5;
 
     /** Передача в кредит - передача предмета расчета без его оплаты в момент его передачи с последующей оплатой в кредит */
-    const CREDIT_FULL = 6;
+    public const CREDIT_FULL = 6;
 
     /** Оплата кредита - оплата предмета расчета после его передачи с оплатой в кредит */
-    const CREDIT_PAY = 7;
+    public const CREDIT_PAY = 7;
 
     //######################################################################
 
@@ -40,8 +39,7 @@ class PaymentMethod extends AtomAbstract
      */
     public function __construct(int $code)
     {
-        switch($code)
-        {
+        switch ($code) {
             case static::PREPAYMENT_FULL:
                 $this->name = 'Предоплата 100%';
                 break;
@@ -73,7 +71,7 @@ class PaymentMethod extends AtomAbstract
     /**
      * @inheritDoc
      */
-    static public function all(): array
+    public static function all(): array
     {
         $a = [];
 
@@ -87,4 +85,4 @@ class PaymentMethod extends AtomAbstract
 
         return $a;
     }
-};
+}

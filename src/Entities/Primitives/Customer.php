@@ -14,20 +14,22 @@ class Customer
      * @param string $name
      * @param string $tin
      */
-    public function __construct(string $name=null, string $tin=null)
+    public function __construct(string $name = null, string $tin = null)
     {
-        if($name !== null)
+        if ($name !== null) {
             $this->setName($name);
-        
-        if($tin !== null)
+        }
+
+        if ($tin !== null) {
             $this->setTin($tin);
+        }
     }
 
     //**********************************************************************
 
     /**
      * Установить ФИО
-     * 
+     *
      * @throws InvalidArgumentException
      *
      * @param string $name
@@ -36,8 +38,9 @@ class Customer
     public function setName(string $name): self
     {
         $name = trim($name);
-        if($name == '')
+        if ($name == '') {
             throw new InvalidArgumentException('invalid customer name');
+        }
 
         $this->name = $name;
 
@@ -58,17 +61,17 @@ class Customer
 
     /**
      * Установить ИНН
-     * 
-     * @throws InvalidArgumentException
      *
+     * @throws InvalidArgumentException
      * @param string $tin
      * @return self
      */
     public function setTin(string $tin): self
     {
         $tin = trim($tin);
-        if($tin == '')
+        if ($tin == '') {
             throw new InvalidArgumentException('invalid customer tin');
+        }
 
         $this->tin = $tin;
 
@@ -91,4 +94,4 @@ class Customer
 
     protected $name = '';
     protected $tin = '';
-};
+}

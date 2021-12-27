@@ -8,7 +8,6 @@ use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
 use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
-
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 use Innokassa\MDK\Exceptions\ConverterException;
 
@@ -22,7 +21,7 @@ abstract class ConverterAbstract
 
     /**
      * Receipt => array
-     * 
+     *
      * @throws ConverterException
      *
      * @param Receipt $receipt
@@ -32,7 +31,7 @@ abstract class ConverterAbstract
 
     /**
      * array => Receipt
-     * 
+     *
      * @throws ConverterException
      *
      * @param array $a
@@ -45,7 +44,7 @@ abstract class ConverterAbstract
 
     /**
      * ReceiptItemCollection => array
-     * 
+     *
      * @throws ConverterException
      *
      * @param ReceiptItemCollection $items
@@ -55,15 +54,16 @@ abstract class ConverterAbstract
     {
         $a = [];
 
-        foreach($items as $item)
+        foreach ($items as $item) {
             $a[] = $this->itemToArray($item);
+        }
 
         return $a;
     }
 
     /**
      * array => ReceiptItemCollection
-     * 
+     *
      * @throws ConverterException
      *
      * @param array $a
@@ -73,8 +73,9 @@ abstract class ConverterAbstract
     {
         $items = new ReceiptITemCollection();
 
-        foreach($a as $item)
+        foreach ($a as $item) {
             $items[] = $this->itemFromArray($item);
+        }
 
         return $items;
     }
@@ -84,7 +85,7 @@ abstract class ConverterAbstract
 
     /**
      * ReceiptItem => array
-     * 
+     *
      * @throws ConverterException
      *
      * @param ReceiptItem $item
@@ -92,11 +93,13 @@ abstract class ConverterAbstract
      */
     public function itemToArray(ReceiptItem $item): array
     {
-        if(!$item->getPrice())
+        if (!$item->getPrice()) {
             throw new ConverterException("uninitialized price item");
+        }
 
-        if(!$item->getName())
+        if (!$item->getName()) {
             throw new ConverterException("uninitialized name item");
+        }
 
         return [
             "type" => $item->getType(),
@@ -111,7 +114,7 @@ abstract class ConverterAbstract
 
     /**
      * array => ReceiptItem
-     * 
+     *
      * @throws ConverterException
      *
      * @param array $a
@@ -119,16 +122,19 @@ abstract class ConverterAbstract
      */
     public function itemFromArray(array $a): ReceiptItem
     {
-        if(!$a)
+        if (!$a) {
             throw new ConverterException('empty array for create receipt item');
+        }
 
         $requiredFields = ['type', 'name', 'price', 'payment_method'];
 
-        if($diff = array_diff($requiredFields, array_keys($a)))
-            throw new ConverterException('not complete array for create receipt item, lacks fields ['.implode(', ',$diff).']');
+        if ($diff = array_diff($requiredFields, array_keys($a))) {
+            throw new ConverterException(
+                'not complete array for create receipt item, lacks fields [' . implode(', ', $diff) . ']'
+            );
+        }
 
-        try
-        {
+        try {
             $item = new ReceiptItem();
             $item
                 ->setType($a['type'])
@@ -138,12 +144,10 @@ abstract class ConverterAbstract
                 ->setAmount($a['amount'])
                 ->setPaymentMethod($a['payment_method'])
                 ->setVat(new Vat($a['vat']));
-        }
-        catch(InvalidArgumentException $e)
-        {
+        } catch (InvalidArgumentException $e) {
             throw new ConverterException($e->getMessage());
         }
-        
+
         return $item;
     }
 
@@ -152,7 +156,7 @@ abstract class ConverterAbstract
 
     /**
      * Amount => array
-     * 
+     *
      * @throws ConverterException
      *
      * @param Amount $amount
@@ -169,21 +173,22 @@ abstract class ConverterAbstract
             'barter' => Amount::BARTER,
         ];
 
-        foreach($amounts as $key => $const)
-        {
-            if($amount->get($const) !== null)
+        foreach ($amounts as $key => $const) {
+            if ($amount->get($const) !== null) {
                 $a[$key] = $amount->get($const);
+            }
         }
 
-        if(!$a)
+        if (!$a) {
             throw new ConverterException('invalid amount => array');
+        }
 
         return $a;
     }
 
     /**
      * array => Amount
-     * 
+     *
      * @throws ConverterException
      *
      * @param array $a
@@ -191,30 +196,28 @@ abstract class ConverterAbstract
      */
     public function amountFromArray(array $a): Amount
     {
-        if(!$a)
+        if (!$a) {
             throw new ConverterException('invalid array => amount');
+        }
 
         $amount = new Amount();
 
         $fields = [
-            'cash' => Amount::CASH, 
-            'cashless' => Amount::CASHLESS, 
-            'prepayment' => Amount::PREPAYMENT, 
-            'postpayment' => Amount::POSTPAYMENT, 
+            'cash' => Amount::CASH,
+            'cashless' => Amount::CASHLESS,
+            'prepayment' => Amount::PREPAYMENT,
+            'postpayment' => Amount::POSTPAYMENT,
             'barter' => Amount::BARTER
         ];
-        
-        try
-        {
-            foreach($fields as $field => $const)
-            {
-                if(isset($a[$field]))
+
+        try {
+            foreach ($fields as $field => $const) {
+                if (isset($a[$field])) {
                     $amount->set($const, $a[$field]);
+                }
             }
-        }
-        catch(InvalidArgumentException $e)
-        {
-            throw new ConverterException('invalid array => amount: '.$e->getMessage());
+        } catch (InvalidArgumentException $e) {
+            throw new ConverterException('invalid array => amount: ' . $e->getMessage());
         }
 
         return $amount;
@@ -225,7 +228,7 @@ abstract class ConverterAbstract
 
     /**
      * Notify => array
-     * 
+     *
      * @throws ConverterException
      *
      * @param Notify $notify
@@ -235,21 +238,24 @@ abstract class ConverterAbstract
     {
         $a = [];
 
-        if($notify->getEmail())
+        if ($notify->getEmail()) {
             $a['email'] = $notify->getEmail();
+        }
 
-        if($notify->getPhone())
+        if ($notify->getPhone()) {
             $a['phone'] =  $notify->getPhone();
+        }
 
-        if(!$a)
+        if (!$a) {
             throw new ConverterException('invalid notify array');
+        }
 
         return $a;
     }
 
     /**
      * array => Notify
-     * 
+     *
      * @throws ConverterException
      *
      * @param array $a
@@ -259,21 +265,21 @@ abstract class ConverterAbstract
     {
         $notify = new Notify();
 
-        try
-        {
-            if(isset($a['email']))
+        try {
+            if (isset($a['email'])) {
                 $notify->setEmail($a['email']);
+            }
 
-            if(isset($a['phone']))
+            if (isset($a['phone'])) {
                 $notify->setPhone($a['phone']);
-        }
-        catch(InvalidArgumentException $e)
-        {
+            }
+        } catch (InvalidArgumentException $e) {
             throw new ConverterException($e->getMessage());
         }
 
-        if(!isset($a['email']) && !isset($a['phone']))
+        if (!isset($a['email']) && !isset($a['phone'])) {
             throw new ConverterException("invalid notify data fromArray");
+        }
 
         return $notify;
     }
@@ -283,7 +289,7 @@ abstract class ConverterAbstract
 
     /**
      * Customer => array
-     * 
+     *
      * @throws ConverterException
      *
      * @param Customer $customer
@@ -293,21 +299,24 @@ abstract class ConverterAbstract
     {
         $a = [];
 
-        if($customer->getName())
+        if ($customer->getName()) {
             $a['name'] = $customer->getName();
+        }
 
-        if($customer->getTin())
+        if ($customer->getTin()) {
             $a['tin'] = $customer->getTin();
+        }
 
-        if(!$a)
+        if (!$a) {
             throw new ConverterException('invalid customer => array: empty data');
+        }
 
         return $a;
     }
 
     /**
      * array => Customer
-     * 
+     *
      * @throws ConverterException
      *
      * @param array $a
@@ -315,24 +324,24 @@ abstract class ConverterAbstract
      */
     public function customerFromArray(array $a): Customer
     {
-        if(!isset($a['name']) && !isset($a['tin']))
+        if (!isset($a['name']) && !isset($a['tin'])) {
             throw new ConverterException('invalid array => customer');
+        }
 
-        try
-        {
+        try {
             $customer = new Customer();
 
-            if(isset($a['name']))
+            if (isset($a['name'])) {
                 $customer->setName($a['name']);
+            }
 
-            if(isset($a['tin']))
+            if (isset($a['tin'])) {
                 $customer->setTin($a['tin']);
-        }
-        catch(InvalidArgumentException $e)
-        {
+            }
+        } catch (InvalidArgumentException $e) {
             throw new ConverterException($e->getMessage());
         }
 
         return $customer;
     }
-};
+}

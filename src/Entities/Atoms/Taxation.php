@@ -3,7 +3,6 @@
 namespace Innokassa\MDK\Entities\Atoms;
 
 use Innokassa\MDK\Entities\AtomAbstract;
-
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
@@ -12,19 +11,19 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 class Taxation extends AtomAbstract
 {
     /** ОРН */
-    const ORN   = 1;
+    public const ORN   = 1;
 
     /** УСН доход */
-    const USN   = 2;
+    public const USN   = 2;
 
     /** УСН доход - расход */
-    const USNDR = 4;
+    public const USNDR = 4;
 
     /** ЕСН */
-    const ESN   = 16;
+    public const ESN   = 16;
 
     /** ПСН */
-    const PSN   = 32;
+    public const PSN   = 32;
 
     //######################################################################
 
@@ -53,14 +52,14 @@ class Taxation extends AtomAbstract
             default:
                 throw new InvalidArgumentException("invalid taxation '$code'");
         }
-        
+
         $this->code = $code;
     }
 
     /**
      * @inheritDoc
      */
-    static public function all(): array
+    public static function all(): array
     {
         $a = [];
         $a[] = new self(self::ORN);
@@ -68,7 +67,7 @@ class Taxation extends AtomAbstract
         $a[] = new self(self::USNDR);
         $a[] = new self(self::ESN);
         $a[] = new self(self::PSN);
-        
+
         return $a;
     }
-};
+}

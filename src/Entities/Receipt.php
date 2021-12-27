@@ -12,7 +12,6 @@ use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
 use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
-
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
@@ -67,7 +66,7 @@ class Receipt
         $this->uuid = $uuid;
         return $this;
     }
-    
+
     /**
      * Получить текущий UUID
      *
@@ -178,7 +177,7 @@ class Receipt
 
     /**
      * Установить тип чека
-     * 
+     *
      * @throws InvalidArgumentException
      *
      * @param int $type
@@ -204,7 +203,7 @@ class Receipt
 
     /**
      * Установить подтип чека
-     * 
+     *
      * @throws InvalidArgumentException
      *
      * @param int $subType
@@ -230,7 +229,7 @@ class Receipt
 
     /**
      * Установить налогообложение
-     * 
+     *
      * @throws InvalidArgumentException
      *
      * @param int $taxation
@@ -364,7 +363,7 @@ class Receipt
 
     /**
      * Установить место расчетов (адрес сайта)
-     * 
+     *
      * @throws InvalidArgumentException
      *
      * @param string $location
@@ -372,8 +371,9 @@ class Receipt
      */
     public function setLocation(string $location): self
     {
-        if(!filter_var($location, FILTER_VALIDATE_URL, FILTER_FLAG_HOST_REQUIRED))
+        if (!filter_var($location, FILTER_VALIDATE_URL, FILTER_FLAG_HOST_REQUIRED)) {
             throw new InvalidArgumentException("invalid location '$location'");
+        }
 
         $this->location = $location;
         return $this;
@@ -418,4 +418,4 @@ class Receipt
     // статусные данные
 
     private $status = null;
-};
+}

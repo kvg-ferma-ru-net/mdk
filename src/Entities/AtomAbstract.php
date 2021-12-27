@@ -32,7 +32,7 @@ abstract class AtomAbstract
      *
      * @return array
      */
-    abstract static public function all(): array;
+    abstract public static function all(): array;
 
     //######################################################################
     // PROTECTED
@@ -51,4 +51,4 @@ abstract class AtomAbstract
      * @var int
      */
     protected $code;
-};
+}

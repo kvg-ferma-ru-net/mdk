@@ -3,7 +3,6 @@
 namespace Innokassa\MDK\Entities\Atoms;
 
 use Innokassa\MDK\Entities\AtomAbstract;
-
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
@@ -12,22 +11,22 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 class Vat extends AtomAbstract
 {
     /** 20% */
-    const CODE_20       = 1;
+    public const CODE_20       = 1;
 
     /** 10% */
-    const CODE_10       = 2;
+    public const CODE_10       = 2;
 
     /** 20/120 */
-    const CODE_120      = 3;
+    public const CODE_120      = 3;
 
     /** 10/110 */
-    const CODE_110      = 4;
+    public const CODE_110      = 4;
 
     /** 0% */
-    const CODE_0        = 5;
+    public const CODE_0        = 5;
 
     /** Без НДС */
-    const CODE_WITHOUT  = 6;
+    public const CODE_WITHOUT  = 6;
 
     //######################################################################
 
@@ -40,8 +39,7 @@ class Vat extends AtomAbstract
         $value = trim($value);
         $value = str_replace("%", "", $value);
 
-        switch($value)
-        {
+        switch ($value) {
             case '20':
                 $this->code = self::CODE_20;
                 $this->name = $value;
@@ -75,10 +73,9 @@ class Vat extends AtomAbstract
                     self::CODE_0 => '0',
                     self::CODE_WITHOUT => '0'
                 ];
-                if(!isset($a[$value]))
+                if (!isset($a[$value])) {
                     throw new InvalidArgumentException("invalid vat value '$value'");
-                else
-                {
+                } else {
                     $this->code = $value;
                     $this->name = $a[$value];
                 }
@@ -88,7 +85,7 @@ class Vat extends AtomAbstract
     /**
      * @inheritDoc
      */
-    static public function all(): array
+    public static function all(): array
     {
         $a = [];
         $a[] = new self(self::CODE_20);
@@ -100,4 +97,4 @@ class Vat extends AtomAbstract
 
         return $a;
     }
-};
+}

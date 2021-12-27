@@ -5,7 +5,6 @@ namespace Innokassa\MDK\Services;
 use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Settings\SettingsInterface;
-
 use Innokassa\MDK\Exceptions\SettingsException;
 use Innokassa\MDK\Exceptions\TransferException;
 
@@ -24,34 +23,29 @@ class ConnectorBase implements ConnectorInterface
      */
     public function testSettings(SettingsInterface $settings): bool
     {
-        try
-        {
+        try {
             $response = $this->transfer->getCashBox();
-        }
-        catch(TransferException $e)
-        {
-            if($e->getCode() >= 500)
+        } catch (TransferException $e) {
+            if ($e->getCode() >= 500) {
                 throw new SettingsException('Сервер временно недоступен, попробуйте позже', $e->getCode());
-            else
+            } else {
                 throw new SettingsException('Неверные авторизационные данные', $e->getCode());
+            }
         }
 
-        if(!($response->taxation & $settings->getTaxation()))
-        {
+        if (!($response->taxation & $settings->getTaxation())) {
             $taxations = Taxation::all();
             $included = [];
-            foreach($taxations as $taxation)
-            {
-                if($response->taxation & $taxation->getCode())
+            foreach ($taxations as $taxation) {
+                if ($response->taxation & $taxation->getCode()) {
                     $included[] = $taxation->getName();
+                }
             }
 
             $sListTaxations = implode(", ", $included);
             $error = "Указанный налог не может быть применен, доступные налогообложения: $sListTaxations";
             throw new SettingsException($error);
-        }
-        else if(array_search($settings->getLocation(), $response->billing_place_list) === false)
-        {
+        } elseif (array_search($settings->getLocation(), $response->billing_place_list) === false) {
             $sListPlaces = implode(", ", $response->billing_place_list);
             $error = "Указанное место расчетов не может быть использовано, доступные: $sListPlaces";
             throw new SettingsException($error);
@@ -65,4 +59,4 @@ class ConnectorBase implements ConnectorInterface
     //######################################################################
 
     private $transfer = null;
-};
+}

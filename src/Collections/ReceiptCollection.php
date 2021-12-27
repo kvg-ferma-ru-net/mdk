@@ -17,8 +17,9 @@ class ReceiptCollection extends BaseCollection
     public function getAmount(): float
     {
         $amount = 0.0;
-        foreach($this as $receipt)
+        foreach ($this as $receipt) {
             $amount += $receipt->getItems()->getAmount();
+        }
 
         return $amount;
     }
@@ -42,17 +43,17 @@ class ReceiptCollection extends BaseCollection
      * @param integer|null $subType подтип чека из ReceiptSubType
      * @return Receipt|null
      */
-    public function getByType(int $typeReceipt, int $subType=null): ?Receipt
+    public function getByType(int $typeReceipt, int $subType = null): ?Receipt
     {
-        foreach($this->objects as $key => $receipt)
-        {
-            if(
+        foreach ($this->objects as $key => $receipt) {
+            if (
                 $receipt->getType() == $typeReceipt
                 && ($subType === null || ($receipt->getSubType() == $subType))
-            )
+            ) {
                 return $this->objects[$key];
+            }
         }
 
         return null;
     }
-};
+}

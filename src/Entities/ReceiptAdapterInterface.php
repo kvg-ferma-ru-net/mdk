@@ -14,7 +14,7 @@ interface ReceiptAdapterInterface
 {
     /**
      * Получить коллекцию позиций заказа
-     * 
+     *
      * @throws InvalidArgumentException
      *
      * @param string $orderId
@@ -25,7 +25,7 @@ interface ReceiptAdapterInterface
 
     /**
      * Получить данные об оплате
-     * 
+     *
      * @throws InvalidArgumentException
      *
      * @param string $orderId
@@ -49,4 +49,4 @@ interface ReceiptAdapterInterface
      * @return Notify
      */
     public function getNotify(string $orderId): Notify;
-};
+}

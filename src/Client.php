@@ -7,7 +7,6 @@ use Innokassa\MDK\Services\PrinterInterface;
 use Innokassa\MDK\Services\PipelineInterface;
 use Innokassa\MDK\Services\AutomaticInterface;
 use Innokassa\MDK\Services\ConnectorInterface;
-
 use Innokassa\MDK\Settings\SettingsInterface;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Entities\ReceiptAdapterInterface;
@@ -21,14 +20,12 @@ class Client
         SettingsInterface $settings,
         ReceiptAdapterInterface $adapter,
         ReceiptStorageInterface $storage,
-
         AutomaticInterface $atomatic,
         ManualInterface $manual,
         PipelineInterface $pipeline,
         PrinterInterface $printer,
         ConnectorInterface $connector
-    )
-    {
+    ) {
         $this->settings = $settings;
         $this->adapter = $adapter;
         $this->storage = $storage;
@@ -110,7 +107,7 @@ class Client
     }
 
     //######################################################################
-    // private 
+    // PRIVATE
     //######################################################################
 
     private $atomatic;
@@ -118,4 +115,4 @@ class Client
     private $pipeline;
     private $printer;
     private $connector;
-};
+}

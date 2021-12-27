@@ -10,26 +10,25 @@ use Innokassa\MDK\Entities\AtomAbstract;
 class ReceiptStatus extends AtomAbstract
 {
     /** Чек подготовлен, но еще не отправлен */
-    const PREPARED  = 0;
+    public const PREPARED  = 0;
 
     /** Нет ошибок, чек фискализирован */
-    const COMPLETED  = 1;
+    public const COMPLETED  = 1;
 
     /** Нет ошибок, ждем пока чек фискализируется, нужно проверить статус */
-    const WAIT       = 2;
+    public const WAIT       = 2;
 
-    /** 
-     * Нет ошибок, чек отправлен на сервер, надеемся на фискализацию,
-     * но что там с чеком не известно, потому что сервер ответил некорректно, 
-     * нужно проверить статус 
+    /** Нет ошибок, чек отправлен на сервер, надеемся на фискализацию,
+     * но что там с чеком не известно, потому что сервер ответил некорректно,
+     * нужно проверить статус
      */
-    const ASSUME     = 3;
+    public const ASSUME     = 3;
 
     /** Возникли проблемы с доступом к кассе, но надо попробовать еще раз пробить чек */
-    const REPEAT     = 4;
+    public const REPEAT     = 4;
 
     /** Ошибка фискализации */
-    const ERROR      = 5;
+    public const ERROR      = 5;
 
     //######################################################################
 
@@ -38,8 +37,7 @@ class ReceiptStatus extends AtomAbstract
      */
     public function __construct(int $code)
     {
-        switch($code)
-        {
+        switch ($code) {
             case self::PREPARED:
                 $this->code = self::PREPARED;
                 $this->name = 'Чек подготовлен, но еще не отправлен';
@@ -68,37 +66,24 @@ class ReceiptStatus extends AtomAbstract
                 break;
         }
 
-        // все ОК
-        if($code == 200 || $code == 201)
-        {
+        if ($code == 200 || $code == 201) {
+            // все ОК
             $this->code = self::COMPLETED;
             $this->name = 'Чек фискализирован';
-        }
-
-        // пробовать еще раз фискализировать с тем же КИ (чек принят сервером)
-        else if($code >= 202 && $code < 300)
-        {
+        } elseif ($code >= 202 && $code < 300) {
+            // пробовать еще раз фискализировать с тем же КИ (чек принят сервером)
             $this->code = self::WAIT;
             $this->name = 'Чек в очереди';
-        }
-
-        // пробовать еще раз фискализировать с тем же КИ (чек отправлен на сервер, но не известно что с там с ним)
-        else if($code >= 500 && $code < 600)
-        {
+        } elseif ($code >= 500 && $code < 600) {
+            // пробовать еще раз фискализировать с тем же КИ (чек отправлен на сервер, но не известно что с там с ним)
             $this->code = self::ASSUME;
             $this->name = 'Чек отправлен на сервер';
-        }
-
-        // проблемы авторизации, надо попробовать фискализировать еще раз, но с большим периодом времени
-        else if($code == 401 || $code == 402 || $code == 404)
-        {
+        } elseif ($code == 401 || $code == 402 || $code == 404) {
+            // проблемы авторизации, надо попробовать фискализировать еще раз, но с большим периодом времени
             $this->code = self::REPEAT;
             $this->name = 'Ошибка авторизации, помещен в отложенную очередь';
-        }
-
-        // [400, 500) - ошибки, повторять фискализизацию с такими же данными нельзя
-        else
-        {
+        } else {
+            // [400, 500) - ошибки, повторять фискализизацию с такими же данными нельзя
             $this->code = self::ERROR;
             $this->name = 'Ошибка фискализации';
         }
@@ -107,7 +92,7 @@ class ReceiptStatus extends AtomAbstract
     /**
      * @inheritDoc
      */
-    static public function all(): array
+    public static function all(): array
     {
         $a = [];
 
@@ -120,4 +105,4 @@ class ReceiptStatus extends AtomAbstract
 
         return $a;
     }
-};
+}

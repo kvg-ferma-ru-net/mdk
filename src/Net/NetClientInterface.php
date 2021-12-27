@@ -8,25 +8,25 @@ namespace Innokassa\MDK\Net;
 interface NetClientInterface
 {
     /** Путь (string) */
-    const PATH = 1;
+    public const PATH = 1;
 
     /** Заголовки (array) */
-    const HEAD = 2;
+    public const HEAD = 2;
 
     /** Тип (string - GET, POST etc) */
-    const TYPE = 3;
+    public const TYPE = 3;
 
     /** Тело */
-    const BODY = 4;
+    public const BODY = 4;
 
     /** Код ответа (int) */
-    const CODE = 5;
+    public const CODE = 5;
 
     //######################################################################
 
     /**
      * Запись данных для сервера
-     * 
+     *
      * Обязательыне данные: PATH
      * Значения по умоланию:
      *  - HEAD = []
@@ -61,4 +61,4 @@ interface NetClientInterface
      * @return self
      */
     public function reset(): self;
-};
+}

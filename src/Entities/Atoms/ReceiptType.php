@@ -3,7 +3,6 @@
 namespace Innokassa\MDK\Entities\Atoms;
 
 use Innokassa\MDK\Entities\AtomAbstract;
-
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
@@ -12,16 +11,16 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 class ReceiptType extends AtomAbstract
 {
     /** Приход */
-    const COMING            = 1;
+    public const COMING            = 1;
 
     /** Возврат прихода */
-    const REFUND_COMING     = 2;
+    public const REFUND_COMING     = 2;
 
     /** Расход */
-    const EXPENCE           = 3;
+    public const EXPENCE           = 3;
 
     /** Возврат расхода */
-    const REFUND_EXPENSE    = 4;
+    public const REFUND_EXPENSE    = 4;
 
     //######################################################################
 
@@ -56,7 +55,7 @@ class ReceiptType extends AtomAbstract
     /**
      * @inheritDoc
      */
-    static public function all(): array
+    public static function all(): array
     {
         $a = [];
 
@@ -67,4 +66,4 @@ class ReceiptType extends AtomAbstract
 
         return $a;
     }
-};
+}

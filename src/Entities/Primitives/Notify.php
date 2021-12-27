@@ -13,27 +13,25 @@ class Notify
      * @throws InvalidArgumentException
      * @param string|null $value
      */
-    public function __construct(string $value=null)
+    public function __construct(string $value = null)
     {
-        if($value === null)
+        if ($value === null) {
             return;
+        }
 
-        try
-        {
+        try {
             $this->setEmail($value);
+        } catch (InvalidArgumentException $e) {
         }
-        catch(InvalidArgumentException $e)
-        {}
 
-        try
-        {
+        try {
             $this->setPhone($value);
+        } catch (InvalidArgumentException $e) {
         }
-        catch(InvalidArgumentException $e)
-        {}
 
-        if(!$this->email && !$this->phone)
+        if (!$this->email && !$this->phone) {
             throw new InvalidArgumentException("invalid notify value '$value'");
+        }
     }
 
     //**********************************************************************
@@ -48,8 +46,9 @@ class Notify
     public function setEmail(string $email): self
     {
         $email = trim($email);
-        if(!($email = filter_var($email, FILTER_VALIDATE_EMAIL)))
+        if (!($email = filter_var($email, FILTER_VALIDATE_EMAIL))) {
             throw new InvalidArgumentException("invalid notify email '$email'");
+        }
 
         $this->email = $email;
 
@@ -79,23 +78,27 @@ class Notify
     {
         $phone = trim($phone);
 
-        if(!$phone)
+        if (!$phone) {
             throw new InvalidArgumentException("invalid notify phone ''");
-		
-		$phone = str_replace("+", "", $phone);
-		$phone = str_replace("(", "", $phone);
-		$phone = str_replace(")", "", $phone);
-		$phone = str_replace("-", "", $phone);
-		$phone = str_replace(" ", "", $phone);
+        }
 
-        if($phone[0] == '8')
-			$phone = '+7'.substr($phone, 1);
+        $phone = str_replace("+", "", $phone);
+        $phone = str_replace("(", "", $phone);
+        $phone = str_replace(")", "", $phone);
+        $phone = str_replace("-", "", $phone);
+        $phone = str_replace(" ", "", $phone);
 
-        if($phone[0] == '7')
-			$phone = '+'.$phone;
+        if ($phone[0] == '8') {
+            $phone = '+7' . substr($phone, 1);
+        }
 
-        if(!preg_match("/\+7\d{10}/", $phone))
+        if ($phone[0] == '7') {
+            $phone = '+' . $phone;
+        }
+
+        if (!preg_match("/\+7\d{10}/", $phone)) {
             throw new InvalidArgumentException("invalid notify phone '$phone'");
+        }
 
         $this->phone = $phone;
 
@@ -118,4 +121,4 @@ class Notify
 
     private $email = '';
     private $phone = '';
-};
+}

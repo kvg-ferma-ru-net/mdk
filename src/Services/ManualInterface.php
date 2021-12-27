@@ -14,7 +14,7 @@ interface ManualInterface
 {
     /**
      * Фискализация прихода по заказу
-     * 
+     *
      * @throws InvalidArgumentException
      * @throws TransferException
      * @throws StorageException
@@ -26,15 +26,15 @@ interface ManualInterface
      * @return Receipt
      */
     public function fiscalize(
-        string $orderId, 
-        ReceiptItemCollection $items, 
-        Notify $notify, 
-        Amount $amount=null
+        string $orderId,
+        ReceiptItemCollection $items,
+        Notify $notify,
+        Amount $amount = null
     ): Receipt;
 
     /**
      * Фискализация возврата по заказу
-     * 
+     *
      * @throws InvalidArgumentException
      * @throws TransferException
      * @throws StorageException
@@ -47,9 +47,9 @@ interface ManualInterface
      * @return Receipt
      */
     public function refund(
-        string $orderId, 
-        ReceiptItemCollection $items, 
-        Notify $notify, 
-        Amount $amount=null
+        string $orderId,
+        ReceiptItemCollection $items,
+        Notify $notify,
+        Amount $amount = null
     ): Receipt;
-};
+}

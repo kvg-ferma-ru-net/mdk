@@ -57,4 +57,4 @@ interface SettingsInterface
      * @return string
      */
     public function get(string $name);
-};
+}

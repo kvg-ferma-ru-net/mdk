@@ -3,7 +3,6 @@
 namespace Innokassa\MDK\Entities\Atoms;
 
 use Innokassa\MDK\Entities\AtomAbstract;
-
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
@@ -12,13 +11,13 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 class ReceiptSubType extends AtomAbstract
 {
     /** Чек создан вручную */
-    const HAND  = 0;
+    public const HAND  = 0;
 
     /** Предоплата - покупатель оплатил товар (чек создан автоматически) */
-    const PRE   = 1;
+    public const PRE   = 1;
 
     /** Полный расчет - заказ передан покупателю (чек создан автоматически) */
-    const FULL  = 2;
+    public const FULL  = 2;
 
     //######################################################################
 
@@ -49,7 +48,7 @@ class ReceiptSubType extends AtomAbstract
     /**
      * @inheritDoc
      */
-    static public function all(): array
+    public static function all(): array
     {
         $a = [];
 
@@ -59,4 +58,4 @@ class ReceiptSubType extends AtomAbstract
 
         return $a;
     }
-};
+}

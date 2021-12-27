@@ -16,4 +16,4 @@ interface ConnectorInterface
      * @return bool true в случае успеха
      */
     public function testSettings(SettingsInterface $settings): bool;
-};
+}

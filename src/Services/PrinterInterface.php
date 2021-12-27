@@ -13,7 +13,7 @@ interface PrinterInterface
      * Получить ссылку на рендер чека с проверкой на корректность данных
      *
      * @throws PrinterException
-     * 
+     *
      * @param integer $idReceipt
      * @return string
      */
@@ -26,4 +26,4 @@ interface PrinterInterface
      * @return string
      */
     public function getLinkRaw(Receipt $receipt): string;
-};
+}
