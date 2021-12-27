@@ -7,7 +7,7 @@ define('TEST_CASHBOX_WITH_AGENT', '112233445');
 
 define('PATH', dirname(dirname(dirname(__FILE__))));
 require_once(PATH."/vendor/autoload.php");
-require_once(PATH."/src/init.php");
+require_once(PATH."/src/autoload.php");
 
 require_once(__DIR__."/ReceiptAdapterConcrete.php");
 require_once(__DIR__."/ReceiptStorageConcrete.php");

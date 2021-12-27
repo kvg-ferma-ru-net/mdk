@@ -4,7 +4,7 @@
 spl_autoload_register(function ($class) {
 
     $prefix = 'Innokassa\\MDK\\';
-    $base_dir = __DIR__."/";
+    $base_dir = __DIR__ . "/";
 
     // does the class use the namespace prefix?
     $len = strlen($prefix);
@@ -22,26 +22,3 @@ spl_autoload_register(function ($class) {
         require $file;
     }
 });
-
-//##########################################################################
-
-function print_exception($e, $stacktrace=false, $return=false): ?string
-{
-    $sError = $e->getCode()." => ".$e->getMessage()."\n";
-
-    if($stacktrace)
-        $sError .= "Stack trace:\n".$e->getTraceAsString()."\n";
-
-    if($return)
-        return $sError;
-    
-    echo $sError;
-    return null;
-}
-
-function exit_print_r($data)
-{
-	header("Content-type: text/plain; charset: utf-8");
-	print_r($data);
-	exit();
-}
