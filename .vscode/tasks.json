@@ -1,0 +1,41 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run unit tests all",
+            "type": "shell",
+            "command": "vendor/bin/phpunit",
+            "args": [
+                "--colors=always",
+                "--coverage-html",
+                "coverage-report-html",
+                "--bootstrap",
+                "tests/Unit/bootstrap.php",
+                "tests/Unit/"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Run unit test current file",
+            "type": "shell",
+            "command": "vendor/bin/phpunit",
+            "args": [
+                "--colors=always",
+                "--coverage-html",
+                "coverage-report-html",
+                "--bootstrap",
+                "tests/Unit/bootstrap.php",
+                "${file}"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        }
+    ]
+}
