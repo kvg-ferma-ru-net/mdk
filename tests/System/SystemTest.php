@@ -27,6 +27,7 @@ use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
 use Innokassa\MDK\Exceptions\Services\ManualException;
 use Innokassa\MDK\Exceptions\Services\AutomaticException;
+use Innokassa\MDK\Logger\LoggerFile;
 
 /**
  * @uses Innokassa\MDK\Collections\BaseCollection
@@ -63,11 +64,12 @@ class SystemTest extends TestCase
     protected static $storage;
     protected static $adapter;
     protected static $client;
+    protected static $logger;
 
     public static function setUpBeforeClass(): void
     {
         self::$db = new db('localhost', 'mdk_test', '1ObK7x3B');
-        self::$db->query(file_get_contents(__DIR__.'/db.sql'));
+        self::$db->query(file_get_contents(__DIR__ . '/db.sql'));
 
         self::$settings = new SettingsConcrete([
             'actor_id' => '1234567',
@@ -82,12 +84,15 @@ class SystemTest extends TestCase
         self::$storage = new ReceiptStorageConcrete(new ConverterStorage(), self::$db);
         self::$adapter = new ReceiptAdapterConcrete(self::$db);
 
+        self::$logger = new LoggerFile();
+
         $transfer = new Transfer(
-            new NetClientCurl(), 
-            new ConverterApi(), 
-            self::$settings->getActorId(), 
-            self::$settings->getActorToken(), 
-            self::$settings->getCashbox()
+            new NetClientCurl(),
+            new ConverterApi(),
+            self::$settings->getActorId(),
+            self::$settings->getActorToken(),
+            self::$settings->getCashbox(),
+            self::$logger
         );
 
         $automatic = new AutomaticBase(self::$settings, self::$storage, $transfer, self::$adapter);
@@ -95,10 +100,17 @@ class SystemTest extends TestCase
         $pipeline = new PipelineBase(self::$storage, $transfer);
         $printer = new PrinterBase(self::$storage, $transfer);
         $connector = new ConnectorBase($transfer);
-        
+
         self::$client = new Client(
-            self::$settings, self::$adapter, self::$storage,
-            $automatic, $manual, $pipeline, $printer, $connector
+            self::$settings,
+            self::$adapter,
+            self::$storage,
+            $automatic,
+            $manual,
+            $pipeline,
+            $printer,
+            $connector,
+            self::$logger
         );
     }
 
@@ -376,7 +388,8 @@ class SystemTest extends TestCase
             new ConverterApi(), 
             $settings->getActorId(), 
             $settings->getActorToken(), 
-            $settings->getCashbox()
+            $settings->getCashbox(),
+            self::$logger
         );
         $connector = new ConnectorBase($transfer);
 
@@ -403,7 +416,8 @@ class SystemTest extends TestCase
             new ConverterApi(), 
             $settings->getActorId(), 
             $settings->getActorToken(), 
-            $settings->getCashbox()
+            $settings->getCashbox(),
+            self::$logger
         );
         $connector = new ConnectorBase($transfer);
 

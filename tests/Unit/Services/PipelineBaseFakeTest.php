@@ -13,6 +13,7 @@ use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Collections\ReceiptCollection;
 use Innokassa\MDK\Exceptions\NetConnectException;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
+use Innokassa\MDK\Logger\LoggerInterface;
 
 /**
  * @uses Innokassa\MDK\Services\PipelineBase
@@ -20,7 +21,6 @@ use Innokassa\MDK\Storage\ReceiptStorageInterface;
  * @uses Innokassa\MDK\Exceptions\TransferException
  * @uses Innokassa\MDK\Entities\AtomAbstract
  * @uses Innokassa\MDK\Entities\Atoms\Taxation
- * 
  * @uses Innokassa\MDK\Collections\BaseCollection
  * @uses Innokassa\MDK\Collections\ReceiptCollection
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptStatus
@@ -29,12 +29,14 @@ use Innokassa\MDK\Storage\ReceiptStorageInterface;
  * @uses Innokassa\MDK\Entities\Receipt
  * @uses Innokassa\MDK\Entities\UUID
  * @uses Innokassa\MDK\Storage\ReceiptFilter
+ * @uses Innokassa\MDK\Exceptions\BaseException
  */
 class PipelineBaseFakeTest extends TestCase
 {
     private $client;
     private $converter;
     private $storage;
+    private $logger;
 
     protected function setUp(): void
     {
@@ -48,6 +50,7 @@ class PipelineBaseFakeTest extends TestCase
 
         $this->converter = $this->createMock(ConverterAbstract::class);
         $this->storage = $this->createMock(ReceiptStorageInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
     }
 
     //######################################################################
@@ -63,7 +66,8 @@ class PipelineBaseFakeTest extends TestCase
             $this->converter, 
             TEST_ACTOR_ID, 
             TEST_ACTOR_TOKEN, 
-            TEST_CASHBOX_WITHOUT_AGENT
+            TEST_CASHBOX_WITHOUT_AGENT,
+            $this->logger
         );
         $pipeline = new PipelineBase($this->storage, $transfer);
 
@@ -117,7 +121,8 @@ class PipelineBaseFakeTest extends TestCase
             $this->converter, 
             TEST_ACTOR_ID, 
             TEST_ACTOR_TOKEN, 
-            TEST_CASHBOX_WITHOUT_AGENT
+            TEST_CASHBOX_WITHOUT_AGENT,
+            $this->logger
         );
         $pipeline = new PipelineBase($this->storage, $transfer);
         $this->assertTrue($pipeline->updateAccepted());
@@ -161,7 +166,8 @@ class PipelineBaseFakeTest extends TestCase
             $this->converter, 
             TEST_ACTOR_ID, 
             TEST_ACTOR_TOKEN, 
-            TEST_CASHBOX_WITHOUT_AGENT
+            TEST_CASHBOX_WITHOUT_AGENT,
+            $this->logger
         );
         $pipeline = new PipelineBase($this->storage, $transfer);
         $this->assertTrue($pipeline->updateAccepted());
@@ -205,7 +211,8 @@ class PipelineBaseFakeTest extends TestCase
             $this->converter, 
             TEST_ACTOR_ID, 
             TEST_ACTOR_TOKEN, 
-            TEST_CASHBOX_WITHOUT_AGENT
+            TEST_CASHBOX_WITHOUT_AGENT,
+            $this->logger
         );
         $pipeline = new PipelineBase($this->storage, $transfer);
         $this->assertTrue($pipeline->updateAccepted());
@@ -229,7 +236,8 @@ class PipelineBaseFakeTest extends TestCase
             $this->converter, 
             TEST_ACTOR_ID, 
             TEST_ACTOR_TOKEN, 
-            TEST_CASHBOX_WITHOUT_AGENT
+            TEST_CASHBOX_WITHOUT_AGENT,
+            $this->logger
         );
         $pipeline = new PipelineBase($this->storage, $transfer);
         $fp = fopen(PipelineBase::LOCK_FILE_UNACCEPTED, "w+");
@@ -282,7 +290,8 @@ class PipelineBaseFakeTest extends TestCase
             $this->converter, 
             TEST_ACTOR_ID, 
             TEST_ACTOR_TOKEN, 
-            TEST_CASHBOX_WITHOUT_AGENT
+            TEST_CASHBOX_WITHOUT_AGENT,
+            $this->logger
         );
         $pipeline = new PipelineBase($this->storage, $transfer);
         $this->assertTrue($pipeline->updateUnaccepted());
@@ -322,7 +331,8 @@ class PipelineBaseFakeTest extends TestCase
             $this->converter, 
             TEST_ACTOR_ID, 
             TEST_ACTOR_TOKEN, 
-            TEST_CASHBOX_WITHOUT_AGENT
+            TEST_CASHBOX_WITHOUT_AGENT,
+            $this->logger
         );
         $pipeline = new PipelineBase($this->storage, $transfer);
         $this->assertTrue($pipeline->updateUnaccepted());
@@ -366,7 +376,8 @@ class PipelineBaseFakeTest extends TestCase
             $this->converter, 
             TEST_ACTOR_ID, 
             TEST_ACTOR_TOKEN, 
-            TEST_CASHBOX_WITHOUT_AGENT
+            TEST_CASHBOX_WITHOUT_AGENT,
+            $this->logger
         );
         $pipeline = new PipelineBase($this->storage, $transfer);
         $this->assertTrue($pipeline->updateUnaccepted());

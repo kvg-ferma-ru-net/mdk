@@ -5,3 +5,4 @@ composer.lock
 coverage-report-html
 .updateAccepted
 .updateUnaccepted
+logs

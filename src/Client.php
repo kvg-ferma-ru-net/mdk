@@ -2,12 +2,13 @@
 
 namespace Innokassa\MDK;
 
+use Innokassa\MDK\Logger\LoggerInterface;
 use Innokassa\MDK\Services\ManualInterface;
 use Innokassa\MDK\Services\PrinterInterface;
 use Innokassa\MDK\Services\PipelineInterface;
+use Innokassa\MDK\Settings\SettingsInterface;
 use Innokassa\MDK\Services\AutomaticInterface;
 use Innokassa\MDK\Services\ConnectorInterface;
-use Innokassa\MDK\Settings\SettingsInterface;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Entities\ReceiptAdapterInterface;
 
@@ -24,7 +25,8 @@ class Client
         ManualInterface $manual,
         PipelineInterface $pipeline,
         PrinterInterface $printer,
-        ConnectorInterface $connector
+        ConnectorInterface $connector,
+        LoggerInterface $logger
     ) {
         $this->settings = $settings;
         $this->adapter = $adapter;
@@ -35,6 +37,7 @@ class Client
         $this->pipeline = $pipeline;
         $this->printer = $printer;
         $this->connector = $connector;
+        $this->logger = $logger;
     }
 
     //######################################################################
@@ -80,7 +83,7 @@ class Client
     }
 
     /**
-     * Получить сервис тестирования соединения с сервермо фискализации
+     * Получить сервис тестирования соединения с сервером фискализации
      *
      * @return ConnectorInterface
      */
@@ -91,19 +94,44 @@ class Client
 
     //######################################################################
 
+    /**
+     * Получить компонент настроек
+     *
+     * @return SettingsInterface
+     */
     public function componentSettings(): SettingsInterface
     {
         return $this->settings;
     }
 
+    /**
+     * Получить компонент адаптера чеков
+     *
+     * @return ReceiptAdapterInterface
+     */
     public function componentAdapter(): ReceiptAdapterInterface
     {
         return $this->adapter;
     }
 
+    /**
+     * Получить компонент хранилища чеков
+     *
+     * @return ReceiptStorageInterface
+     */
     public function componentStorage(): ReceiptStorageInterface
     {
         return $this->storage;
+    }
+
+    /**
+     * Получить компонент логирования
+     *
+     * @return LoggerInterface
+     */
+    public function componentLogger(): LoggerInterface
+    {
+        return $this->logger;
     }
 
     //######################################################################
@@ -115,4 +143,5 @@ class Client
     private $pipeline;
     private $printer;
     private $connector;
+    private $logger;
 }

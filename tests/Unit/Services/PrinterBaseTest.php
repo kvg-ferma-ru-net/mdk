@@ -1,8 +1,7 @@
 <?php
 
-use Innokassa\MDK\Net\Transfer;
-
 use PHPUnit\Framework\TestCase;
+use Innokassa\MDK\Net\Transfer;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Services\PrinterBase;
 use Innokassa\MDK\Net\NetClientInterface;
@@ -15,6 +14,7 @@ use Innokassa\MDK\Exceptions\SettingsException;
 use Innokassa\MDK\Exceptions\NetConnectException;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Exceptions\Services\PrinterException;
+use Innokassa\MDK\Logger\LoggerInterface;
 
 /**
  * @uses Innokassa\MDK\Services\ConnectorBase
@@ -33,6 +33,7 @@ class PrinterBaseTest extends TestCase
     private $client;
     private $converter;
     private $storage;
+    private $logger;
 
     protected function setUp(): void
     {
@@ -47,6 +48,7 @@ class PrinterBaseTest extends TestCase
             ->will($this->returnSelf());
 
         $this->converter = $this->createMock(ConverterAbstract::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
     }
 
     //######################################################################
@@ -62,7 +64,7 @@ class PrinterBaseTest extends TestCase
         $this->storage->method('getOne')
             ->willReturn($receipt);
 
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
+        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
         $printer = new PrinterBase($this->storage, $transfer);
         $this->assertIsString($printer->getLinkVerify(1));
     }
@@ -76,7 +78,7 @@ class PrinterBaseTest extends TestCase
         $this->storage->method('getOne')
             ->willReturn(null);
 
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
+        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
         $printer = new PrinterBase($this->storage, $transfer);
         $this->expectException(PrinterException::class);
         $printer->getLinkVerify(1);
@@ -93,7 +95,7 @@ class PrinterBaseTest extends TestCase
         $this->storage->method('getOne')
             ->willReturn($receipt);
 
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
+        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
         $printer = new PrinterBase($this->storage, $transfer);
         $this->expectException(PrinterException::class);
         $printer->getLinkVerify(1);
@@ -112,7 +114,7 @@ class PrinterBaseTest extends TestCase
         $this->storage->method('getOne')
             ->willReturn($receipt);
 
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
+        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
         $printer = new PrinterBase($this->storage, $transfer);
         $this->assertIsString($printer->getLinkRaw($receipt));
     }

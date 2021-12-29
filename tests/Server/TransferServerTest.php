@@ -1,7 +1,6 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Net\Transfer;
 use Innokassa\MDK\Net\ConverterApi;
 use Innokassa\MDK\Net\NetClientCurl;
@@ -14,6 +13,7 @@ use Innokassa\MDK\Entities\Primitives\Notify;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Exceptions\TransferException;
+use Innokassa\MDK\Logger\LoggerInterface;
 
 /**
  * @uses Innokassa\MDK\Net\Transfer
@@ -39,6 +39,13 @@ use Innokassa\MDK\Exceptions\TransferException;
  */
 class TransferServerTest extends TestCase
 {
+    protected $logger;
+
+    protected function setUp(): void
+    {
+        $this->logger = $this->createMock(LoggerInterface::class);
+    }
+
     /**
      * @covers Innokassa\MDK\Net\Transfer::sendReceipt
      */
@@ -60,7 +67,14 @@ class TransferServerTest extends TestCase
 
         $client = new NetClientCurl();
         $converter = new ConverterApi();
-        $transfer = new Transfer($client, $converter, TEST_ACTOR_ID, TEST_ACTOR_TOKEN, TEST_CASHBOX_WITHOUT_AGENT);
+        $transfer = new Transfer(
+            $client,
+            $converter,
+            TEST_ACTOR_ID,
+            TEST_ACTOR_TOKEN,
+            TEST_CASHBOX_WITHOUT_AGENT,
+            $this->logger
+        );
 
         $transfer->sendReceipt($receipt, false);
         $this->assertTrue(
@@ -79,7 +93,14 @@ class TransferServerTest extends TestCase
     {
         $client = new NetClientCurl();
         $converter = new ConverterApi();
-        $transfer = new Transfer($client, $converter, TEST_ACTOR_ID, TEST_ACTOR_TOKEN, TEST_CASHBOX_WITHOUT_AGENT);
+        $transfer = new Transfer(
+            $client,
+            $converter,
+            TEST_ACTOR_ID,
+            TEST_ACTOR_TOKEN,
+            TEST_CASHBOX_WITHOUT_AGENT,
+            $this->logger
+        );
         $receipt = $transfer->getReceipt($receipt);
         $this->assertTrue(
             $receipt->getStatus()->getCode() == ReceiptStatus::COMPLETED
@@ -110,7 +131,14 @@ class TransferServerTest extends TestCase
 
         $client = new NetClientCurl();
         $converter = new ConverterApi();
-        $transfer = new Transfer($client, $converter, TEST_ACTOR_ID, TEST_ACTOR_TOKEN, TEST_CASHBOX_WITHOUT_AGENT);
+        $transfer = new Transfer(
+            $client,
+            $converter,
+            TEST_ACTOR_ID,
+            TEST_ACTOR_TOKEN,
+            TEST_CASHBOX_WITHOUT_AGENT,
+            $this->logger
+        );
 
         $this->expectException(TransferException::class);
         $this->expectExceptionCode(400);
@@ -124,7 +152,14 @@ class TransferServerTest extends TestCase
     {
         $client = new NetClientCurl();
         $converter = new ConverterApi();
-        $transfer = new Transfer($client, $converter, TEST_ACTOR_ID, TEST_ACTOR_TOKEN, TEST_CASHBOX_WITHOUT_AGENT);
+        $transfer = new Transfer(
+            $client,
+            $converter,
+            TEST_ACTOR_ID,
+            TEST_ACTOR_TOKEN,
+            TEST_CASHBOX_WITHOUT_AGENT,
+            $this->logger
+        );
 
         $this->expectException(TransferException::class);
         $this->expectExceptionCode(404);
@@ -138,7 +173,7 @@ class TransferServerTest extends TestCase
     {
         $client = new NetClientCurl();
         $converter = new ConverterApi();
-        $transfer = new Transfer($client, $converter, '0', '0', '0');
+        $transfer = new Transfer($client, $converter, '0', '0', '0', $this->logger);
 
         $this->expectException(TransferException::class);
         $this->expectExceptionCode(401);
@@ -154,7 +189,14 @@ class TransferServerTest extends TestCase
     {
         $client = new NetClientCurl();
         $converter = new ConverterApi();
-        $transfer = new Transfer($client, $converter, TEST_ACTOR_ID, TEST_ACTOR_TOKEN, TEST_CASHBOX_WITHOUT_AGENT);
+        $transfer = new Transfer(
+            $client,
+            $converter,
+            TEST_ACTOR_ID,
+            TEST_ACTOR_TOKEN,
+            TEST_CASHBOX_WITHOUT_AGENT,
+            $this->logger
+        );
         $cashbox = $transfer->getCashBox();
 
         $this->assertIsObject($cashbox);
@@ -170,7 +212,7 @@ class TransferServerTest extends TestCase
     {
         $client = new NetClientCurl();
         $converter = new ConverterApi();
-        $transfer = new Transfer($client, $converter, TEST_ACTOR_ID, TEST_ACTOR_TOKEN, 0);
+        $transfer = new Transfer($client, $converter, TEST_ACTOR_ID, TEST_ACTOR_TOKEN, 0, $this->logger);
 
         $this->expectException(TransferException::class);
         $this->expectExceptionCode(404);

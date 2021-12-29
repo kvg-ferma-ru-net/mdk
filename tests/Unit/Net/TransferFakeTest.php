@@ -1,17 +1,15 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Net\Transfer;
 use Innokassa\MDK\Net\NetClientInterface;
-
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Entities\ConverterAbstract;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
-
 use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Exceptions\ConverterException;
 use Innokassa\MDK\Exceptions\NetConnectException;
+use Innokassa\MDK\Logger\LoggerInterface;
 
 /**
  * @uses Innokassa\MDK\Net\Transfer
@@ -22,11 +20,13 @@ use Innokassa\MDK\Exceptions\NetConnectException;
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptSubType
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptStatus
  * @uses Innokassa\MDK\Entities\AtomAbstract
+ * @uses Innokassa\MDK\Exceptions\BaseException
  */
 class TransferFakeTest extends TestCase
 {
     private $client;
     private $converter;
+    private $logger;
 
     protected function setUp(): void
     {
@@ -39,6 +39,7 @@ class TransferFakeTest extends TestCase
             ->will($this->returnSelf());
 
         $this->converter = $this->createMock(ConverterAbstract::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
     }
 
     //######################################################################
@@ -56,7 +57,7 @@ class TransferFakeTest extends TestCase
                 [NetClientInterface::CODE, 200]
             ]));
         
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
+        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
         $response = $transfer->getCashbox();
         $this->assertIsObject($response);
         $this->assertEquals(json_decode($cashbox), $response);
@@ -71,7 +72,7 @@ class TransferFakeTest extends TestCase
         $this->client->method('send')
             ->will($this->throwException(new NetConnectException()));
 
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
+        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
         
         $this->expectException(TransferException::class);
         $transfer->getCashbox(0);
@@ -89,7 +90,7 @@ class TransferFakeTest extends TestCase
                 [NetClientInterface::CODE, 401]
             ]));
 
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
+        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
         
         $this->expectException(TransferException::class);
         $this->expectExceptionCode(401);
@@ -110,7 +111,7 @@ class TransferFakeTest extends TestCase
                 [NetClientInterface::CODE, 202]
             ]));
 
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
+        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
         $receipt = new Receipt();
         $this->assertEquals($receipt, $transfer->getReceipt($receipt));
         $this->assertEquals(ReceiptStatus::WAIT, $receipt->getStatus()->getCode());
@@ -125,7 +126,7 @@ class TransferFakeTest extends TestCase
         $this->client->method('send')
             ->will($this->throwException(new NetConnectException('error connect', 18)));
 
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
+        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
         $receipt = new Receipt();
 
         try
@@ -151,7 +152,7 @@ class TransferFakeTest extends TestCase
                 [NetClientInterface::CODE, 401]
             ]));
 
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
+        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
         $receipt = new Receipt();
 
         try
@@ -179,7 +180,7 @@ class TransferFakeTest extends TestCase
                 [NetClientInterface::CODE, 401]
             ]));
 
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
+        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
         $receipt = new Receipt();
 
         $this->assertIsString($transfer->getReceiptLink($receipt));
@@ -202,7 +203,7 @@ class TransferFakeTest extends TestCase
         $this->converter->method('receiptToArray')
             ->willReturn([]);
 
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
+        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
         $receipt = new Receipt();
         
         $this->assertEquals($receipt, $transfer->sendReceipt($receipt, false));
@@ -221,7 +222,7 @@ class TransferFakeTest extends TestCase
         $this->converter->method('receiptToArray')
             ->willReturn([]);
 
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
+        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
         $receipt = new Receipt();
 
         try
@@ -250,7 +251,7 @@ class TransferFakeTest extends TestCase
         $this->converter->method('receiptToArray')
             ->willReturn([]);
 
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
+        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
         $receipt = new Receipt();
 
         try
@@ -273,7 +274,7 @@ class TransferFakeTest extends TestCase
         $this->converter->method('receiptToArray')
             ->will($this->throwException(new ConverterException()));
 
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0');
+        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
         $receipt = new Receipt();
         
         try

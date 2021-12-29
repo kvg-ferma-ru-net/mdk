@@ -14,6 +14,7 @@ use Innokassa\MDK\Exceptions\SettingsException;
 use Innokassa\MDK\Exceptions\NetConnectException;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Exceptions\Services\PrinterException;
+use Innokassa\MDK\Logger\LoggerInterface;
 
 /**
  * @uses Innokassa\MDK\Services\ConnectorBase
@@ -26,12 +27,14 @@ use Innokassa\MDK\Exceptions\Services\PrinterException;
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptType
  * @uses Innokassa\MDK\Entities\Receipt
  * @uses Innokassa\MDK\Entities\UUID
+ * @uses Innokassa\MDK\Exceptions\BaseException
  */
 class ConnectorBaseFakeTest extends TestCase
 {
     private $client;
     private $converter;
     private $settings;
+    private $logger;
 
     protected function setUp(): void
     {
@@ -56,6 +59,8 @@ class ConnectorBaseFakeTest extends TestCase
             ->willReturn(Taxation::ORN);
         $this->settings->method('getLocation')
             ->willReturn('https://example.com/');
+
+        $this->logger = $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -76,7 +81,8 @@ class ConnectorBaseFakeTest extends TestCase
             $this->converter, 
             $this->settings->getActorId(), 
             $this->settings->getActorToken(), 
-            $this->settings->getCashbox()
+            $this->settings->getCashbox(),
+            $this->logger
         );
         $connector = new ConnectorBase($transfer);
         $this->assertTrue($connector->testSettings($this->settings));
@@ -98,7 +104,8 @@ class ConnectorBaseFakeTest extends TestCase
             $this->converter, 
             $this->settings->getActorId(), 
             $this->settings->getActorToken(), 
-            $this->settings->getCashbox()
+            $this->settings->getCashbox(),
+            $this->logger
         );
         $connector = new ConnectorBase($transfer);
         $this->expectException(SettingsException::class);
@@ -119,7 +126,8 @@ class ConnectorBaseFakeTest extends TestCase
             $this->converter, 
             $this->settings->getActorId(), 
             $this->settings->getActorToken(), 
-            $this->settings->getCashbox()
+            $this->settings->getCashbox(),
+            $this->logger
         );
         $connector = new ConnectorBase($transfer);
         $this->expectException(SettingsException::class);
@@ -144,7 +152,8 @@ class ConnectorBaseFakeTest extends TestCase
             $this->converter, 
             $this->settings->getActorId(), 
             $this->settings->getActorToken(), 
-            $this->settings->getCashbox()
+            $this->settings->getCashbox(),
+            $this->logger
         );
         $connector = new ConnectorBase($transfer);
         $this->expectException(SettingsException::class);
@@ -169,7 +178,8 @@ class ConnectorBaseFakeTest extends TestCase
             $this->converter, 
             $this->settings->getActorId(), 
             $this->settings->getActorToken(), 
-            $this->settings->getCashbox()
+            $this->settings->getCashbox(),
+            $this->logger
         );
         $connector = new ConnectorBase($transfer);
         $this->expectException(SettingsException::class);
