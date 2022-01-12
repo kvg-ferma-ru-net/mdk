@@ -6,3 +6,5 @@ coverage-report-html
 .updateAccepted
 .updateUnaccepted
 logs
+docker-data
+xdebug.log

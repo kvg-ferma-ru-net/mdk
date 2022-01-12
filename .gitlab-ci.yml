@@ -1,0 +1,14 @@
+before_script:
+  - docker -v
+  - docker-compose -v
+
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    - docker-compose -f docker-compose-test.yml up --abort-on-container-exit
+  coverage: '/\s+Lines:\s{2,}(\d+[,.]\d+%)/'
+  tags:
+    - mdk

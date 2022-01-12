@@ -1,0 +1,34 @@
+version: '3.0'
+
+services:
+
+  mysql:
+    image: mysql:5.7
+    container_name: mdk-mysql-test
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    networks:
+      - app-network
+
+  php:
+    build:
+      context: ./.docker/php
+      args:
+        uid: 1000
+        user: runner
+    container_name: mdk-php-test
+    depends_on: 
+      - mysql
+    volumes:
+      - ./:/opt/mdk/
+      - ./.docker/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+      - ./.docker/php/test/entrypoint.sh:/usr/bin/entrypoint.sh
+      - ./.docker/php/test/wait-db.php:/opt/wait-db.php
+    command: /bin/bash -c "/usr/bin/entrypoint.sh"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

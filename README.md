@@ -1,3 +1,4 @@
+[![coverage report](http://git.innokassa.ru/Byurrer/mdk/badges/test-ci/coverage.svg)](http://git.innokassa.ru/Byurrer/mdk/-/commits/test-ci)
 
 ![Innokassa MDK](/logo.png)
 
