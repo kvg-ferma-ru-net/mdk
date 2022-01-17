@@ -24,8 +24,9 @@
         * [Manual](#manual)
         * [Printer](#printer)
         * [Pipeline](#pipeline)
-* [Обработка ошибок](#обработка-ошибок)
-* [Логи](#логи)
+    * [Обработка ошибок](#обработка-ошибок)
+    * [Логи](#логи)
+* [Разработка](#разработка)
 * [Issues & Contributing](#issues-и-contributing)
 * [License](#license)
 
@@ -234,13 +235,39 @@ $pipeline->updateUnaccepted();
 * при ручных действиях (ручная фискализация, проверка настроек и прочее) показывать ошибку через интерфейс
 * при автоматических действиях оповещать пользователя интеграции через email или другими доступными средствами
 
-## Логи
+### Логи
 
 Для логирования используются файловые логи [LoggerFile](/src/Logger/LoggerFile.php) интерфейса [LoggerInterface](/src/Logger/LoggerInterface.php), хранимые в директории `logs`, которая должна быть доступна извне для анализа работы `MDK`. 
 
 Логи применяются в классе [Transfer](/src/Net/Transfer.php) для хранения истории взаимодействия с сервером фискализации.
 
 Клиентский код также может использовать логирование предоставляемое `MDK`.
+
+## Разработка
+
+> Для разработки потребуется `docker` и `docker-compose`
+
+Репозиторий содержит [docker-compose-dev.yml](/docker-compose-dev.yml) для организации среды разработки `MDK`, состоит из двух контейнеров:
+* `mdk-php-dev` - основан на [php:7.3-cli](https://hub.docker.com/_/php) с модификациями, внутри используется `xdebug` для отладки и `composer` для установки `phpunit`
+* `mdk-mysql-dev` - основан [mysql:5.7](https://hub.docker.com/_/mysql) без модификаций (логин:пароль от БД root:root)
+
+Запуск контейнеров:
+```bash
+docker-compose -f docker-compose-dev.yml up
+```
+
+После запуска будет развернута изолированная среда со всем необходимым ПО для разработки `MDK`.
+
+Для `VS Code` есть вспомогательные инструменты:
+* отладчик [PHP Debug](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-debug), настройки которого можно найти в [launch.json](/.vscode/launch.json) послеовательность действий:
+    * запускается отладчик в редакторе
+    * в docker контейнере запускается нужный скрипт, например `docker exec -it mdk-php-dev /bin/bash -c "php -f file.php"`
+    * отладчик в редакторе получает отладочные данные из контейнера
+* задания  [tasks.json](/.vscode/tasks.json) (задания запускаются в `docker` контейнере):
+    * Run unit tests all - запуск всех unit тестов
+    * Run unit test current file - запуск текущего тестового скрипта на тестирование
+
+> Рекомендуемые расширения для `VS Code` [intelephense](https://marketplace.visualstudio.com/items?itemName=bmewburn.vscode-intelephense-client), [phpcs](https://marketplace.visualstudio.com/items?itemName=ikappas.phpcs), нужные настройки для них подгрузятся из конфига в репозитории
 
 ## Issues и Contributing
 
