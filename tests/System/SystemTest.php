@@ -68,7 +68,7 @@ class SystemTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$db = new db('localhost', 'mdk_test', '1ObK7x3B');
+        self::$db = new db('mysql', 'root', 'root');
         self::$db->query(file_get_contents(__DIR__ . '/db.sql'));
 
         self::$settings = new SettingsConcrete([

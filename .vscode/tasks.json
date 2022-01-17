@@ -4,14 +4,14 @@
         {
             "label": "Run unit tests all",
             "type": "shell",
-            "command": "vendor/bin/phpunit",
+            "command": "docker",
             "args": [
-                "--colors=always",
-                "--coverage-html",
-                "coverage-report-html",
-                "--bootstrap",
-                "tests/Unit/bootstrap.php",
-                "tests/Unit/"
+                "exec",
+                "-it",
+                "mdk-php-dev",
+                "/bin/bash",
+                "-c",
+                "vendor/bin/phpunit --colors=always --coverage-html --bootstrap tests/Unit/bootstrap.php tests/Unit/"
             ],
             "group": "test",
             "presentation": {
@@ -22,14 +22,14 @@
         {
             "label": "Run unit test current file",
             "type": "shell",
-            "command": "vendor/bin/phpunit",
+            "command": "docker",
             "args": [
-                "--colors=always",
-                "--coverage-html",
-                "coverage-report-html",
-                "--bootstrap",
-                "tests/Unit/bootstrap.php",
-                "${file}"
+                "exec",
+                "-it",
+                "mdk-php-dev",
+                "/bin/bash",
+                "-c",
+                "vendor/bin/phpunit --colors=always --coverage-html coverage-report-html --bootstrap tests/Unit/bootstrap.php ${relativeFile}"
             ],
             "group": "test",
             "presentation": {

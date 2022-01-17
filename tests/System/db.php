@@ -1,26 +1,26 @@
 <?php
 
-class db 
+class db
 {
-    public function __construct(string $host, string $user, string $pwd, string $charset="utf8")
-	{
-		$this->db = null;
-		
-		$opt  = [
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-			PDO::ATTR_EMULATE_PREPARES => TRUE,
-		];
+    public function __construct(string $host, string $user, string $pwd, string $charset = "utf8")
+    {
+        $this->db = null;
 
-		$dsn = 'mysql:host='.$host.';charset='.$charset;
-		
+        $opt  = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => TRUE,
+        ];
+
+        $dsn = 'mysql:host='.$host.';charset='.$charset;
+
         $this->db = new PDO($dsn, $user, $pwd, $opt);
-	}
+    }
 
     public function query(string $sql, $return=false)
-	{
+    {
         $statement = $this->db->prepare($sql);
-            
+
         if(!($res = $statement->execute()))
             return null;
 
@@ -31,7 +31,7 @@ class db
             return $statement->fetchAll();
         else
             return $res;
-	}
+    }
 
     public function lastInsertId()
     {
@@ -41,5 +41,5 @@ class db
     //######################################################################
 
     //! объект PDO
-	private $db = null;
-};
+    private $db = null;
+}
