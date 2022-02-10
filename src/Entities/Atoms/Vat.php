@@ -3,6 +3,7 @@
 namespace Innokassa\MDK\Entities\Atoms;
 
 use Innokassa\MDK\Entities\AtomAbstract;
+use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
@@ -33,9 +34,16 @@ class Vat extends AtomAbstract
     /**
      * @throws InvalidArgumentException
      * @param string|int $value значение НДС (20% == 20) или код НДС для API из констант
+     * @param int|null $taxation налогообложение, для вычисления НДСс учетом налогообложения
      */
-    public function __construct($value)
+    public function __construct($value, int $taxation = null)
     {
+        if ($taxation && $taxation != Taxation::ORN) {
+            $this->code = self::CODE_WITHOUT;
+            $this->name = 'Не облагается';
+            return;
+        }
+
         $value = trim($value);
         $value = str_replace("%", "", $value);
 
@@ -62,7 +70,7 @@ class Vat extends AtomAbstract
                 break;
             case '':
                 $this->code = self::CODE_WITHOUT;
-                $this->name = '0';
+                $this->name = 'Не облагается';
                 break;
             default:
                 $a = [
@@ -71,7 +79,7 @@ class Vat extends AtomAbstract
                     self::CODE_120 => '20/120',
                     self::CODE_110 => '10/110',
                     self::CODE_0 => '0',
-                    self::CODE_WITHOUT => '0'
+                    self::CODE_WITHOUT => 'Не облагается'
                 ];
                 if (!isset($a[$value])) {
                     throw new InvalidArgumentException("invalid vat value '$value'");
