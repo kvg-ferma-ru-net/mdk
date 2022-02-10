@@ -3,6 +3,7 @@
 use PHPUnit\Framework\TestCase;
 
 use Innokassa\MDK\Entities\Atoms\Vat;
+use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
@@ -19,7 +20,7 @@ class VatTest extends TestCase
     {
         $vat = new Vat("");
         $this->assertSame(Vat::CODE_WITHOUT, $vat->getCode());
-        $this->assertSame("0", $vat->getName());
+        $this->assertSame("Не облагается", $vat->getName());
 
         $vat = new Vat("20%");
         $this->assertSame(Vat::CODE_20, $vat->getCode());
@@ -64,7 +65,15 @@ class VatTest extends TestCase
 
         $vat = new Vat(6);
         $this->assertSame(Vat::CODE_WITHOUT, $vat->getCode());
-        $this->assertSame("0", $vat->getName());
+        $this->assertSame("Не облагается", $vat->getName());
+
+        $vat = new Vat("20%", Taxation::ORN);
+        $this->assertSame(Vat::CODE_20, $vat->getCode());
+        $this->assertSame("20", $vat->getName());
+
+        $vat = new Vat("20%", Taxation::USN);
+        $this->assertSame(Vat::CODE_WITHOUT, $vat->getCode());
+        $this->assertSame("Не облагается", $vat->getName());
 
         $this->expectException(InvalidArgumentException::class);
         $vat = new Vat("15%");
@@ -80,4 +89,4 @@ class VatTest extends TestCase
         $this->assertContainsOnlyInstancesOf(Vat::class, $a);
         $this->assertCount(6, $a);
     }
-};
+}
