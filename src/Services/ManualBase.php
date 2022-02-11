@@ -82,19 +82,36 @@ class ManualBase extends FiscalizationBaseAbstract implements ManualInterface
             ->setOrderId($orderId);
         $receipt = $this->supplementReceipt($receipt);
 
+        // подсчет поступлений денег по заказу
         $receiptsComing = $this->receiptStorage->getCollection(
             (new ReceiptFilter())
                 ->setOrderId($orderId)
                 ->setType(ReceiptType::COMING)
         );
+        $amountComing = 0;
+        foreach ($receiptsComing as $rec) {
+            $amount = $rec->getAmount();
+            $amountComing += $amount->get(Amount::CASH) + $amount->get(Amount::CASHLESS);
+        }
+
+        // подсчет возвратов денег по заказу
         $receiptsRefund = $this->receiptStorage->getCollection(
             (new ReceiptFilter())
                 ->setOrderId($orderId)
                 ->setType(ReceiptType::REFUND_COMING)
         );
+        $amountRefund = 0;
+        foreach ($receiptsRefund as $rec) {
+            $amount = $rec->getAmount();
+            $amountRefund += $amount->get(Amount::CASH) + $amount->get(Amount::CASHLESS);
+        }
 
-        $amountNewRefund = $receipt->getItems()->getAmount();
-        $amountBalance = $receiptsComing->getAmount() - $receiptsRefund->getAmount();
+        // текущая сумма возврата
+        $amount = $receipt->getAmount();
+        $amountNewRefund = $amount->get(Amount::CASH) + $amount->get(Amount::CASHLESS);
+
+        // текущий баланс заказа
+        $amountBalance = $amountComing - $amountRefund;
 
         // если сумма нового возврата превышает остаток по заказу - нельзя пробить чек возврата
         if ($amountNewRefund > $amountBalance) {

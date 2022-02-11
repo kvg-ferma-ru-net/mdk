@@ -151,7 +151,8 @@ class ManualBaseFakeTest extends TestCase
 
         $receipts = new ReceiptCollection();
         $receipts[] = (new Receipt())
-            ->setItems($items);
+            ->setItems($items)
+            ->setAmount(new Amount(Amount::CASHLESS, 200));
 
         $this->storage
             ->method('getCollection')
@@ -187,7 +188,8 @@ class ManualBaseFakeTest extends TestCase
 
         $receipts = new ReceiptCollection();
         $receipts[] = (new Receipt())
-            ->setItems($items);
+            ->setItems($items)
+            ->setAmount(new Amount(Amount::CASHLESS, 200));
 
         $this->storage
             ->method('getCollection')
@@ -220,7 +222,8 @@ class ManualBaseFakeTest extends TestCase
 
         $receipts = new ReceiptCollection();
         $receipts[] = (new Receipt())
-            ->setItems($items);
+            ->setItems($items)
+            ->setAmount(new Amount(Amount::CASHLESS, 200));
 
         $this->storage
             ->method('getCollection')
