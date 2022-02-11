@@ -371,7 +371,7 @@ class Receipt
      */
     public function setLocation(string $location): self
     {
-        if (!filter_var($location, FILTER_VALIDATE_URL, FILTER_FLAG_HOST_REQUIRED)) {
+        if (!preg_match('/\w+\.\w+/u', $location)) {
             throw new InvalidArgumentException("invalid location '$location'");
         }
 

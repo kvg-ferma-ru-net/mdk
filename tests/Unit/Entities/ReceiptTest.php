@@ -205,6 +205,19 @@ class ReceiptTest extends TestCase
     /**
      * @covers Innokassa\MDK\Entities\Receipt::__construct
      * @covers Innokassa\MDK\Entities\Receipt::setLocation
+     * @covers Innokassa\MDK\Entities\Receipt::getLocation
+     */
+    public function testSetGetLocationCyr()
+    {
+        $site = 'http://мойсайт.рф';
+        $receipt = new Receipt();
+        $this->assertSame($receipt, $receipt->setLocation($site));
+        $this->assertSame($site, $receipt->getLocation());
+    }
+
+    /**
+     * @covers Innokassa\MDK\Entities\Receipt::__construct
+     * @covers Innokassa\MDK\Entities\Receipt::setLocation
      */
     public function testSetGetLocationError()
     {
