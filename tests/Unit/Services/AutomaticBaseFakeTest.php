@@ -63,8 +63,8 @@ class AutomaticBaseFakeTest extends TestCase
         $this->adapter = $this->createMock(ReceiptAdapterInterface::class);
         $this->adapter->method('getItems')
             ->willReturn($items);
-        $this->adapter->method('getAmount')
-            ->willReturn(new Amount(Amount::CASHLESS, 200.0));
+        $this->adapter->method('getTotal')
+            ->willReturn(200.0);
         $this->adapter->method('getCustomer')
             ->willReturn(new Customer('Test'));
         $this->adapter->method('getNotify')
@@ -93,6 +93,7 @@ class AutomaticBaseFakeTest extends TestCase
     //######################################################################
 
     /**
+     * Тест чека предоплаты
      * @covers Innokassa\MDK\Services\AutomaticBase::__construct
      * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
      */
@@ -127,6 +128,7 @@ class AutomaticBaseFakeTest extends TestCase
     //**********************************************************************
 
     /**
+     * Тест чека полного расчета, без чека предоплаты
      * @covers Innokassa\MDK\Services\AutomaticBase::__construct
      * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
      */
@@ -144,26 +146,11 @@ class AutomaticBaseFakeTest extends TestCase
         $receipt = $automatic->fiscalize('0', ReceiptSubType::FULL);
         $this->assertInstanceOf(Receipt::class, $receipt);
         $this->assertSame(ReceiptSubType::FULL, $receipt->getSubType());
-
-
-        $receipts = new ReceiptCollection();
-        $receipt = new Receipt();
-        $receipt->setType(ReceiptType::COMING);
-        $receipt->setSubType(ReceiptSubType::PRE);
-        $receipts[] = $receipt;
-
-        $this->storage = $this->createMock(ReceiptStorageInterface::class);
-        $this->storage
-            ->method('getCollection')
-            ->will($this->onConsecutiveCalls(new ReceiptCollection(), $receipts));
-
-        $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
-        $receipt = $automatic->fiscalize('0');
-        $this->assertInstanceOf(Receipt::class, $receipt);
-        $this->assertSame(ReceiptSubType::FULL, $receipt->getSubType());
+        $this->assertSame(200.0, $receipt->getAmount()->get(Amount::CASHLESS));
     }
 
     /**
+     * Тест чека полного расчета с чеком предоплаты
      * @covers Innokassa\MDK\Services\AutomaticBase::__construct
      * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
      */
@@ -187,11 +174,13 @@ class AutomaticBaseFakeTest extends TestCase
         $receipt = $automatic->fiscalize('0');
         $this->assertInstanceOf(Receipt::class, $receipt);
         $this->assertSame(ReceiptSubType::FULL, $receipt->getSubType());
+        $this->assertSame(200.0, $receipt->getAmount()->get(Amount::PREPAYMENT));
     }
 
     //**********************************************************************
 
     /**
+     * Тест чека полного рачета при наличии настройки "пробивать только второй чек"
      * @covers Innokassa\MDK\Services\AutomaticBase::__construct
      * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
      */
@@ -209,6 +198,7 @@ class AutomaticBaseFakeTest extends TestCase
         $receipt = $automatic->fiscalize('0');
         $this->assertInstanceOf(Receipt::class, $receipt);
         $this->assertSame(ReceiptSubType::FULL, $receipt->getSubType());
+        $this->assertSame(200.0, $receipt->getAmount()->get(Amount::CASHLESS));
     }
 
     //**********************************************************************

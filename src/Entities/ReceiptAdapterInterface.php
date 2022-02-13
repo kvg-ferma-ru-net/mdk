@@ -24,15 +24,14 @@ interface ReceiptAdapterInterface
     public function getItems(string $orderId, int $subType): ReceiptItemCollection;
 
     /**
-     * Получить данные об оплате
+     * Получить общую сумму заказа
      *
      * @throws InvalidArgumentException
      *
      * @param string $orderId
-     * @param int $subType подтип создаваемого чека (ReceiptSubType::PRE || ReceiptSubType::FULL)
-     * @return Amount
+     * @return float
      */
-    public function getAmount(string $orderId, int $subType): Amount;
+    public function getTotal(string $orderId): float;
 
     /**
      * Получить данные покупателя

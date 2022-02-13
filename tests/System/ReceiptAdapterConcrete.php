@@ -1,8 +1,6 @@
 <?php
 
 use Innokassa\MDK\Entities\ReceiptItem;
-use Innokassa\MDK\Entities\ConverterAbstract;
-use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
 use Innokassa\MDK\Entities\Atoms\PaymentMethod;
 use Innokassa\MDK\Entities\Primitives\Customer;
@@ -35,15 +33,10 @@ class ReceiptAdapterConcrete implements ReceiptAdapterInterface
         return $items;
     }
 
-    public function getAmount(string $orderId, int $subType): Amount
+    public function getTotal(string $orderId): float
     {
-        $paymentMethod = $this->getPaymentMethod($subType);
-
-        $items = $this->getItems($orderId, $subType);
-        return new Amount(
-            ($paymentMethod == PaymentMethod::PREPAYMENT_FULL ? Amount::CASHLESS : Amount::PREPAYMENT),
-            $items->getAmount()
-        );
+        $items = $this->getItems($orderId, ReceiptSubType::PRE);
+        return $items->getAmount();
     }
 
     public function getCustomer(string $orderId): Customer

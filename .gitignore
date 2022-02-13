@@ -8,3 +8,4 @@ coverage-report-html
 logs
 docker-data
 xdebug.log
+php_errors.log

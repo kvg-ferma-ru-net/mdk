@@ -2,16 +2,17 @@
 
 namespace Innokassa\MDK\Services;
 
-use Innokassa\MDK\Services\FiscalizationBaseAbstract;
-use Innokassa\MDK\Entities\Atoms\ReceiptType;
-use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Entities\Receipt;
-use Innokassa\MDK\Entities\ReceiptAdapterInterface;
 use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Storage\ReceiptFilter;
-use Innokassa\MDK\Storage\ReceiptStorageInterface;
+use Innokassa\MDK\Entities\Atoms\ReceiptType;
+use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Settings\SettingsInterface;
 use Innokassa\MDK\Exceptions\TransferException;
+use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
+use Innokassa\MDK\Storage\ReceiptStorageInterface;
+use Innokassa\MDK\Entities\ReceiptAdapterInterface;
+use Innokassa\MDK\Services\FiscalizationBaseAbstract;
 use Innokassa\MDK\Exceptions\Services\AutomaticException;
 
 /**
@@ -72,6 +73,19 @@ class AutomaticBase extends FiscalizationBaseAbstract implements AutomaticInterf
             throw new AutomaticException("В заказе уже есть второй чек");
         }
 
+        $total = $this->receiptAdapter->getTotal($orderId);
+        $amount = new Amount();
+
+        // если пробиваем второй чек и был чек предоплаты
+        if (
+            $receiptSubType == ReceiptSubType::FULL
+            && $receipts->getByType(ReceiptType::COMING, ReceiptSubType::PRE)
+        ) {
+            $amount->set(Amount::PREPAYMENT, $total);
+        } else {
+            $amount->set(Amount::CASHLESS, $total);
+        }
+
         $receipt = new Receipt();
         $receipt->setOrderId($orderId);
         $receipt->setType(ReceiptType::COMING);
@@ -79,7 +93,7 @@ class AutomaticBase extends FiscalizationBaseAbstract implements AutomaticInterf
         $receipt->setItems($this->receiptAdapter->getItems($orderId, $receiptSubType));
         $receipt->setCustomer($this->receiptAdapter->getCustomer($orderId));
         $receipt->setNotify($this->receiptAdapter->getNotify($orderId));
-        $receipt->setAmount($this->receiptAdapter->getAmount($orderId, $receiptSubType));
+        $receipt->setAmount($amount);
         $receipt->setTaxation($this->settings->getTaxation());
         $receipt->setLocation($this->settings->getLocation());
         $receipt->setCashbox($this->settings->getCashbox());

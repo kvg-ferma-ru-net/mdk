@@ -181,14 +181,9 @@ class SystemTest extends TestCase
         $items = self::$adapter->getItems(1, ReceiptSubType::FULL);
         $this->assertSame(PaymentMethod::PAYMENT_FULL, $items[0]->getPaymentMethod());
 
-        $amount = self::$adapter->getAmount(1, ReceiptSubType::PRE);
-        $this->assertInstanceOf(Amount::class, $amount);
-        $this->assertTrue($amount->get(Amount::CASHLESS) > 0);
-        $this->assertNull($amount->get(Amount::PREPAYMENT));
-
-        $amount = self::$adapter->getAmount(1, ReceiptSubType::FULL);
-        $this->assertTrue($amount->get(Amount::PREPAYMENT) > 0);
-        $this->assertNull($amount->get(Amount::CASHLESS));
+        $total = self::$adapter->getTotal(1);
+        $this->assertIsFloat($total);
+        $this->assertTrue($total > 0);
 
         $customer = self::$adapter->getCustomer(1);
         $this->assertInstanceOf(Customer::class, $customer);
@@ -222,7 +217,8 @@ class SystemTest extends TestCase
 
         $orderId = 2;
         $items = self::$adapter->getItems($orderId, ReceiptSubType::PRE);
-        $amount = self::$adapter->getAmount($orderId, ReceiptSubType::PRE);
+        $total = self::$adapter->getTotal($orderId);
+        $amount = new Amount(Amount::CASHLESS, $total);
         $notify = self::$adapter->getNotify($orderId);
 
         $receiptComing = $manual->fiscalize($orderId, $items, $notify, $amount);
@@ -265,7 +261,8 @@ class SystemTest extends TestCase
         */
         $orderId = 5;
         $items = self::$adapter->getItems($orderId, ReceiptSubType::PRE);
-        $amount = self::$adapter->getAmount($orderId, ReceiptSubType::PRE);
+        $total = self::$adapter->getTotal($orderId);
+        $amount = new Amount(Amount::CASHLESS, $total);
         $notify = self::$adapter->getNotify($orderId);
         
         $receiptComing = $manual->fiscalize($orderId, $items, $notify, $amount);
@@ -295,7 +292,8 @@ class SystemTest extends TestCase
         */
         $orderId = 4;
         $items = self::$adapter->getItems($orderId, ReceiptSubType::PRE);
-        $amount = self::$adapter->getAmount($orderId, ReceiptSubType::PRE);
+        $total = self::$adapter->getTotal($orderId);
+        $amount = new Amount(Amount::CASHLESS, $total);
         $notify = self::$adapter->getNotify($orderId);
         $receiptComing = $manual->fiscalize($orderId, $items, $notify, $amount);
         $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::REPEAT));
