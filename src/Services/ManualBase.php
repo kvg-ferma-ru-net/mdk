@@ -3,17 +3,18 @@
 namespace Innokassa\MDK\Services;
 
 use Innokassa\MDK\Entities\Receipt;
+use Innokassa\MDK\Net\TransferInterface;
+use Innokassa\MDK\Storage\ReceiptFilter;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
-use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
+use Innokassa\MDK\Settings\SettingsInterface;
+use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
+use Innokassa\MDK\Exceptions\TransferException;
+use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
+use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
 use Innokassa\MDK\Services\FiscalizationBaseAbstract;
-use Innokassa\MDK\Net\TransferInterface;
-use Innokassa\MDK\Settings\SettingsInterface;
-use Innokassa\MDK\Storage\ReceiptStorageInterface;
-use Innokassa\MDK\Storage\ReceiptFilter;
-use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Exceptions\Services\ManualException;
 
 /**
@@ -87,6 +88,7 @@ class ManualBase extends FiscalizationBaseAbstract implements ManualInterface
             (new ReceiptFilter())
                 ->setOrderId($orderId)
                 ->setType(ReceiptType::COMING)
+                ->setStatus(ReceiptStatus::COMPLETED)
         );
         $amountComing = 0;
         foreach ($receiptsComing as $rec) {
@@ -99,6 +101,7 @@ class ManualBase extends FiscalizationBaseAbstract implements ManualInterface
             (new ReceiptFilter())
                 ->setOrderId($orderId)
                 ->setType(ReceiptType::REFUND_COMING)
+                ->setStatus(ReceiptStatus::COMPLETED)
         );
         $amountRefund = 0;
         foreach ($receiptsRefund as $rec) {
