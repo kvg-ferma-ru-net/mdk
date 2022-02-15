@@ -112,9 +112,11 @@ class ManualBase extends FiscalizationBaseAbstract implements ManualInterface
         // текущая сумма возврата
         $amount = $receipt->getAmount();
         $amountNewRefund = $amount->get(Amount::CASH) + $amount->get(Amount::CASHLESS);
+        $amountNewRefund = intval(round($amountNewRefund, 2) * 100);
 
         // текущий баланс заказа
         $amountBalance = $amountComing - $amountRefund;
+        $amountBalance = intval(round($amountBalance, 2) * 100);
 
         // если сумма нового возврата превышает остаток по заказу - нельзя пробить чек возврата
         if ($amountNewRefund > $amountBalance) {
