@@ -120,8 +120,10 @@ class ManualBase extends FiscalizationBaseAbstract implements ManualInterface
 
         // если сумма нового возврата превышает остаток по заказу - нельзя пробить чек возврата
         if ($amountNewRefund > $amountBalance) {
+            $amountNewRefundRub = round(($amountNewRefund / 100.0), 2);
+            $amountBalanceRub = round(($amountBalance / 100.0), 2);
             throw new ManualException(
-                "Cумма нового возврата '$amountNewRefund' превышает остаток по заказу '$amountBalance'"
+                "Cумма нового возврата '$amountNewRefundRub' превышает остаток по заказу '$amountBalanceRub'"
             );
         }
 
