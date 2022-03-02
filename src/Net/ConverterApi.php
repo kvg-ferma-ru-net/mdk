@@ -79,9 +79,7 @@ class ConverterApi extends ConverterAbstract
                 'type' => 'email',
                 'value' => $notify->getEmail()
             ];
-        }
-
-        if ($notify->getPhone()) {
+        } elseif ($notify->getPhone()) {
             $a[] = [
                 'type' => 'phone',
                 'value' => $notify->getPhone()

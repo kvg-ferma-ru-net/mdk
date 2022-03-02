@@ -1,17 +1,14 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Net\ConverterApi;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Entities\ReceiptItem;
-
 use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
 use Innokassa\MDK\Entities\Primitives\Customer;
-
 use Innokassa\MDK\Exceptions\ConverterException;
 
 /**
@@ -83,7 +80,7 @@ class ConverterApiTest extends TestCase
                 'loc' => [
                     'billing_place' => 'http://example.com/'
                 ]
-            ], 
+            ],
             $conv->receiptToArray($receipt)
         );
     }
@@ -216,25 +213,41 @@ class ConverterApiTest extends TestCase
     /**
      * @covers Innokassa\MDK\Net\ConverterApi::notifyToArray
      */
-    public function testNotifyToArray()
+    public function testNotifyToArrayEmail()
     {
         $conv = new ConverterApi();
         $notify = new Notify();
         $notify
             ->setEmail('box@domain.zone')
             ->setPhone('+79998887766');
-        
+
         $this->assertEquals(
             [
                 [
                     'type' => 'email',
                     'value' => 'box@domain.zone'
-                ],
+                ]
+            ],
+            $conv->notifyToArray($notify)
+        );
+    }
+
+    /**
+     * @covers Innokassa\MDK\Net\ConverterApi::notifyToArray
+     */
+    public function testNotifyToArrayPhone()
+    {
+        $conv = new ConverterApi();
+        $notify = new Notify();
+        $notify->setPhone('+79998887766');
+
+        $this->assertEquals(
+            [
                 [
                     'type' => 'phone',
                     'value' => '+79998887766'
                 ]
-            ], 
+            ],
             $conv->notifyToArray($notify)
         );
     }
@@ -260,4 +273,4 @@ class ConverterApiTest extends TestCase
         $conv = new ConverterApi();
         $conv->notifyFromArray([]);
     }
-};
+}
