@@ -1,4 +1,4 @@
-[![coverage report](http://git.innokassa.ru/Byurrer/mdk/badges/test-ci/coverage.svg)](http://git.innokassa.ru/Byurrer/mdk/-/commits/test-ci)
+[![pipeline status](http://git.innokassa.ru/Byurrer/mdk/badges/main/pipeline.svg)](http://git.innokassa.ru/Byurrer/mdk/-/commits/main) [![coverage report](http://git.innokassa.ru/Byurrer/mdk/badges/main/coverage.svg)](http://git.innokassa.ru/Byurrer/mdk/-/commits/main) [![Latest Release](http://git.innokassa.ru/Byurrer/mdk/-/badges/release.svg)](http://git.innokassa.ru/Byurrer/mdk/-/releases)
 
 ![Innokassa MDK](/logo.png)
 
