@@ -35,6 +35,27 @@ class LoggerFileTest extends TestCase
     }
 
     /**
+     * @covers Innokassa\MDK\Logger\LoggerFile::__construct
+     * @covers Innokassa\MDK\Logger\LoggerFile::getFile
+     * @covers Innokassa\MDK\Logger\LoggerFile::getLastMsg
+     */
+    public function testConstructArg()
+    {
+        $dirLog = __DIR__ . '/../../logs';
+        $logger = new LoggerFile($dirLog);
+        $this->assertIsString($logger->getFile());
+        $this->assertTrue(strlen($logger->getFile()) > 0);
+        $this->assertSame([], $logger->getLastMsg());
+
+        $dir = dirname($logger->getFile());
+        $this->assertTrue(file_exists($dir));
+        $this->assertIsString(realpath($dirLog));
+
+        array_map('unlink', glob("$dir/*.*"));
+        rmdir($dir);
+    }
+
+    /**
      * @covers Innokassa\MDK\Logger\LoggerFile::log
      * @covers Innokassa\MDK\Logger\LoggerFile::stacktrace
      * @covers Innokassa\MDK\Logger\LoggerFile::canStacktrace

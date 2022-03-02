@@ -7,22 +7,25 @@ namespace Innokassa\MDK\Logger;
  */
 class LoggerFile implements LoggerInterface
 {
-    /** Директория логов */
-    public const DIR = __DIR__ . '/../../logs';
-
-    /** Признак окончания одной сессии */
-    public const EOL = '####################';
-
-    //######################################################################
-
-    public function __construct()
+    /**
+     * Директория логов
+     *
+     * @param string $dir
+     */
+    public function __construct(string $dir = __DIR__ . '/../../logs')
     {
-        $dir = dirname(dirname(__DIR__)) . '/logs/' . date("Y-m");
-        if (!file_exists($dir)) {
-            mkdir($dir, 0777, true);
+        $dirCurrDate = $dir . '/' . date("Y-m");
+        if (!file_exists($dirCurrDate)) {
+            mkdir($dirCurrDate, 0777, true);
         }
 
-        $this->file = $dir . '/' . date("Y-m-d") . ".txt";
+        $dirCurrDate = realpath($dirCurrDate);
+
+        $this->file = $dirCurrDate . '/' . date("Y-m-d") . ".txt";
+        if (!file_exists($this->file)) {
+            file_put_contents($this->file, '');
+            chmod($this->file, 0777);
+        }
     }
 
     /**
@@ -71,7 +74,7 @@ class LoggerFile implements LoggerInterface
 
         file_put_contents(
             $this->file,
-            '[' . date("Y-m-d H:i:s") . "]\n" . $msg . self::EOL . "\n",
+            sprintf("[%s]\n%s\n", date("Y-m-d H:i:s"), $msg),
             FILE_APPEND | LOCK_EX
         );
     }
@@ -97,7 +100,13 @@ class LoggerFile implements LoggerInterface
 
         for ($i = 1; $i < count($a); ++$i) {
             $value = $a[$i];
-            $a2[] = $value['file'] . ':' . $value['line'] . ' - ' . $value['class'] . '::' . $value['function'];
+            $a2[] = sprintf(
+                "%s:%d - %d::%s",
+                $value['file'],
+                $value['line'],
+                $value['class'],
+                $value['function']
+            );
         }
 
         return $a2;
