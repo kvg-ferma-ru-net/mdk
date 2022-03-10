@@ -304,10 +304,10 @@ class Receipt
     /**
      * Установить данные покупателя
      *
-     * @param Customer $customer
+     * @param Customer|null $customer
      * @return self
      */
-    public function setCustomer(Customer $customer): self
+    public function setCustomer(?Customer $customer): self
     {
         $this->customer = $customer;
         return $this;
