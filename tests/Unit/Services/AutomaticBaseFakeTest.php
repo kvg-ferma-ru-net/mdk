@@ -278,7 +278,7 @@ class AutomaticBaseFakeTest extends TestCase
 
         $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
 
-        $this->expectException(AutomaticException::class);
+        $this->expectException(TransferException::class);
         $automatic->fiscalize('0');
     }
 
