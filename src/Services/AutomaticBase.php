@@ -101,7 +101,7 @@ class AutomaticBase extends FiscalizationBaseAbstract implements AutomaticInterf
         try {
             $this->fiscalizeProc($receipt);
         } catch (TransferException $e) {
-            throw new AutomaticException($e->getMessage(), $e->getCode());
+            throw $e;
         }
 
         $this->receiptStorage->save($receipt);
