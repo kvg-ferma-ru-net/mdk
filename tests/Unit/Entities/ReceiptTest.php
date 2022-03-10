@@ -133,6 +133,11 @@ class ReceiptTest extends TestCase
         $this->assertSame($receipt, $receipt->setCustomer(new Customer('Тест Тест Тест', '0000000000')));
         $this->assertSame('Тест Тест Тест', $receipt->getCustomer()->getName());
         $this->assertSame('0000000000', $receipt->getCustomer()->getTin());
+
+        $receipt = new Receipt();
+        $this->assertNull($receipt->getCustomer());
+        $this->assertSame($receipt, $receipt->setCustomer(null));
+        $this->assertNull($receipt->getCustomer());
     }
 
     /**
