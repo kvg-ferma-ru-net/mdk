@@ -39,7 +39,7 @@ class ReceiptAdapterConcrete implements ReceiptAdapterInterface
         return $items->getAmount();
     }
 
-    public function getCustomer(string $orderId): Customer
+    public function getCustomer(string $orderId): ?Customer
     {
         $a = $this->get($orderId);
         return new Customer($a['customer']);

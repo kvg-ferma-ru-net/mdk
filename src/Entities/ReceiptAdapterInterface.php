@@ -37,9 +37,9 @@ interface ReceiptAdapterInterface
      * Получить данные покупателя
      *
      * @param string $orderId
-     * @return Customer
+     * @return Customer|null
      */
-    public function getCustomer(string $orderId): Customer;
+    public function getCustomer(string $orderId): ?Customer;
 
     /**
      * Получить данные для уведомления покупателя
