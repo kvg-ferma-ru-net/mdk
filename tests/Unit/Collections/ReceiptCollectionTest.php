@@ -1,13 +1,13 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Collections\ReceiptCollection;
 use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Collections\ReceiptCollection
  * @uses Innokassa\MDK\Collections\BaseCollection
@@ -59,4 +59,4 @@ class ReceiptCollectionTest extends TestCase
         $this->assertInstanceOf(Receipt::class, $receipts->getByType(ReceiptType::REFUND_COMING));
         $this->assertNull($receipts->getByType(ReceiptType::REFUND_COMING, ReceiptSubType::FULL));
     }
-};
+}

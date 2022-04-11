@@ -144,4 +144,7 @@ class Client
     private $printer;
     private $connector;
     private $logger;
+    private $settings;
+    private $adapter;
+    private $storage;
 }

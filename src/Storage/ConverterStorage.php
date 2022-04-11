@@ -55,6 +55,10 @@ class ConverterStorage extends ConverterAbstract
         $a['notify'] = $this->notifyToArray($receipt->getNotify());
         $a['location'] = $receipt->getLocation();
 
+        if (($additional = $receipt->getAdditional())) {
+            $a['additional_attribute'] = $additional;
+        }
+
         if ($receipt->getCustomer()) {
             $a['customer'] = $this->customerToArray($receipt->getCustomer());
         } else {
@@ -107,11 +111,19 @@ class ConverterStorage extends ConverterAbstract
                 ->setSiteId($a['siteId'])
                 ->setStatus(new ReceiptStatus($a['status']))
                 ->setType($a['type'])
-                ->setItems($this->itemsFRomArray($a['items']))
+                ->setItems($this->itemsFromArray($a['items']))
                 ->setTaxation($a['taxation'])
                 ->setAmount($this->amountFromArray($a['amount']))
                 ->setNotify($this->notifyFromArray($a['notify']))
                 ->setLocation($a['location']);
+
+            if (isset($a['additional_attribute']) && $a['additional_attribute']) {
+                $key = array_keys($a['additional_attribute'])[0];
+                $value = $a['additional_attribute'][$key];
+                if (is_string($key) && is_string($value) && !empty($key) && !empty($value)) {
+                    $receipt->setAdditional($key, $value);
+                }
+            }
 
             if (isset($a['customer'])) {
                 $receipt->setCustomer($this->customerFromArray($a['customer']));

@@ -1,9 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Exceptions\TransferException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Exceptions\TransferException
  */
@@ -14,22 +14,46 @@ class TransferExceptionTest extends TestCase
      */
     public function testConstruct()
     {
-        $exception = new TransferException('{"type": ["UNEXPECTED_FIELD"], "desc": "Отправлено лишнее поле", "path": "$.notify[0].email"}', 400);
+        $exception = new TransferException(
+            '[{"type": "UNEXPECTED_FIELD", "desc": "Отправлено лишнее поле", "path": "$.notify[0].email"}]',
+            400
+        );
         $this->assertSame(400, $exception->getCode());
-        $this->assertSame('UNEXPECTED_FIELD: Отправлено лишнее поле - $.notify[0].email', $exception->getMessage());
+        $this->assertSame(
+            'UNEXPECTED_FIELD: Отправлено лишнее поле - $.notify[0].email',
+            $exception->getMessage()
+        );
 
-        $exception = new TransferException('{"type": ["MISSED_REQUIRED_FIELD"], "desc": "Пропущено обязательное поле", "path": "$.items[0].amount"}', 400);
+        $exception = new TransferException(
+            '[{"type": "MISSED_REQUIRED_FIELD", "desc": "Пропущено обязательное поле", "path": "$.items[0].amount"}]',
+            400
+        );
         $this->assertSame(400, $exception->getCode());
-        $this->assertSame('MISSED_REQUIRED_FIELD: Пропущено обязательное поле - $.items[0].amount', $exception->getMessage());
+        $this->assertSame(
+            'MISSED_REQUIRED_FIELD: Пропущено обязательное поле - $.items[0].amount',
+            $exception->getMessage()
+        );
 
-        $exception = new TransferException('{"type": ["BAD_VALUE"], "desc": "Ожидается тип `array`", "path": "$.notify"}', 400);
+        $exception = new TransferException(
+            '[{"type": "BAD_VALUE", "desc": "Ожидается тип `array`", "path": "$.notify"}]',
+            400
+        );
         $this->assertSame(400, $exception->getCode());
-        $this->assertSame('BAD_VALUE: Ожидается тип `array` - $.notify', $exception->getMessage());
+        $this->assertSame(
+            'BAD_VALUE: Ожидается тип `array` - $.notify',
+            $exception->getMessage()
+        );
 
-        $exception = new TransferException('{"type": ["UNAVAILABLE_VALUE", "UA_BILLING_PLACE"], "desc": "Данное место расчетов недоступно этой группе касс", "path": "$.loc.billing_place"}', 400);
+        $exception = new TransferException(
+            '[{"type": "UNAVAILABLE_VALUE", "desc": "Данное место расчетов недоступно этой группе касс", "path": "$.loc.billing_place"}]',
+            400
+        );
         $this->assertSame(400, $exception->getCode());
-        $this->assertSame('UNAVAILABLE_VALUE > UA_BILLING_PLACE: Данное место расчетов недоступно этой группе касс - $.loc.billing_place', $exception->getMessage());
-        
+        $this->assertSame(
+            'UNAVAILABLE_VALUE: Данное место расчетов недоступно этой группе касс - $.loc.billing_place',
+            $exception->getMessage()
+        );
+
 
         $exception = new TransferException('error', 400);
         $this->assertSame(400, $exception->getCode());
@@ -75,4 +99,4 @@ class TransferExceptionTest extends TestCase
         $this->assertSame(504, $exception->getCode());
         $this->assertSame('504', $exception->getMessage());
     }
-};
+}

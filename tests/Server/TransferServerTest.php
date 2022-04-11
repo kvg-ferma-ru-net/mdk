@@ -15,6 +15,7 @@ use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Logger\LoggerInterface;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Net\Transfer
  * @uses Innokassa\MDK\Entities\Receipt
@@ -54,16 +55,19 @@ class TransferServerTest extends TestCase
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
-            ->addItem((new ReceiptItem())
-                ->setPrice(100.0)
-                ->setQuantity(2)
-                ->setName('name')
+            ->addItem(
+                (new ReceiptItem())
+                    ->setPrice(100.0)
+                    ->setQuantity(2)
+                    ->setName('name')
+                    ->setAdditional('additional')
             )
-            ->setTaxation(Taxation::ORN)
+            ->setTaxation(Taxation::USN)
             ->setAmount(new Amount(Amount::CASHLESS, 200.0))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
-            ->setLocation('https://example.com/');
+            ->setLocation('https://example.com/')
+            ->setAdditional('name', 'value');
 
         $client = new NetClientCurl();
         $converter = new ConverterApi();
@@ -78,7 +82,7 @@ class TransferServerTest extends TestCase
 
         $transfer->sendReceipt($receipt, false);
         $this->assertTrue(
-            $receipt->getStatus()->getCode() == ReceiptStatus::COMPLETED 
+            $receipt->getStatus()->getCode() == ReceiptStatus::COMPLETED
             || $receipt->getStatus()->getCode() == ReceiptStatus::WAIT
         );
 
@@ -118,12 +122,13 @@ class TransferServerTest extends TestCase
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
-            ->addItem((new ReceiptItem())
-                ->setPrice(100.0)
-                ->setQuantity(2)
-                ->setName('name')
+            ->addItem(
+                (new ReceiptItem())
+                    ->setPrice(100.0)
+                    ->setQuantity(2)
+                    ->setName('name')
             )
-            ->setTaxation(Taxation::ORN)
+            ->setTaxation(Taxation::USN)
             ->setAmount(new Amount(Amount::CASHLESS, 300.0))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
@@ -142,7 +147,7 @@ class TransferServerTest extends TestCase
 
         $this->expectException(TransferException::class);
         $this->expectExceptionCode(400);
-        $transfer->sendReceipt($receipt, false);
+        $receipt = $transfer->sendReceipt($receipt, false);
     }
 
     /**
@@ -219,4 +224,4 @@ class TransferServerTest extends TestCase
         $this->expectExceptionMessage(TransferException::CODE_404);
         $transfer->getCashBox();
     }
-};
+}

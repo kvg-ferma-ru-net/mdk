@@ -3,6 +3,7 @@
 namespace Innokassa\MDK\Services;
 
 use Innokassa\MDK\Settings\SettingsInterface;
+use Innokassa\MDK\Exceptions\SettingsException;
 
 /**
  * Интерфейс сервиса тестирования соединения и настроек

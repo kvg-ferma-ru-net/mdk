@@ -16,6 +16,7 @@ use Innokassa\MDK\Entities\ReceiptAdapterInterface;
 use Innokassa\MDK\Logger\LoggerInterface;
 use Innokassa\MDK\Logger\LoggerFile;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Client
  * @uses Innokassa\MDK\Net\NetClientCurl

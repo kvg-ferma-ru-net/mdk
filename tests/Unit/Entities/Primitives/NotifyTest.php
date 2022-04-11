@@ -1,11 +1,10 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\Primitives\Notify;
-
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Entities\Primitives\Notify
  */
@@ -162,4 +161,4 @@ class NotifyTest extends TestCase
         $this->assertSame('box@domain.zone', $notify->getEmail());
         $this->assertSame('+79998887766', $notify->getPhone());
     }
-};
+}

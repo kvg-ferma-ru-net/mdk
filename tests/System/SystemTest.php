@@ -29,6 +29,7 @@ use Innokassa\MDK\Exceptions\Services\ManualException;
 use Innokassa\MDK\Exceptions\Services\AutomaticException;
 use Innokassa\MDK\Logger\LoggerFile;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Collections\BaseCollection
  * @uses Innokassa\MDK\Entities\AtomAbstract
@@ -72,11 +73,11 @@ class SystemTest extends TestCase
         self::$db->query(file_get_contents(__DIR__ . '/db.sql'));
 
         self::$settings = new SettingsConcrete([
-            'actor_id' => '1234567',
-            'actor_token' => 'zysx0gMMcg6TlcB0thWrPZBPp',
-            'cashbox' => '123456789',
+            'actor_id' => TEST_ACTOR_ID,
+            'actor_token' => TEST_ACTOR_TOKEN,
+            'cashbox' => TEST_CASHBOX_WITHOUT_AGENT,
             'site' => 'https://example.com/',
-            'taxation' => Taxation::ORN,
+            'taxation' => Taxation::USN,
             'only2' => false,
             'agent' => false,
         ]);
@@ -124,12 +125,13 @@ class SystemTest extends TestCase
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
-            ->addItem((new ReceiptItem())
-                ->setPrice(100.0)
-                ->setQuantity(2)
-                ->setName('name')
+            ->addItem(
+                (new ReceiptItem())
+                    ->setPrice(100.0)
+                    ->setQuantity(2)
+                    ->setName('name')
             )
-            ->setTaxation(Taxation::ORN)
+            ->setTaxation(Taxation::USN)
             ->setAmount(new Amount(Amount::CASHLESS, 200.0))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
@@ -145,13 +147,13 @@ class SystemTest extends TestCase
         $receipt->setId(0);
         $receipt->setType(ReceiptType::COMING);
         $index2 = self::$storage->save($receipt);
-        $this->assertSame($index+1, $index2);
+        $this->assertSame($index + 1, $index2);
 
 
         $receiptFromDB = self::$storage->getOne($index);
         $this->assertSame($index, $receiptFromDB->getId());
         $this->assertSame(ReceiptType::REFUND_COMING, $receiptFromDB->getType());
-        $this->assertSame(Taxation::ORN, $receiptFromDB->getTaxation());
+        $this->assertSame(Taxation::USN, $receiptFromDB->getTaxation());
         $this->assertSame(200.0, $receiptFromDB->getAmount()->get(Amount::CASHLESS));
         $this->assertSame('box@domain.zone', $receiptFromDB->getNotify()->getEmail());
         $this->assertSame('Test', $receiptFromDB->getCustomer()->getName());
@@ -256,7 +258,7 @@ class SystemTest extends TestCase
         $manual = self::$client->serviceManual();
 
         /*
-            создадим два одинаковых чека для заказа 5, пробьем и специально установим статус WAIT, 
+            создадим два одинаковых чека для заказа 5, пробьем и специально установим статус WAIT,
             в тестах будем ждать COMPLETED | WAIT
         */
         $orderId = 5;
@@ -264,7 +266,7 @@ class SystemTest extends TestCase
         $total = self::$adapter->getTotal($orderId);
         $amount = new Amount(Amount::CASHLESS, $total);
         $notify = self::$adapter->getNotify($orderId);
-        
+
         $receiptComing = $manual->fiscalize($orderId, $items, $notify, $amount);
         $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::WAIT));
         self::$storage->save($receiptComing);
@@ -276,7 +278,8 @@ class SystemTest extends TestCase
         $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
 
         /*
-            создадим чек для заказа 3, присвоим ему статус PREPARED (подготовлен, но соединение с сервером не удалось), в тестах будем ждать COMPLETED | WAIT
+            создадим чек для заказа 3, присвоим ему статус PREPARED (подготовлен, но соединение с сервером не удалось),
+            в тестах будем ждать COMPLETED | WAIT
         */
         $orderId = 3;
         $receiptComing = $manual->fiscalize($orderId, $items, $notify, $amount);
@@ -286,7 +289,7 @@ class SystemTest extends TestCase
 
 
         /*
-            создадим чек для заказа 4, пробьем и специально установим статус REPEAT, 
+            создадим чек для заказа 4, пробьем и специально установим статус REPEAT,
             чтобы при updateUnaccepted получить 409 от сервера,
             в тестах будем ждать COMPLETED | WAIT
         */
@@ -300,9 +303,9 @@ class SystemTest extends TestCase
         self::$storage->save($receiptComing);
         $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
 
-        /* 
-            создадим еще один чек для несуществующего заказа 10, 
-            не будем фискализировать и установим статус ASSUME (сервер ответил ошибками сервера) 
+        /*
+            создадим еще один чек для несуществующего заказа 10,
+            не будем фискализировать и установим статус ASSUME (сервер ответил ошибками сервера)
         */
         $receipt = new Receipt();
         $receipt
@@ -310,12 +313,13 @@ class SystemTest extends TestCase
             ->setStatus(new ReceiptStatus(ReceiptStatus::ASSUME))
             ->setOrderId(10)
             ->setType(ReceiptType::COMING)
-            ->addItem((new ReceiptItem())
-                ->setPrice(100.0)
-                ->setQuantity(2)
-                ->setName('name')
+            ->addItem(
+                (new ReceiptItem())
+                    ->setPrice(100.0)
+                    ->setQuantity(2)
+                    ->setName('name')
             )
-            ->setTaxation(Taxation::ORN)
+            ->setTaxation(Taxation::USN)
             ->setAmount(new Amount(Amount::CASHLESS, 200.0))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
@@ -325,22 +329,24 @@ class SystemTest extends TestCase
 
 
         $pipeline = self::$client->servicePipeline();
-        
+
         /*
             сначала отклоненные чеки, а затем принятые, так у нас чек заказа 10 изменит статус на REPEAT
         */
         $pipeline->updateUnaccepted();
         $pipeline->updateAccepted();
-        foreach($receipts as $key => $value)
+        foreach ($receipts as $key => $value) {
             $this->assertContains(self::$storage->getOne($key)->getStatus()->getCode(), $value);
-        
+        }
+
         /*
             еще раз прогоняем отправку отклоненных чеков, теперь чек заказа 10 изменит статус на COMPLETED
         */
         $receipts[$receipt->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
         $pipeline->updateUnaccepted();
-        foreach($receipts as $key => $value)
+        foreach ($receipts as $key => $value) {
             $this->assertContains(self::$storage->getOne($key)->getStatus()->getCode(), $value);
+        }
     }
 
     //######################################################################
@@ -357,10 +363,10 @@ class SystemTest extends TestCase
         $connector->testSettings(
             new SettingsConcrete([
                 'actor_id' => '0',
-                'actor_token' => 'zysx0gMMcg6TlcB0thWrPZBPp',
-                'cashbox' => '123456789',
+                'actor_token' => TEST_ACTOR_TOKEN,
+                'cashbox' => TEST_CASHBOX_WITHOUT_AGENT,
                 'site' => 'https://example.com/',
-                'taxation' => Taxation::ORN,
+                'taxation' => Taxation::USN,
                 'only2' => false,
                 'agent' => false,
             ])
@@ -374,18 +380,18 @@ class SystemTest extends TestCase
     {
         $settings = new SettingsConcrete([
             'actor_id' => '0',
-            'actor_token' => 'zysx0gMMcg6TlcB0thWrPZBPp',
-            'cashbox' => '123456789',
+            'actor_token' => TEST_ACTOR_TOKEN,
+            'cashbox' => TEST_CASHBOX_WITHOUT_AGENT,
             'site' => 'https://example.com/',
-            'taxation' => Taxation::ORN,
+            'taxation' => Taxation::USN,
             'only2' => false,
             'agent' => false,
         ]);
         $transfer = new Transfer(
-            new NetClientCurl(), 
-            new ConverterApi(), 
-            $settings->getActorId(), 
-            $settings->getActorToken(), 
+            new NetClientCurl(),
+            new ConverterApi(),
+            $settings->getActorId(),
+            $settings->getActorToken(),
             $settings->getCashbox(),
             self::$logger
         );
@@ -401,19 +407,19 @@ class SystemTest extends TestCase
     public function testConnectorFailCashbox()
     {
         $settings = new SettingsConcrete([
-            'actor_id' => '1234567',
-            'actor_token' => 'zysx0gMMcg6TlcB0thWrPZBPp',
+            'actor_id' => TEST_ACTOR_ID,
+            'actor_token' => TEST_ACTOR_TOKEN,
             'cashbox' => '0',
             'site' => 'https://example.com/',
-            'taxation' => Taxation::ORN,
+            'taxation' => Taxation::USN,
             'only2' => false,
             'agent' => false,
         ]);
         $transfer = new Transfer(
-            new NetClientCurl(), 
-            new ConverterApi(), 
-            $settings->getActorId(), 
-            $settings->getActorToken(), 
+            new NetClientCurl(),
+            new ConverterApi(),
+            $settings->getActorId(),
+            $settings->getActorToken(),
             $settings->getCashbox(),
             self::$logger
         );
@@ -433,8 +439,8 @@ class SystemTest extends TestCase
         $this->expectException(SettingsException::class);
         $connector->testSettings(
             new SettingsConcrete([
-                'actor_id' => '1234567',
-                'actor_token' => 'zysx0gMMcg6TlcB0thWrPZBPp',
+                'actor_id' => TEST_ACTOR_ID,
+                'actor_token' => TEST_ACTOR_TOKEN,
                 'cashbox' => '0',
                 'site' => 'https://example.com/',
                 'taxation' => Taxation::ESN,
@@ -443,4 +449,4 @@ class SystemTest extends TestCase
             ])
         );
     }
-};
+}

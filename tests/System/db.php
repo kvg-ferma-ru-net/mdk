@@ -1,5 +1,7 @@
 <?php
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
+// phpcs:disable Squiz.Classes.ValidClassName.NotCamelCaps
 class db
 {
     public function __construct(string $host, string $user, string $pwd, string $charset = "utf8")
@@ -9,28 +11,31 @@ class db
         $opt  = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => TRUE,
+            PDO::ATTR_EMULATE_PREPARES => true,
         ];
 
-        $dsn = 'mysql:host='.$host.';charset='.$charset;
+        $dsn = 'mysql:host=' . $host . ';charset=' . $charset;
 
         $this->db = new PDO($dsn, $user, $pwd, $opt);
     }
 
-    public function query(string $sql, $return=false)
+    public function query(string $sql, $return = false)
     {
         $statement = $this->db->prepare($sql);
 
-        if(!($res = $statement->execute()))
+        if (!($res = $statement->execute())) {
             return null;
+        }
 
-        if($statement->rowCount() == 0)
+        if ($statement->rowCount() == 0) {
             return [];
+        }
 
-        if($return)
+        if ($return) {
             return $statement->fetchAll();
-        else
+        } else {
             return $res;
+        }
     }
 
     public function lastInsertId()

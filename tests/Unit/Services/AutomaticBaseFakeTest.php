@@ -1,7 +1,6 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Net\TransferInterface;
@@ -22,6 +21,7 @@ use Innokassa\MDK\Collections\ReceiptItemCollection;
 use Innokassa\MDK\Exceptions\Services\ManualException;
 use Innokassa\MDK\Exceptions\Services\AutomaticException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Services\AutomaticBase
  * @uses Innokassa\MDK\Entities\UUID
@@ -380,4 +380,4 @@ class AutomaticBaseFakeTest extends TestCase
         $this->expectException(AutomaticException::class);
         $automatic->fiscalize('0');
     }
-};
+}

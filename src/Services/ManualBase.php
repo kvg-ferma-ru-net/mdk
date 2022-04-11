@@ -16,6 +16,7 @@ use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
 use Innokassa\MDK\Services\FiscalizationBaseAbstract;
 use Innokassa\MDK\Exceptions\Services\ManualException;
+use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
  * Базовая реализация ManualInterface

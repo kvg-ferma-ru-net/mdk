@@ -1,11 +1,10 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\Primitives\Customer;
-
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Entities\Primitives\Customer
  */
@@ -50,4 +49,4 @@ class CustomerTest extends TestCase
     }
 
     //######################################################################
-};
+}

@@ -1,10 +1,10 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Collections\ReceiptItemCollection
  * @uses Innokassa\MDK\Collections\BaseCollection
@@ -28,4 +28,4 @@ class ReceiptItemCollectionTest extends TestCase
 
         $this->assertSame(200.0, $items->getAmount());
     }
-};
+}

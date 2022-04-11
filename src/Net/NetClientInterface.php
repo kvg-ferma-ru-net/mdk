@@ -2,6 +2,8 @@
 
 namespace Innokassa\MDK\Net;
 
+use Innokassa\MDK\Exceptions\NetConnectException;
+
 /**
  * Сетевой интерфейс для приема/передачи данных на/от сервера
  */

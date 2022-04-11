@@ -3,6 +3,7 @@
 namespace Innokassa\MDK\Services;
 
 use Innokassa\MDK\Entities\Receipt;
+use Innokassa\MDK\Exceptions\Services\PrinterException;
 
 /**
  * Сервис печати чеков

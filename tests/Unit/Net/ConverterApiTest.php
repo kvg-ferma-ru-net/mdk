@@ -11,6 +11,7 @@ use Innokassa\MDK\Entities\Primitives\Notify;
 use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Exceptions\ConverterException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Entities\Primitives\Notify
  * @uses Innokassa\MDK\Collections\BaseCollection
@@ -41,10 +42,12 @@ class ConverterApiTest extends TestCase
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
-            ->addItem((new ReceiptItem())
-                ->setPrice(100.0)
-                ->setQuantity(2)
-                ->setName('name')
+            ->addItem(
+                (new ReceiptItem())
+                    ->setPrice(100.0)
+                    ->setQuantity(2)
+                    ->setName('name')
+                    ->setAdditional('additional')
             )
             ->setTaxation(Taxation::ORN)
             ->setAmount(new Amount(Amount::CASHLESS, 200.0))
@@ -62,17 +65,15 @@ class ConverterApiTest extends TestCase
                     'quantity' => 2.0,
                     'amount' => 200.0,
                     'payment_method' => 4,
-                    'vat' => 6
+                    'vat' => 6,
+                    'additional_props' => 'additional'
                 ]],
                 'taxation' => Taxation::ORN,
                 'amount' => [
                     'cashless' => 200.0
                 ],
                 'notify' => [
-                    [
-                        'type' => 'email',
-                        'value' => 'box@domain.zone'
-                    ]
+                    'emails' => ['box@domain.zone']
                 ],
                 'customer' => [
                     'name' => 'Test'
@@ -113,10 +114,11 @@ class ConverterApiTest extends TestCase
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
-            ->addItem((new ReceiptItem())
-                ->setPrice(100.0)
-                ->setQuantity(2)
-                ->setName('name')
+            ->addItem(
+                (new ReceiptItem())
+                    ->setPrice(100.0)
+                    ->setQuantity(2)
+                    ->setName('name')
             )
             ->setAmount(new Amount(Amount::CASHLESS, 200.0))
             ->setNotify(new Notify('box@domain.zone'))
@@ -136,10 +138,11 @@ class ConverterApiTest extends TestCase
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
-            ->addItem((new ReceiptItem())
-                ->setPrice(100.0)
-                ->setQuantity(2)
-                ->setName('name')
+            ->addItem(
+                (new ReceiptItem())
+                    ->setPrice(100.0)
+                    ->setQuantity(2)
+                    ->setName('name')
             )
             ->setTaxation(Taxation::ORN)
             ->setNotify(new Notify('box@domain.zone'))
@@ -159,10 +162,11 @@ class ConverterApiTest extends TestCase
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
-            ->addItem((new ReceiptItem())
-                ->setPrice(100.0)
-                ->setQuantity(2)
-                ->setName('name')
+            ->addItem(
+                (new ReceiptItem())
+                    ->setPrice(100.0)
+                    ->setQuantity(2)
+                    ->setName('name')
             )
             ->setTaxation(Taxation::ORN)
             ->setAmount(new Amount(Amount::CASHLESS, 200.0))
@@ -182,10 +186,11 @@ class ConverterApiTest extends TestCase
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
-            ->addItem((new ReceiptItem())
-                ->setPrice(100.0)
-                ->setQuantity(2)
-                ->setName('name')
+            ->addItem(
+                (new ReceiptItem())
+                    ->setPrice(100.0)
+                    ->setQuantity(2)
+                    ->setName('name')
             )
             ->setTaxation(Taxation::ORN)
             ->setAmount(new Amount(Amount::CASHLESS, 200.0))
@@ -223,10 +228,8 @@ class ConverterApiTest extends TestCase
 
         $this->assertEquals(
             [
-                [
-                    'type' => 'email',
-                    'value' => 'box@domain.zone'
-                ]
+                'emails' => ['box@domain.zone'],
+                'phone' => '+79998887766',
             ],
             $conv->notifyToArray($notify)
         );
@@ -243,10 +246,7 @@ class ConverterApiTest extends TestCase
 
         $this->assertEquals(
             [
-                [
-                    'type' => 'phone',
-                    'value' => '+79998887766'
-                ]
+                'phone' => '+79998887766',
             ],
             $conv->notifyToArray($notify)
         );

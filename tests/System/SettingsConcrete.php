@@ -3,6 +3,7 @@
 use Innokassa\MDK\Settings\SettingsInterface;
 use Innokassa\MDK\Exceptions\SettingsException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 class SettingsConcrete implements SettingsInterface
 {
     public function __construct(array $aSettings)
@@ -12,7 +13,7 @@ class SettingsConcrete implements SettingsInterface
 
     public function getActorId(): string
     {
-        return intval($this->get('actor_id'));
+        return $this->get('actor_id');
     }
 
     public function getActorToken(): string
@@ -42,13 +43,14 @@ class SettingsConcrete implements SettingsInterface
 
     public function get(string $name)
     {
-        if(isset($this->aSettings[$name]) && strlen($this->aSettings[$name]) > 0)
+        if (isset($this->aSettings[$name]) && strlen($this->aSettings[$name]) > 0) {
             return $this->aSettings[$name];
-        
+        }
+
         throw new SettingsException("Настройка '$name' не инициализирована");
     }
 
     //######################################################################
 
     protected $aSettings = null;
-};
+}

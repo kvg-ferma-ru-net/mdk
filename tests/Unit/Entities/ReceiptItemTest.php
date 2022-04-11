@@ -1,15 +1,13 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\Atoms\Vat;
 use Innokassa\MDK\Entities\Atoms\PaymentMethod;
 use Innokassa\MDK\Entities\Atoms\ReceiptItemType;
-
 use Innokassa\MDK\Entities\ReceiptItem;
-
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Entities\ReceiptItem
  * @uses Innokassa\MDK\Entities\Atoms\Vat
@@ -156,7 +154,7 @@ class ReceiptItemTest extends TestCase
     public function testSetGetVat()
     {
         $receiptItem = new ReceiptItem();
-        
+
         $this->assertSame($receiptItem, $receiptItem->setVat(new Vat('20')));
         $this->assertSame('20', $receiptItem->getVat()->getName());
         $this->assertSame(Vat::CODE_20, $receiptItem->getVat()->getCode());
@@ -164,4 +162,4 @@ class ReceiptItemTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $receiptItem->setType(0);
     }
-};
+}

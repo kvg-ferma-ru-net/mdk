@@ -6,6 +6,7 @@ use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
 use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
+use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
  * Адаптер чеков из заказов, реализуется на стороне конкретной интеграции

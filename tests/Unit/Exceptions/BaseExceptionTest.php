@@ -3,6 +3,7 @@
 use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Exceptions\BaseException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Exceptions\BaseException
  */

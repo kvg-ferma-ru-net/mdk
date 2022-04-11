@@ -8,6 +8,7 @@ use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Entities\ReceiptAdapterInterface;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 class ReceiptAdapterConcrete implements ReceiptAdapterInterface
 {
     public function __construct(db $db)
@@ -18,11 +19,10 @@ class ReceiptAdapterConcrete implements ReceiptAdapterInterface
     public function getItems(string $orderId, int $subType): ReceiptItemCollection
     {
         $paymentMethod = $this->getPaymentMethod($subType);
-        
+
         $a = json_decode($this->get($orderId)['items'], true);
         $items = new ReceiptItemCollection();
-        foreach($a as $value)
-        {
+        foreach ($a as $value) {
             $items[] = (new ReceiptItem())
                 ->setName($value['name'])
                 ->setPrice($value['price'])
@@ -67,8 +67,7 @@ class ReceiptAdapterConcrete implements ReceiptAdapterInterface
     {
         $paymentMethod = null;
 
-        switch($subType)
-        {
+        switch ($subType) {
             case ReceiptSubType::PRE:
                 $paymentMethod = PaymentMethod::PREPAYMENT_FULL;
                 break;
@@ -81,4 +80,4 @@ class ReceiptAdapterConcrete implements ReceiptAdapterInterface
 
         return $paymentMethod;
     }
-};
+}

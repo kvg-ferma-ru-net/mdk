@@ -1,11 +1,10 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
-
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptType
  */
@@ -48,4 +47,4 @@ class ReceiptTypeTest extends TestCase
         $this->assertContainsOnlyInstancesOf(ReceiptType::class, $a);
         $this->assertCount(4, $a);
     }
-};
+}

@@ -225,6 +225,28 @@ class ReceiptItem
         return ($this->paymentMethod ? $this->paymentMethod->getCode() : null);
     }
 
+    /**
+     * Установить значение дополнительного поля
+     *
+     * @param non-empty-string $additional
+     * @return self
+     */
+    public function setAdditional(string $additional): self
+    {
+        $this->additional = $additional;
+        return $this;
+    }
+
+    /**
+     * Получить значение дополнительного поля
+     *
+     * @return string
+     */
+    public function getAdditional(): string
+    {
+        return $this->additional;
+    }
+
     //######################################################################
     // PRIVATE
     //######################################################################
@@ -236,4 +258,9 @@ class ReceiptItem
     private $amount = 0.0;
     private $vat = null;
     private $paymentMethod = null;
+
+    /**
+     * @var string
+     */
+    private $additional = '';
 }

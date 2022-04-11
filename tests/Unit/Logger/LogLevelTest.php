@@ -3,6 +3,7 @@
 use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Logger\LogLevel;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Logger\LogLevel
  */

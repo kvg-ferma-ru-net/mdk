@@ -1,10 +1,10 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Entities\Atoms\Taxation
  * @uses Innokassa\MDK\Entities\AtomAbstract
@@ -52,4 +52,4 @@ class TaxationTest extends TestCase
         $this->assertContainsOnlyInstancesOf(Taxation::class, $a);
         $this->assertCount(5, $a);
     }
-};
+}

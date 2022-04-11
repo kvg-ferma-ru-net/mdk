@@ -3,6 +3,7 @@
 namespace Innokassa\MDK\Storage;
 
 use Innokassa\MDK\Entities\Receipt;
+use Innokassa\MDK\Exceptions\StorageException;
 use Innokassa\MDK\Collections\ReceiptCollection;
 
 /**

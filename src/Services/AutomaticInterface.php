@@ -3,6 +3,10 @@
 namespace Innokassa\MDK\Services;
 
 use Innokassa\MDK\Entities\Receipt;
+use Innokassa\MDK\Exceptions\StorageException;
+use Innokassa\MDK\Exceptions\TransferException;
+use Innokassa\MDK\Exceptions\Services\AutomaticException;
+use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
  * Интерфейс сервиса автоматической фискализации заказов
@@ -17,7 +21,7 @@ interface AutomaticInterface
      * @throws StorageException
      * @throws AutomaticException
      *
-     * @param integer $orderId
+     * @param string $orderId
      * @param integer|null $receiptSubType подтип чека для конкретизации, либо null для автоматического определения типа
      * @return Receipt
      */

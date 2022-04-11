@@ -1,9 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Collections\BaseCollection;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Collections\BaseCollection
  */
@@ -14,9 +14,7 @@ class BaseCollectionTest extends TestCase
      * @covers Innokassa\MDK\Collections\BaseCollection::offsetExists
      * @covers Innokassa\MDK\Collections\BaseCollection::offsetUnset
      * @covers Innokassa\MDK\Collections\BaseCollection::offsetGet
-     * 
      * @covers Innokassa\MDK\Collections\BaseCollection::count
-     * 
      * @covers Innokassa\MDK\Collections\BaseCollection::key
      * @covers Innokassa\MDK\Collections\BaseCollection::valid
      * @covers Innokassa\MDK\Collections\BaseCollection::current
@@ -68,4 +66,4 @@ class BaseCollectionTest extends TestCase
         $this->assertTrue($collection->shuffle());
         $this->assertSame(2, $collection->count());
     }
-};
+}

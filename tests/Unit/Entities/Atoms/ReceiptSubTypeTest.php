@@ -1,10 +1,10 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptSubType
  */
@@ -28,7 +28,7 @@ class ReceiptSubTypeTest extends TestCase
             ReceiptSubType::FULL,
             (new ReceiptSubType(ReceiptSubType::FULL))->getCode()
         );
-        
+
         $this->expectException(InvalidArgumentException::class);
         $vat = new ReceiptSubType(3);
     }
@@ -43,4 +43,4 @@ class ReceiptSubTypeTest extends TestCase
         $this->assertContainsOnlyInstancesOf(ReceiptSubType::class, $a);
         $this->assertCount(3, $a);
     }
-};
+}

@@ -73,6 +73,7 @@ class Vat extends AtomAbstract
                 $this->name = 'Не облагается';
                 break;
             default:
+                $value = intval($value);
                 $a = [
                     self::CODE_20 => '20',
                     self::CODE_10 => '10',

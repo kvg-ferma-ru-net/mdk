@@ -50,6 +50,14 @@ class ConverterApi extends ConverterAbstract
             'billing_place' => $receipt->getLocation()
         ];
 
+        if (($additional = $receipt->getAdditional())) {
+            $key = array_keys($additional)[0];
+            $a['additional_attribute'] = [
+                'name' => $key,
+                'value' => $additional[$key],
+            ];
+        }
+
         if ($receipt->getCustomer()) {
             $a['customer'] = $this->customerToArray($receipt->getCustomer());
         }
@@ -75,15 +83,10 @@ class ConverterApi extends ConverterAbstract
         $a = [];
 
         if ($notify->getEmail()) {
-            $a[] = [
-                'type' => 'email',
-                'value' => $notify->getEmail()
-            ];
-        } elseif ($notify->getPhone()) {
-            $a[] = [
-                'type' => 'phone',
-                'value' => $notify->getPhone()
-            ];
+            $a['emails'] = [$notify->getEmail()];
+        }
+        if ($notify->getPhone()) {
+            $a['phone'] = $notify->getPhone();
         }
 
         if (!$a) {

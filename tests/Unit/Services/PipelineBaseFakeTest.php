@@ -1,7 +1,6 @@
 <?php
 
 use Innokassa\MDK\Net\Transfer;
-
 use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Net\TransferInterface;
@@ -15,6 +14,7 @@ use Innokassa\MDK\Exceptions\NetConnectException;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Logger\LoggerInterface;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Services\PipelineBase
  * @uses Innokassa\MDK\Net\Transfer
@@ -62,10 +62,10 @@ class PipelineBaseFakeTest extends TestCase
     public function testUpdateAcceptedLock()
     {
         $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            TEST_ACTOR_ID, 
-            TEST_ACTOR_TOKEN, 
+            $this->client,
+            $this->converter,
+            TEST_ACTOR_ID,
+            TEST_ACTOR_TOKEN,
             TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
@@ -86,12 +86,13 @@ class PipelineBaseFakeTest extends TestCase
     public function testUpdateAcceptedSuccess200()
     {
         $receipts = new ReceiptCollection();
-        for($i=0; $i<PipelineBase::COUNT_SELECT; ++$i)
-            $receipts[] = (new Receipt())->setId($i+1);
-        
-        /* 
-            ожидание 3 вызова т.к. в БД PipelineBase::COUNT_SELECT чеков, для одной итерации одного статуса хватит, 
-            но будет взведена вторая, в которой будет пустая коллекция, 
+        for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
+            $receipts[] = (new Receipt())->setId($i + 1);
+        }
+
+        /*
+            ожидание 3 вызова т.к. в БД PipelineBase::COUNT_SELECT чеков, для одной итерации одного статуса хватит,
+            но будет взведена вторая, в которой будет пустая коллекция,
             а на второй статус будет получена пустая коллекция и цикл будет прерван
         */
         $this->storage
@@ -99,7 +100,7 @@ class PipelineBaseFakeTest extends TestCase
             ->method('getCollection')
             ->will(
                 $this->onConsecutiveCalls(
-                    $receipts, 
+                    $receipts,
                     new ReceiptCollection(),
                     new ReceiptCollection()
                 )
@@ -117,18 +118,19 @@ class PipelineBaseFakeTest extends TestCase
             ]));
 
         $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            TEST_ACTOR_ID, 
-            TEST_ACTOR_TOKEN, 
+            $this->client,
+            $this->converter,
+            TEST_ACTOR_ID,
+            TEST_ACTOR_TOKEN,
             TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
         $pipeline = new PipelineBase($this->storage, $transfer);
         $this->assertTrue($pipeline->updateAccepted());
 
-        for($i=0; $i<PipelineBase::COUNT_SELECT; ++$i)
+        for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
             $this->assertSame(ReceiptStatus::COMPLETED, $receipts[$i]->getStatus()->getCode());
+        }
     }
 
     /**
@@ -162,10 +164,10 @@ class PipelineBaseFakeTest extends TestCase
             ]));
 
         $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            TEST_ACTOR_ID, 
-            TEST_ACTOR_TOKEN, 
+            $this->client,
+            $this->converter,
+            TEST_ACTOR_ID,
+            TEST_ACTOR_TOKEN,
             TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
@@ -186,10 +188,14 @@ class PipelineBaseFakeTest extends TestCase
     public function testUpdateAcceptedError()
     {
         $receipts = new ReceiptCollection();
-        for($i=0; $i<PipelineBase::MAX_COUNT_ERR+1; ++$i)
+        for ($i = 0; $i < PipelineBase::MAX_COUNT_ERR + 1; ++$i) {
             $receipts[] = new Receipt();
-        
-        // ожидание одного вызова потому что в БД только PipelineBase::MAX_COUNT_ERR+1 чеков и все получат ошибочный статус
+        }
+
+        /*
+            ожидание одного вызова потому что в БД только PipelineBase::MAX_COUNT_ERR+1 чеков
+            и все получат ошибочный статус
+        */
         $this->storage
             ->expects($this->exactly(1))
             ->method('getCollection')
@@ -207,18 +213,19 @@ class PipelineBaseFakeTest extends TestCase
             ]));
 
         $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            TEST_ACTOR_ID, 
-            TEST_ACTOR_TOKEN, 
+            $this->client,
+            $this->converter,
+            TEST_ACTOR_ID,
+            TEST_ACTOR_TOKEN,
             TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
         $pipeline = new PipelineBase($this->storage, $transfer);
         $this->assertTrue($pipeline->updateAccepted());
 
-        for($i=0; $i<PipelineBase::MAX_COUNT_ERR; ++$i)
+        for ($i = 0; $i < PipelineBase::MAX_COUNT_ERR; ++$i) {
             $this->assertSame(ReceiptStatus::ASSUME, $receipts[$i]->getStatus()->getCode());
+        }
 
         $this->assertSame(ReceiptStatus::PREPARED, $receipts[PipelineBase::MAX_COUNT_ERR]->getStatus()->getCode());
     }
@@ -232,10 +239,10 @@ class PipelineBaseFakeTest extends TestCase
     public function testUpdateUnacceptedLock()
     {
         $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            TEST_ACTOR_ID, 
-            TEST_ACTOR_TOKEN, 
+            $this->client,
+            $this->converter,
+            TEST_ACTOR_ID,
+            TEST_ACTOR_TOKEN,
             TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
@@ -255,12 +262,13 @@ class PipelineBaseFakeTest extends TestCase
     public function testUpdateUnacceptedSuccess200()
     {
         $receipts = new ReceiptCollection();
-        for($i=0; $i<PipelineBase::COUNT_SELECT; ++$i)
-            $receipts[] = (new Receipt())->setId($i+1);
-        
-        /* 
-            ожидание 3 вызова т.к. в БД PipelineBase::COUNT_SELECT чеков, для одной итерации одного статуса хватит, 
-            но будет взведена вторая, в которой будет пустая коллекция, 
+        for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
+            $receipts[] = (new Receipt())->setId($i + 1);
+        }
+
+        /*
+            ожидание 3 вызова т.к. в БД PipelineBase::COUNT_SELECT чеков, для одной итерации одного статуса хватит,
+            но будет взведена вторая, в которой будет пустая коллекция,
             а на второй статус будет получена пустая коллекция и цикл будет прерван
         */
         $this->storage
@@ -268,7 +276,7 @@ class PipelineBaseFakeTest extends TestCase
             ->method('getCollection')
             ->will(
                 $this->onConsecutiveCalls(
-                    $receipts, 
+                    $receipts,
                     new ReceiptCollection(),
                     new ReceiptCollection()
                 )
@@ -286,18 +294,19 @@ class PipelineBaseFakeTest extends TestCase
             ]));
 
         $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            TEST_ACTOR_ID, 
-            TEST_ACTOR_TOKEN, 
+            $this->client,
+            $this->converter,
+            TEST_ACTOR_ID,
+            TEST_ACTOR_TOKEN,
             TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
         $pipeline = new PipelineBase($this->storage, $transfer);
         $this->assertTrue($pipeline->updateUnaccepted());
 
-        for($i=0; $i<PipelineBase::COUNT_SELECT; ++$i)
+        for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
             $this->assertSame(ReceiptStatus::COMPLETED, $receipts[$i]->getStatus()->getCode());
+        }
     }
 
     /**
@@ -327,10 +336,10 @@ class PipelineBaseFakeTest extends TestCase
             ]));
 
         $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            TEST_ACTOR_ID, 
-            TEST_ACTOR_TOKEN, 
+            $this->client,
+            $this->converter,
+            TEST_ACTOR_ID,
+            TEST_ACTOR_TOKEN,
             TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
@@ -351,10 +360,14 @@ class PipelineBaseFakeTest extends TestCase
     public function testUpdateUnacceptedError()
     {
         $receipts = new ReceiptCollection();
-        for($i=0; $i<PipelineBase::MAX_COUNT_ERR+1; ++$i)
-            $receipts[] = (new Receipt())->setId($i+1);
-        
-        // ожидание одного вызова потому что в БД только PipelineBase::MAX_COUNT_ERR+1 чеков и все получат ошибочный статус
+        for ($i = 0; $i < PipelineBase::MAX_COUNT_ERR + 1; ++$i) {
+            $receipts[] = (new Receipt())->setId($i + 1);
+        }
+
+        /*
+            ожидание одного вызова потому что в БД только PipelineBase::MAX_COUNT_ERR+1 чеков
+            и все получат ошибочный статус
+        */
         $this->storage
             ->expects($this->exactly(1))
             ->method('getCollection')
@@ -372,19 +385,20 @@ class PipelineBaseFakeTest extends TestCase
             ]));
 
         $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            TEST_ACTOR_ID, 
-            TEST_ACTOR_TOKEN, 
+            $this->client,
+            $this->converter,
+            TEST_ACTOR_ID,
+            TEST_ACTOR_TOKEN,
             TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
         $pipeline = new PipelineBase($this->storage, $transfer);
         $this->assertTrue($pipeline->updateUnaccepted());
 
-        for($i=0; $i<PipelineBase::MAX_COUNT_ERR; ++$i)
+        for ($i = 0; $i < PipelineBase::MAX_COUNT_ERR; ++$i) {
             $this->assertSame(ReceiptStatus::ASSUME, $receipts[$i]->getStatus()->getCode());
+        }
 
         $this->assertSame(ReceiptStatus::PREPARED, $receipts[PipelineBase::MAX_COUNT_ERR]->getStatus()->getCode());
     }
-};
+}

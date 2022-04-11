@@ -16,6 +16,7 @@ use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Exceptions\Services\PrinterException;
 use Innokassa\MDK\Logger\LoggerInterface;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Services\ConnectorBase
  * @uses Innokassa\MDK\Net\Transfer
@@ -118,4 +119,4 @@ class PrinterBaseTest extends TestCase
         $printer = new PrinterBase($this->storage, $transfer);
         $this->assertIsString($printer->getLinkRaw($receipt));
     }
-};
+}

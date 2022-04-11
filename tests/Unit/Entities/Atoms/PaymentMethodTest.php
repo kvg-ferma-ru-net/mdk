@@ -1,10 +1,10 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\Atoms\PaymentMethod;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Entities\Atoms\PaymentMethod
  */
@@ -17,31 +17,31 @@ class PaymentMethodTest extends TestCase
     public function testConstructGetCode()
     {
         $this->assertSame(
-            PaymentMethod::PREPAYMENT_FULL, 
+            PaymentMethod::PREPAYMENT_FULL,
             (new PaymentMethod(PaymentMethod::PREPAYMENT_FULL))->getCode()
         );
         $this->assertSame(
-            PaymentMethod::PREPAYMENT_PART, 
+            PaymentMethod::PREPAYMENT_PART,
             (new PaymentMethod(PaymentMethod::PREPAYMENT_PART))->getCode()
         );
         $this->assertSame(
-            PaymentMethod::ADVANCE, 
+            PaymentMethod::ADVANCE,
             (new PaymentMethod(PaymentMethod::ADVANCE))->getCode()
         );
         $this->assertSame(
-            PaymentMethod::CREDIT_FULL, 
+            PaymentMethod::CREDIT_FULL,
             (new PaymentMethod(PaymentMethod::CREDIT_FULL))->getCode()
         );
         $this->assertSame(
-            PaymentMethod::CREDIT_PART, 
+            PaymentMethod::CREDIT_PART,
             (new PaymentMethod(PaymentMethod::CREDIT_PART))->getCode()
         );
         $this->assertSame(
-            PaymentMethod::CREDIT_PAY, 
+            PaymentMethod::CREDIT_PAY,
             (new PaymentMethod(PaymentMethod::CREDIT_PAY))->getCode()
         );
         $this->assertSame(
-            PaymentMethod::PAYMENT_FULL, 
+            PaymentMethod::PAYMENT_FULL,
             (new PaymentMethod(PaymentMethod::PAYMENT_FULL))->getCode()
         );
 
@@ -64,4 +64,4 @@ class PaymentMethodTest extends TestCase
         $this->assertContainsOnlyInstancesOf(PaymentMethod::class, $a);
         $this->assertCount(7, $a);
     }
-};
+}

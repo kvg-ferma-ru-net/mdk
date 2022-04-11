@@ -30,11 +30,12 @@ class TransferException extends BaseException
 
         switch ($code) {
             case 400:
-                if ($aBody = json_decode($message, true)) {
-                    $sType = implode(" > ", $aBody["type"]);
-                    $sPath = $aBody["path"];
-                    $sPath = (strlen($sPath) > 1 ? " - $sPath" : "");
-                    $this->message = "$sType: " . $aBody["desc"] . $sPath;
+                if ($body = json_decode($message, true)) {
+                    $message = [];
+                    foreach ($body as $value) {
+                        $message[] = $value["type"] . ": " . $value["desc"] . " - " . $value["path"];
+                    }
+                    $this->message = implode("\n", $message);
                 } else {
                     $this->message = $message;
                 }

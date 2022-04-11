@@ -6,6 +6,7 @@ use Innokassa\MDK\Collections\ReceiptCollection;
 use Innokassa\MDK\Entities\ConverterAbstract;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 class ReceiptStorageConcrete implements ReceiptStorageInterface
 {
     public function __construct(ConverterAbstract $conv, db $db)
@@ -18,8 +19,7 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
     {
         $a = $this->conv->receiptToArray($receipt);
 
-        if($receipt->getId() > 0)
-        {
+        if ($receipt->getId() > 0) {
             unset($a['id']);
             $this->update($receipt->getId(), $a);
             return $receipt->getId();
@@ -41,12 +41,11 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
         return $this->conv->receiptFromArray($a);
     }
 
-    public function getCollection(ReceiptFilter $filter, int $limit=0): ReceiptCollection
+    public function getCollection(ReceiptFilter $filter, int $limit = 0): ReceiptCollection
     {
         $aWhere = $filter->toArray();
         $aWhere2 = [];
-        foreach($aWhere as $key => $value)
-        {
+        foreach ($aWhere as $key => $value) {
             $val = $value['value'];
             $op = $value['op'];
             $aWhere2[] = "{$key}{$op}'{$val}'";
@@ -57,8 +56,7 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
         $a = $this->selectArray($where, $limit);
         $receipts = new ReceiptCollection();
 
-        foreach($a as $aReceipt)
-        {
+        foreach ($a as $aReceipt) {
             $aReceipt['items'] = json_decode($aReceipt['items'], true);
             $aReceipt['amount'] = json_decode($aReceipt['amount'], true);
             $aReceipt['customer'] = json_decode($aReceipt['customer'], true);
@@ -80,17 +78,25 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
 
     private function insert(array $a): int
     {
-        $keys = implode(', ', array_map(function($val){
-                return "`$val`";
-            },
-            array_keys($a)
-        ));
-        $values = implode(', ', array_map(function($val){
-                $val = (is_array($val) ? json_encode($val, JSON_UNESCAPED_UNICODE) : strval($val));
-                return "'$val'";
-            },
-            array_values($a)
-        ));
+        $keys = implode(
+            ', ',
+            array_map(
+                function ($val) {
+                    return "`$val`";
+                },
+                array_keys($a)
+            )
+        );
+        $values = implode(
+            ', ',
+            array_map(
+                function ($val) {
+                    $val = (is_array($val) ? json_encode($val, JSON_UNESCAPED_UNICODE) : strval($val));
+                    return "'$val'";
+                },
+                array_values($a)
+            )
+        );
         $sql = "INSERT INTO `receipts` ($keys) VALUES ($values)";
         return $this->db->query($sql);
     }
@@ -98,9 +104,10 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
     private function update(int $id, array $a)
     {
         $a2 = [];
-        foreach($a as $key => $value)
-            $a2[] = "`$key`='".(is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : strval($value))."'";
-        
+        foreach ($a as $key => $value) {
+            $a2[] = "`$key`='" . (is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : strval($value)) . "'";
+        }
+
         $set = implode(', ', $a2);
 
         $sql = "UPDATE `receipts` SET $set WHERE `id`=$id";
@@ -116,8 +123,9 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
     private function selectArray(string $where, int $limit): array
     {
         $sql = "SELECT * FROM `receipts` WHERE $where";
-        if($limit > 0)
+        if ($limit > 0) {
             $sql .= " LIMIT $limit";
+        }
         return $this->db->query($sql, true);
     }
-};
+}

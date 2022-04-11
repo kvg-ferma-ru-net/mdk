@@ -101,7 +101,7 @@ abstract class ConverterAbstract
             throw new ConverterException("uninitialized name item");
         }
 
-        return [
+        $a = [
             "type" => $item->getType(),
             "name" => $item->getName(),
             "price" => $item->getPrice(),
@@ -110,6 +110,12 @@ abstract class ConverterAbstract
             "payment_method" => $item->getPaymentMethod(),
             "vat" => $item->getVat()->getCode(),
         ];
+
+        if ($item->getAdditional()) {
+            $a["additional_props"] = $item->getAdditional();
+        }
+
+        return $a;
     }
 
     /**
@@ -144,6 +150,10 @@ abstract class ConverterAbstract
                 ->setAmount($a['amount'])
                 ->setPaymentMethod($a['payment_method'])
                 ->setVat(new Vat($a['vat']));
+
+            if (isset($a['additional_props']) && $a['additional_props']) {
+                $item->setAdditional($a['additional_props']);
+            }
         } catch (InvalidArgumentException $e) {
             throw new ConverterException($e->getMessage());
         }

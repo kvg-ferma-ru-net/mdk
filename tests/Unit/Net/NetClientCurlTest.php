@@ -1,18 +1,16 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Net\Transfer;
 use Innokassa\MDK\Net\NetClientCurl;
 use Innokassa\MDK\Net\NetClientInterface;
-
 use Innokassa\MDK\Entities\UUID;
 use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\Atoms\PaymentMethod;
-
 use Innokassa\MDK\Exceptions\NetConnectException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Net\NetClientCurl
  * @uses Innokassa\MDK\Exceptions\NetConnectException
@@ -81,11 +79,14 @@ class NetClientCurlTest extends TestCase
 
         $client = new NetClientCurl();
         $client
-            ->write(NetClientInterface::PATH, Transfer::API_URL."/c_groups/".TEST_CASHBOX_WITHOUT_AGENT."/receipts/online_store/".(new UUID())->get())
+            ->write(
+                NetClientInterface::PATH,
+                Transfer::API_URL . "/c_groups/" . TEST_CASHBOX_WITHOUT_AGENT . "/receipts/online_store/" . (new UUID())->get()
+            )
             ->write(NetClientInterface::TYPE, 'POST')
             ->write(NetClientInterface::BODY, json_encode($a))
             ->write(NetClientInterface::HEAD, [
-                "Authorization: Basic ".base64_encode(TEST_ACTOR_ID.":".TEST_ACTOR_TOKEN),
+                "Authorization: Basic " . base64_encode(TEST_ACTOR_ID . ":" . TEST_ACTOR_TOKEN),
                 "Content-type: application/json; charset=utf-8"
             ])
             ->write(-1, '')
@@ -105,9 +106,9 @@ class NetClientCurlTest extends TestCase
     public function testSendFailServer1()
     {
         $client = new NetClientCurl();
-        $client->write(NetClientInterface::PATH, 'https://api0.kassavoblake.com/0');
-        
+        $client->write(NetClientInterface::PATH, 'https://api0.innokassa.ru/0');
+
         $this->expectException(NetConnectException::class);
         $client->send();
     }
-};
+}

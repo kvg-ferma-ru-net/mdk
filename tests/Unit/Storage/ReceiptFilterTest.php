@@ -1,12 +1,12 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Storage\ReceiptFilter;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Storage\ReceiptFilter
  */
@@ -66,4 +66,4 @@ class ReceiptFilterTest extends TestCase
             $filter->toArray()
         );
     }
-};
+}

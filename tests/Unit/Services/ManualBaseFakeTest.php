@@ -1,7 +1,6 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Services\ManualBase;
 use Innokassa\MDK\Entities\ReceiptItem;
@@ -19,6 +18,7 @@ use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
 use Innokassa\MDK\Exceptions\Services\ManualException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Services\ManualBase
  * @uses Innokassa\MDK\Entities\UUID
@@ -237,4 +237,4 @@ class ManualBaseFakeTest extends TestCase
         $this->expectExceptionCode(400);
         $manual->refund('0', $items, $notify);
     }
-};
+}

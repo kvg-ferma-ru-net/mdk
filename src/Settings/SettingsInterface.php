@@ -2,6 +2,8 @@
 
 namespace Innokassa\MDK\Settings;
 
+use Innokassa\MDK\Exceptions\SettingsException;
+
 /**
  * Интерфейс настроек
  */

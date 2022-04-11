@@ -1,7 +1,6 @@
 <?php
 
 use Innokassa\MDK\Net\Transfer;
-
 use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Net\NetClientInterface;
@@ -16,6 +15,7 @@ use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Exceptions\Services\PrinterException;
 use Innokassa\MDK\Logger\LoggerInterface;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Services\ConnectorBase
  * @uses Innokassa\MDK\Net\Transfer
@@ -185,4 +185,4 @@ class ConnectorBaseFakeTest extends TestCase
         $this->expectException(SettingsException::class);
         $connector->testSettings($this->settings);
     }
-};
+}

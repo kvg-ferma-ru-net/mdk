@@ -1,10 +1,10 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\UUID;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Entities\UUID
  */
@@ -25,4 +25,4 @@ class UUIDTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         new UUID('q2b5df2d9ab5444d9fcd26b42e2a53e3');
     }
-};
+}

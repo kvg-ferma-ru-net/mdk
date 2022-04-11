@@ -20,7 +20,7 @@ class Transfer implements TransferInterface
     /**
      * URL адрес API
      */
-    public const API_URL = "https://api.kassavoblake.com/v2";
+    public const API_URL = "https://api.innokassa.ru/v2";
 
     //######################################################################
 
@@ -126,6 +126,8 @@ class Transfer implements TransferInterface
                 ->write(NetClientInterface::HEAD, $this->headers)
                 ->write(NetClientInterface::TYPE, 'POST')
                 ->write(NetClientInterface::BODY, $sBody);
+
+            $responseCode = $this->client->read(NetClientInterface::CODE);
 
             try {
                 $this->client->send();
@@ -277,4 +279,5 @@ class Transfer implements TransferInterface
     private $actorToken = '';
     private $cashbox = '';
     private $logger = '';
+    private $headers = [];
 }

@@ -3,6 +3,7 @@
 namespace Innokassa\MDK\Net;
 
 use Innokassa\MDK\Entities\Receipt;
+use Innokassa\MDK\Exceptions\TransferException;
 
 /**
  * Трансфер для взаимодействия с сервером фискализации Pangaea API v2

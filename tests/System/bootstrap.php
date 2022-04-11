@@ -1,11 +1,12 @@
-<?php
+<?php // phpcs:disable PSR1.Files.SideEffects.FoundWithSymbols
 
-define('TEST_ACTOR_ID', '1234567');
-define('TEST_ACTOR_TOKEN', 'zysx0gMMcg6TlcB0thWrPZBPp');
-define('TEST_CASHBOX_WITHOUT_AGENT', '123456789');
-define('TEST_CASHBOX_WITH_AGENT', '112233445');
+define('TEST_ACTOR_ID', 'test');
+define('TEST_ACTOR_TOKEN', '#K!-k(D7x[Ro_y40[|-X');
+define('TEST_CASHBOX_WITHOUT_AGENT', '1');
+define('TEST_CASHBOX_WITH_AGENT', '2');
 
 define('PATH', dirname(dirname(dirname(__FILE__))));
+
 require_once(PATH . "/vendor/autoload.php");
 
 require_once(__DIR__ . "/ReceiptAdapterConcrete.php");

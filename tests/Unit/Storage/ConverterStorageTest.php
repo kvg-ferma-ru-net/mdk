@@ -1,22 +1,20 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\UUID;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Entities\ReceiptItem;
-
 use Innokassa\MDK\Storage\ConverterStorage;
 use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
-
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Exceptions\ConverterException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Storage\ConverterStorage
  * @uses Innokassa\MDK\Entities\Primitives\Notify
@@ -49,15 +47,18 @@ class ConverterStorageTest extends TestCase
             ->setType(ReceiptType::COMING)
             ->setStatus(new ReceiptStatus(ReceiptStatus::COMPLETED))
             ->setSubType(ReceiptSubType::HAND)
-            ->addItem((new ReceiptItem())
-                ->setPrice(100.0)
-                ->setQuantity(2)
-                ->setName('name')
+            ->addItem(
+                (new ReceiptItem())
+                    ->setPrice(100.0)
+                    ->setQuantity(2)
+                    ->setName('name')
+                    ->setAdditional('additional')
             )
             ->setTaxation(Taxation::ORN)
             ->setAmount(new Amount(Amount::CASHLESS, 200.0))
             ->setNotify(new Notify('box@domain.zone'))
-            ->setLocation('http://example.com/');
+            ->setLocation('http://example.com/')
+            ->setAdditional('name', 'value');
 
         $a = [
             'id' => 0,
@@ -75,7 +76,8 @@ class ConverterStorageTest extends TestCase
                 'quantity' => 2.0,
                 'amount' => 200.0,
                 'payment_method' => 4,
-                'vat' => 6
+                'vat' => 6,
+                'additional_props' => 'additional'
             ]],
             'taxation' => Taxation::ORN,
             'amount' => [
@@ -85,7 +87,10 @@ class ConverterStorageTest extends TestCase
                 'email' => 'box@domain.zone'
             ],
             'customer' => null,
-            'location' =>  'http://example.com/'
+            'location' =>  'http://example.com/',
+            'additional_attribute' => [
+                'name' => 'value'
+            ]
         ];
 
         $this->assertEquals($a, $conv->receiptToArray($receipt));
@@ -126,10 +131,11 @@ class ConverterStorageTest extends TestCase
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
-            ->addItem((new ReceiptItem())
-                ->setPrice(100.0)
-                ->setQuantity(2)
-                ->setName('name')
+            ->addItem(
+                (new ReceiptItem())
+                    ->setPrice(100.0)
+                    ->setQuantity(2)
+                    ->setName('name')
             )
             ->setAmount(new Amount(Amount::CASHLESS, 200.0))
             ->setNotify(new Notify('box@domain.zone'))
@@ -149,10 +155,11 @@ class ConverterStorageTest extends TestCase
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
-            ->addItem((new ReceiptItem())
-                ->setPrice(100.0)
-                ->setQuantity(2)
-                ->setName('name')
+            ->addItem(
+                (new ReceiptItem())
+                    ->setPrice(100.0)
+                    ->setQuantity(2)
+                    ->setName('name')
             )
             ->setTaxation(Taxation::ORN)
             ->setNotify(new Notify('box@domain.zone'))
@@ -172,10 +179,11 @@ class ConverterStorageTest extends TestCase
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
-            ->addItem((new ReceiptItem())
-                ->setPrice(100.0)
-                ->setQuantity(2)
-                ->setName('name')
+            ->addItem(
+                (new ReceiptItem())
+                    ->setPrice(100.0)
+                    ->setQuantity(2)
+                    ->setName('name')
             )
             ->setTaxation(Taxation::ORN)
             ->setAmount(new Amount(Amount::CASHLESS, 200.0))
@@ -195,10 +203,11 @@ class ConverterStorageTest extends TestCase
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
-            ->addItem((new ReceiptItem())
-                ->setPrice(100.0)
-                ->setQuantity(2)
-                ->setName('name')
+            ->addItem(
+                (new ReceiptItem())
+                    ->setPrice(100.0)
+                    ->setQuantity(2)
+                    ->setName('name')
             )
             ->setTaxation(Taxation::ORN)
             ->setAmount(new Amount(Amount::CASHLESS, 200.0))
@@ -335,4 +344,4 @@ class ConverterStorageTest extends TestCase
         $this->expectException(ConverterException::class);
         $conv->receiptFromArray($a);
     }
-};
+}

@@ -1,9 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\Atoms\Vat;
-
 use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Entities\ConverterAbstract;
 use Innokassa\MDK\Entities\Primitives\Amount;
@@ -13,6 +11,7 @@ use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Exceptions\ConverterException;
 use Innokassa\MDK\Entities\Atoms\ReceiptItemType;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Entities\ConverterAbstract
  * @uses Innokassa\MDK\Entities\ReceiptItem
@@ -56,7 +55,7 @@ class ConverterTest extends TestCase
                 'prepayment' => 300.0,
                 'postpayment' => 400.0,
                 'barter' => 500.0,
-            ], 
+            ],
             $this->converter->amountToArray($amount)
         );
 
@@ -75,7 +74,7 @@ class ConverterTest extends TestCase
             'prepayment' => 300.0,
             'postpayment' => 400.0,
             'barter' => 500.0,
-        ]); 
+        ]);
         $this->assertSame(100.0, $amount->get(Amount::CASHLESS));
         $this->assertSame(200.0, $amount->get(Amount::CASH));
         $this->assertSame(300.0, $amount->get(Amount::PREPAYMENT));
@@ -94,7 +93,7 @@ class ConverterTest extends TestCase
         $this->expectException(ConverterException::class);
         $this->converter->amountFromArray([
             'cashless' => -100.0,
-        ]); 
+        ]);
     }
 
     //######################################################################
@@ -109,7 +108,7 @@ class ConverterTest extends TestCase
             [
                 'name' => 'Тест Тест Тест',
                 'tin' => '0000000000'
-            ], 
+            ],
             $this->converter->customerToArray($customer)
         );
 
@@ -123,7 +122,7 @@ class ConverterTest extends TestCase
     public function testCustomerFromArray()
     {
         $customer = $this->converter->customerFromArray([
-            'name' => 'Тест Тест Тест', 
+            'name' => 'Тест Тест Тест',
             'tin' => '0000000000'
         ]);
         $this->assertSame('Тест Тест Тест', $customer->getName());
@@ -158,7 +157,7 @@ class ConverterTest extends TestCase
             [
                 'phone' => '+79998887766',
                 'email' => 'box@domain.zone'
-            ], 
+            ],
             $this->converter->notifyToArray($notify)
         );
 
@@ -211,7 +210,8 @@ class ConverterTest extends TestCase
             'quantity' => 2.0,
             'amount' => 200.0,
             'payment_method' => PaymentMethod::PREPAYMENT_FULL,
-            'vat' => Vat::CODE_WITHOUT
+            'vat' => Vat::CODE_WITHOUT,
+            'additional_props' => 'additional'
         ];
         $receiptItem = $this->converter->itemFromArray($aOut);
         $this->assertSame($aOut, $this->converter->itemToArray($receiptItem));
@@ -303,7 +303,8 @@ class ConverterTest extends TestCase
             'quantity' => 2.0,
             'amount' => 200.0,
             'payment_method' => PaymentMethod::PREPAYMENT_FULL,
-            'vat' => Vat::CODE_WITHOUT
+            'vat' => Vat::CODE_WITHOUT,
+            'additional_props' => 'additional'
         ];
         $items = [];
         $items[] = $item;
@@ -313,4 +314,4 @@ class ConverterTest extends TestCase
         $receiptItems = $this->converter->itemsFromArray($items);
         $this->assertSame($items, $this->converter->itemsToArray($receiptItems));
     }
-};
+}

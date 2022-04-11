@@ -5,7 +5,11 @@ namespace Innokassa\MDK\Services;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
+use Innokassa\MDK\Exceptions\StorageException;
+use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
+use Innokassa\MDK\Exceptions\Services\ManualException;
+use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
  * Интерфейс сервиса ручной фискализации заказов
@@ -38,7 +42,7 @@ interface ManualInterface
      * @throws InvalidArgumentException
      * @throws TransferException
      * @throws StorageException
-     * @throws RefundException
+     * @throws ManualException
      *
      * @param string $orderId
      * @param ReceiptItemCollection $items

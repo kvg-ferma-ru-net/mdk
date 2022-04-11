@@ -72,7 +72,9 @@ class NetClientCurl implements NetClientInterface
     {
         switch ($code) {
             case static::CODE:
-                return curl_getinfo($this->curl, CURLINFO_RESPONSE_CODE);
+                $code = curl_getinfo($this->curl, CURLINFO_RESPONSE_CODE);
+                $info = curl_getinfo($this->curl);
+                return $code;
             case static::BODY:
                 return $this->response;
             case static::HEAD:

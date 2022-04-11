@@ -1,11 +1,10 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\Primitives\Amount;
-
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Entities\Primitives\Amount
  */
@@ -113,4 +112,4 @@ class AmountTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $amount->get(0);
     }
-};
+}

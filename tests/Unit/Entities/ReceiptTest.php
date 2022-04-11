@@ -1,12 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
 use Innokassa\MDK\Entities\UUID;
 use Innokassa\MDK\Entities\Receipt;
-
 use Innokassa\MDK\Entities\Atoms\Vat;
-
 use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
@@ -16,17 +13,15 @@ use Innokassa\MDK\Entities\Atoms\PaymentMethod;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
-
 use Innokassa\MDK\Entities\Atoms\ReceiptItemType;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Entities\Receipt
  * @uses Innokassa\MDK\Entities\ReceiptItem
- * 
  * @uses Innokassa\MDK\Entities\UUID
- * 
  * @uses Innokassa\MDK\Entities\AtomAbstract
  * @uses Innokassa\MDK\Entities\Atoms\Taxation
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptType
@@ -35,11 +30,9 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
  * @uses Innokassa\MDK\Entities\Atoms\Vat
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptItemType
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptStatus
- * 
  * @uses Innokassa\MDK\Entities\Primitives\Amount
  * @uses Innokassa\MDK\Entities\Primitives\Notify
  * @uses Innokassa\MDK\Entities\Primitives\Customer
- * 
  * @uses Innokassa\MDK\Collections\BaseCollection
  * @uses Innokassa\MDK\Collections\ReceiptItemCollection
  */
@@ -310,4 +303,4 @@ class ReceiptTest extends TestCase
         $receipt->setId(10);
         $this->assertSame(10, $receipt->getId());
     }
-};
+}
