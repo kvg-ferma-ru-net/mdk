@@ -2,7 +2,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Listen for Xdebug",
+            "name": "Listen local",
+            "type": "php",
+            "request": "launch",
+            "hostname": "localhost",
+            "port": 9005,
+            "log": true,
+        },
+        {
+            "name": "Listen container",
             "type": "php",
             "request": "launch",
             "hostname": "192.168.0.1",

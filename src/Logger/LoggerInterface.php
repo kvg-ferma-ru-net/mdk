@@ -12,7 +12,7 @@ interface LoggerInterface
      *
      * @param integer $level уровень сообщения из констант LogLevel
      * @param string $message
-     * @param array $context
+     * @param array<mixed> $context
      * @return void
      */
     public function log(int $level, string $message, array $context = []): void;
