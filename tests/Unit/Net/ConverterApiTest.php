@@ -1,8 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use Innokassa\MDK\Net\ConverterApi;
 use Innokassa\MDK\Entities\Receipt;
+use Innokassa\MDK\Net\ConverterApi;
+use Innokassa\MDK\Entities\Atoms\Unit;
 use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
@@ -49,6 +50,7 @@ class ConverterApiTest extends TestCase
                     ->setQuantity(2)
                     ->setName('name')
                     ->setAdditional('additional')
+                    ->setUnit(Unit::DEFAULT)
             )
             ->setTaxation(Taxation::ORN)
             ->setAmount(new Amount(Amount::CASHLESS, 200.0))
@@ -67,7 +69,8 @@ class ConverterApiTest extends TestCase
                     'amount' => 200.0,
                     'payment_method' => 4,
                     'vat' => 6,
-                    'additional_props' => 'additional'
+                    'additional_props' => 'additional',
+                    'unit' => Unit::DEFAULT
                 ]],
                 'taxation' => Taxation::ORN,
                 'amount' => [

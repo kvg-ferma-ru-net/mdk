@@ -43,7 +43,6 @@ use Innokassa\MDK\Exceptions\Services\AutomaticException;
  * @uses Innokassa\MDK\Entities\Atoms\Unit
  * @uses Innokassa\MDK\Storage\ReceiptFilter
  * @uses Innokassa\MDK\Entities\Primitives\Customer
- * @uses Innokassa\MDK\Services\FiscalizationBaseAbstract
  * @uses Innokassa\MDK\Exceptions\TransferException
  */
 class AutomaticBaseFakeTest extends TestCase
@@ -169,7 +168,7 @@ class AutomaticBaseFakeTest extends TestCase
         $this->storage = $this->createMock(ReceiptStorageInterface::class);
         $this->storage
             ->method('getCollection')
-            ->will($this->onConsecutiveCalls(new ReceiptCollection(), $receipts));
+            ->will($this->onConsecutiveCalls($receipts));
 
         $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
         $receipt = $automatic->fiscalize('0');
@@ -207,7 +206,7 @@ class AutomaticBaseFakeTest extends TestCase
     /**
      * @covers Innokassa\MDK\Services\AutomaticBase::__construct
      * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
-     * @covers Innokassa\MDK\Services\FiscalizationBaseAbstract::fiscalizeProc
+     * @covers Innokassa\MDK\Services\AutomaticBase::fiscalizeProc
      */
     public function testFiscalizeSuccessNotUniqUUID()
     {
@@ -236,7 +235,7 @@ class AutomaticBaseFakeTest extends TestCase
     /**
      * @covers Innokassa\MDK\Services\AutomaticBase::__construct
      * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
-     * @covers Innokassa\MDK\Services\FiscalizationBaseAbstract::fiscalizeProc
+     * @covers Innokassa\MDK\Services\AutomaticBase::fiscalizeProc
      */
     public function testFiscalizeSuccessServerError()
     {
@@ -262,7 +261,7 @@ class AutomaticBaseFakeTest extends TestCase
     /**
      * @covers Innokassa\MDK\Services\AutomaticBase::__construct
      * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
-     * @covers Innokassa\MDK\Services\FiscalizationBaseAbstract::fiscalizeProc
+     * @covers Innokassa\MDK\Services\AutomaticBase::fiscalizeProc
      */
     public function testFiscalizeFailReceipt()
     {
@@ -287,30 +286,6 @@ class AutomaticBaseFakeTest extends TestCase
      * @covers Innokassa\MDK\Services\AutomaticBase::__construct
      * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
      */
-    public function testFiscalizeFailExistsHand()
-    {
-        $this->settings->method('getOnly2')
-            ->willReturn(false);
-
-        $receipts = new ReceiptCollection();
-        $receipt = new Receipt();
-        $receipt->setSubType(ReceiptSubType::HAND);
-        $receipts[] = $receipt;
-
-        $this->storage
-            ->method('getCollection')
-            ->willReturn($receipts);
-
-        $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
-
-        $this->expectException(AutomaticException::class);
-        $automatic->fiscalize('0');
-    }
-
-    /**
-     * @covers Innokassa\MDK\Services\AutomaticBase::__construct
-     * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
-     */
     public function testFiscalizeFailExistsType()
     {
         $this->settings->method('getOnly2')
@@ -324,37 +299,12 @@ class AutomaticBaseFakeTest extends TestCase
 
         $this->storage
             ->method('getCollection')
-            ->will($this->onConsecutiveCalls(new ReceiptCollection(), $receipts));
+            ->will($this->onConsecutiveCalls($receipts));
 
         $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
 
         $this->expectException(AutomaticException::class);
         $automatic->fiscalize('0', ReceiptSubType::PRE);
-    }
-
-    /**
-     * @covers Innokassa\MDK\Services\AutomaticBase::__construct
-     * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
-     */
-    public function testFiscalizeFailExistsRefund2()
-    {
-        $this->settings->method('getOnly2')
-            ->willReturn(false);
-
-        $receipts = new ReceiptCollection();
-        $receipt = new Receipt();
-        $receipt->setType(ReceiptType::REFUND_COMING);
-        $receipt->setSubType(ReceiptSubType::FULL);
-        $receipts[] = $receipt;
-
-        $this->storage
-            ->method('getCollection')
-            ->will($this->onConsecutiveCalls(new ReceiptCollection(), $receipts));
-
-        $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
-
-        $this->expectException(AutomaticException::class);
-        $automatic->fiscalize('0');
     }
 
     /**
@@ -374,7 +324,7 @@ class AutomaticBaseFakeTest extends TestCase
 
         $this->storage
             ->method('getCollection')
-            ->will($this->onConsecutiveCalls(new ReceiptCollection(), $receipts));
+            ->will($this->onConsecutiveCalls($receipts));
 
         $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
 

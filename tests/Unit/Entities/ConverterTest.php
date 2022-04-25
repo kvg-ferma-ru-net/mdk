@@ -2,6 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Entities\Atoms\Vat;
+use Innokassa\MDK\Entities\Atoms\Unit;
 use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Entities\ConverterAbstract;
 use Innokassa\MDK\Entities\Primitives\Amount;
@@ -212,10 +213,11 @@ class ConverterTest extends TestCase
             'amount' => 200.0,
             'payment_method' => PaymentMethod::PREPAYMENT_FULL,
             'vat' => Vat::CODE_WITHOUT,
-            'additional_props' => 'additional'
+            'additional_props' => 'additional',
+            'unit' => Unit::DEFAULT
         ];
         $receiptItem = $this->converter->itemFromArray($aOut);
-        $this->assertSame($aOut, $this->converter->itemToArray($receiptItem));
+        $this->assertEquals($aOut, $this->converter->itemToArray($receiptItem));
     }
 
     //**********************************************************************
@@ -305,7 +307,8 @@ class ConverterTest extends TestCase
             'amount' => 200.0,
             'payment_method' => PaymentMethod::PREPAYMENT_FULL,
             'vat' => Vat::CODE_WITHOUT,
-            'additional_props' => 'additional'
+            'additional_props' => 'additional',
+            'unit' => Unit::DEFAULT
         ];
         $items = [];
         $items[] = $item;
@@ -313,6 +316,6 @@ class ConverterTest extends TestCase
         $items[] = $item;
 
         $receiptItems = $this->converter->itemsFromArray($items);
-        $this->assertSame($items, $this->converter->itemsToArray($receiptItems));
+        $this->assertEquals($items, $this->converter->itemsToArray($receiptItems));
     }
 }

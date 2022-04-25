@@ -109,6 +109,7 @@ abstract class ConverterAbstract
             "amount" => ($item->getAmount() > 0.0 ? $item->getAmount() : $item->getPrice() * $item->getQuantity()),
             "payment_method" => $item->getPaymentMethod(),
             "vat" => $item->getVat()->getCode(),
+            "unit" => $item->getUnit(),
         ];
 
         if ($item->getAdditional()) {
@@ -149,7 +150,8 @@ abstract class ConverterAbstract
                 ->setQuantity($a['quantity'])
                 ->setAmount($a['amount'])
                 ->setPaymentMethod($a['payment_method'])
-                ->setVat(new Vat($a['vat']));
+                ->setVat(new Vat($a['vat']))
+                ->setUnit($a['unit']);
 
             if (isset($a['additional_props']) && $a['additional_props']) {
                 $item->setAdditional($a['additional_props']);

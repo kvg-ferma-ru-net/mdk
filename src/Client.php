@@ -3,14 +3,11 @@
 namespace Innokassa\MDK;
 
 use Innokassa\MDK\Logger\LoggerInterface;
-use Innokassa\MDK\Services\ManualInterface;
-use Innokassa\MDK\Services\PrinterInterface;
 use Innokassa\MDK\Services\PipelineInterface;
 use Innokassa\MDK\Settings\SettingsInterface;
 use Innokassa\MDK\Services\AutomaticInterface;
 use Innokassa\MDK\Services\ConnectorInterface;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
-use Innokassa\MDK\Entities\ReceiptAdapterInterface;
 
 /**
  * Клиент основанный на сервисах для использования API Pangaea v2.
@@ -19,23 +16,17 @@ class Client
 {
     public function __construct(
         SettingsInterface $settings,
-        ReceiptAdapterInterface $adapter,
         ReceiptStorageInterface $storage,
         AutomaticInterface $atomatic,
-        ManualInterface $manual,
         PipelineInterface $pipeline,
-        PrinterInterface $printer,
         ConnectorInterface $connector,
         LoggerInterface $logger
     ) {
         $this->settings = $settings;
-        $this->adapter = $adapter;
         $this->storage = $storage;
 
         $this->atomatic = $atomatic;
-        $this->manual = $manual;
         $this->pipeline = $pipeline;
-        $this->printer = $printer;
         $this->connector = $connector;
         $this->logger = $logger;
     }
@@ -53,16 +44,6 @@ class Client
     }
 
     /**
-     * Получить сервис ручной фискализации
-     *
-     * @return ManualInterface
-     */
-    public function serviceManual(): ManualInterface
-    {
-        return $this->manual;
-    }
-
-    /**
      * Получить сервис обработки очереди чеков
      *
      * @return PipelineInterface
@@ -70,16 +51,6 @@ class Client
     public function servicePipeline(): PipelineInterface
     {
         return $this->pipeline;
-    }
-
-    /**
-     * Получить сервис печати чеков
-     *
-     * @return PrinterInterface
-     */
-    public function servicePrinter(): PrinterInterface
-    {
-        return $this->printer;
     }
 
     /**
@@ -102,16 +73,6 @@ class Client
     public function componentSettings(): SettingsInterface
     {
         return $this->settings;
-    }
-
-    /**
-     * Получить компонент адаптера чеков
-     *
-     * @return ReceiptAdapterInterface
-     */
-    public function componentAdapter(): ReceiptAdapterInterface
-    {
-        return $this->adapter;
     }
 
     /**
@@ -141,14 +102,8 @@ class Client
     /** @var AutomaticInterface */
     private $atomatic;
 
-    /** @var ManualInterface */
-    private $manual;
-
     /** @var PipelineInterface */
     private $pipeline;
-
-    /** @var PrinterInterface */
-    private $printer;
 
     /** @var ConnectorInterface */
     private $connector;
@@ -158,9 +113,6 @@ class Client
 
     /** @var SettingsInterface */
     private $settings;
-
-    /** @var ReceiptAdapterInterface */
-    private $adapter;
 
     /** @var ReceiptStorageInterface */
     private $storage;
