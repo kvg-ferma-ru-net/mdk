@@ -2,6 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Entities\Atoms\Vat;
+use Innokassa\MDK\Entities\Atoms\Unit;
 use Innokassa\MDK\Entities\Atoms\PaymentMethod;
 use Innokassa\MDK\Entities\Atoms\ReceiptItemType;
 use Innokassa\MDK\Entities\ReceiptItem;
@@ -11,6 +12,7 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 /**
  * @uses Innokassa\MDK\Entities\ReceiptItem
  * @uses Innokassa\MDK\Entities\Atoms\Vat
+ * @uses Innokassa\MDK\Entities\Atoms\Unit
  * @uses Innokassa\MDK\Entities\Atoms\PaymentMethod
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptItemType
  * @uses Innokassa\MDK\Entities\AtomAbstract
@@ -161,5 +163,21 @@ class ReceiptItemTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         $receiptItem->setType(0);
+    }
+    
+    /**
+     * @covers Innokassa\MDK\Entities\ReceiptItem::setUnit
+     * @covers Innokassa\MDK\Entities\ReceiptItem::getUnit
+     */
+    public function testSetGetUnit()
+    {
+        $receiptItem = new ReceiptItem();
+
+        $this->assertSame(Unit::DEFAULT, $receiptItem->getUnit());
+        $this->assertSame($receiptItem, $receiptItem->setUnit(Unit::DAY));
+        $this->assertSame(Unit::DAY, $receiptItem->getUnit());
+
+        $this->expectException(InvalidArgumentException::class);
+        $receiptItem->setUnit(-1);
     }
 }

@@ -12,6 +12,7 @@ use Innokassa\MDK\Collections\ReceiptItemCollection;
  * @uses Innokassa\MDK\Entities\Atoms\PaymentMethod
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptItemType
  * @uses Innokassa\MDK\Entities\Atoms\Vat
+ * @uses Innokassa\MDK\Entities\Atoms\Unit
  */
 class ReceiptItemCollectionTest extends TestCase
 {

@@ -37,6 +37,7 @@ use Innokassa\MDK\Exceptions\Services\ManualException;
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptType
  * @uses Innokassa\MDK\Entities\Atoms\Taxation
  * @uses Innokassa\MDK\Entities\Atoms\Vat
+ * @uses Innokassa\MDK\Entities\Atoms\Unit
  * @uses Innokassa\MDK\Storage\ReceiptFilter
  * @uses Innokassa\MDK\Services\FiscalizationBaseAbstract
  * @uses Innokassa\MDK\Exceptions\TransferException

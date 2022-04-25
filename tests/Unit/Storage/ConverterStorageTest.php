@@ -27,6 +27,7 @@ use Innokassa\MDK\Exceptions\ConverterException;
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptType
  * @uses Innokassa\MDK\Entities\Atoms\Taxation
  * @uses Innokassa\MDK\Entities\Atoms\Vat
+ * @uses Innokassa\MDK\Entities\Atoms\Unit
  * @uses Innokassa\MDK\Entities\ConverterAbstract
  * @uses Innokassa\MDK\Entities\Primitives\Amount
  * @uses Innokassa\MDK\Entities\Receipt
