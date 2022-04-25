@@ -273,11 +273,24 @@ class Transfer implements TransferInterface
     // PRIVATE
     //######################################################################
 
+    /** @var NetClientInterface */
     private $client = null;
+
+    /** @var ConverterAbstract */
     private $converter = null;
+
+    /** @var string */
     private $actorId = '';
+
+    /** @var string */
     private $actorToken = '';
+
+    /** @var string */
     private $cashbox = '';
-    private $logger = '';
+
+    /** @var LoggerInterface */
+    private $logger = null;
+
+    /** @var array<string> */
     private $headers = [];
 }

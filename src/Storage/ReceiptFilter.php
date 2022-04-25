@@ -100,7 +100,7 @@ class ReceiptFilter
      * Преобразовать данные фильтра в ассоциативный массив WHERE условия,
      * где ключ название столбца, а значение - ассоциативный массив [value => value, op => op]
      *
-     * @return array
+     * @return array<string, array<string, int|string>>
      */
     public function toArray(): array
     {
@@ -120,9 +120,18 @@ class ReceiptFilter
     // PRIVATE
     //######################################################################
 
+    /** @var array<string, int|string> */
     private $id = null;
+
+    /** @var array<string, int|string> */
     private $type = null;
+
+    /** @var array<string, int|string> */
     private $subType = null;
+
+    /** @var array<string, int|string> */
     private $status = null;
+
+    /** @var array<string, int|string> */
     private $orderId = null;
 }

@@ -138,13 +138,30 @@ class Client
     // PRIVATE
     //######################################################################
 
+    /** @var AutomaticInterface */
     private $atomatic;
+
+    /** @var ManualInterface */
     private $manual;
+
+    /** @var PipelineInterface */
     private $pipeline;
+
+    /** @var PrinterInterface */
     private $printer;
+
+    /** @var ConnectorInterface */
     private $connector;
+
+    /** @var LoggerInterface */
     private $logger;
+
+    /** @var SettingsInterface */
     private $settings;
+
+    /** @var ReceiptAdapterInterface */
     private $adapter;
+
+    /** @var ReceiptStorageInterface */
     private $storage;
 }
