@@ -3,9 +3,10 @@
 use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Entities\UUID;
 use Innokassa\MDK\Entities\Receipt;
+use Innokassa\MDK\Entities\Atoms\Unit;
 use Innokassa\MDK\Entities\ReceiptItem;
-use Innokassa\MDK\Storage\ConverterStorage;
 use Innokassa\MDK\Entities\Atoms\Taxation;
+use Innokassa\MDK\Storage\ConverterStorage;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
@@ -54,6 +55,7 @@ class ConverterStorageTest extends TestCase
                     ->setQuantity(2)
                     ->setName('name')
                     ->setAdditional('additional')
+                    ->setUnit(Unit::DEFAULT)
             )
             ->setTaxation(Taxation::ORN)
             ->setAmount(new Amount(Amount::CASHLESS, 200.0))
@@ -78,7 +80,8 @@ class ConverterStorageTest extends TestCase
                 'amount' => 200.0,
                 'payment_method' => 4,
                 'vat' => 6,
-                'additional_props' => 'additional'
+                'additional_props' => 'additional',
+                'unit' => Unit::DEFAULT
             ]],
             'taxation' => Taxation::ORN,
             'amount' => [
@@ -244,7 +247,8 @@ class ConverterStorageTest extends TestCase
                 'quantity' => 2.0,
                 'amount' => 200.0,
                 'payment_method' => 4,
-                'vat' => 6
+                'vat' => 6,
+                'unit' => Unit::DEFAULT
             ]],
             'taxation' => Taxation::ORN,
             'amount' => [

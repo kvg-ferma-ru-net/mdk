@@ -56,7 +56,6 @@ use Innokassa\MDK\Logger\LoggerFile;
  * @uses Innokassa\MDK\Net\ConverterApi
  * @uses Innokassa\MDK\Net\NetClientCurl
  * @uses Innokassa\MDK\Net\Transfer
- * @uses Innokassa\MDK\Services\ManualBase
  */
 class SystemTest extends TestCase
 {
@@ -97,19 +96,14 @@ class SystemTest extends TestCase
         );
 
         $automatic = new AutomaticBase(self::$settings, self::$storage, $transfer, self::$adapter);
-        $manual = new ManualBase(self::$storage, $transfer, self::$settings);
         $pipeline = new PipelineBase(self::$storage, $transfer);
-        $printer = new PrinterBase(self::$storage, $transfer);
         $connector = new ConnectorBase($transfer);
 
         self::$client = new Client(
             self::$settings,
-            self::$adapter,
             self::$storage,
             $automatic,
-            $manual,
             $pipeline,
-            $printer,
             $connector,
             self::$logger
         );
@@ -198,6 +192,9 @@ class SystemTest extends TestCase
 
     /**
      * @covers Innokassa\MDK\Services\AutomaticBase
+     * @depends testConnectorSuccess
+     * @depends testStorage
+     * @depends testAdapter
      */
     public function testAutomatic()
     {
@@ -206,73 +203,36 @@ class SystemTest extends TestCase
         $this->assertTrue($receipt1->getStatus()->getCode() != ReceiptStatus::ERROR);
         $receipt2 = $automatic->fiscalize(1, ReceiptSubType::FULL);
         $this->assertTrue($receipt2->getStatus()->getCode() != ReceiptStatus::ERROR);
-    }
 
-    //######################################################################
-
-    /**
-     * @covers Innokassa\MDK\Services\ManualBase
-     */
-    public function testManual()
-    {
-        $manual = self::$client->serviceManual();
-
-        $orderId = 2;
-        $items = self::$adapter->getItems($orderId, ReceiptSubType::PRE);
-        $total = self::$adapter->getTotal($orderId);
-        $amount = new Amount(Amount::CASHLESS, $total);
-        $notify = self::$adapter->getNotify($orderId);
-
-        $receiptComing = $manual->fiscalize($orderId, $items, $notify, $amount);
-        $receiptRefund = $manual->refund($orderId, $items, $notify, $amount);
-
-        $this->expectException(ManualException::class);
-        $manual->refund($orderId, $items, $notify, $amount);
-    }
-
-    //######################################################################
-
-    /**
-     * @covers Innokassa\MDK\Services\AutomaticBase
-     * @depends testManual
-     */
-    public function testAutomaticAfterManual()
-    {
-        $automatic = self::$client->serviceAutomatic();
         $this->expectException(AutomaticException::class);
-        $automatic->fiscalize(2, ReceiptSubType::FULL);
+        $automatic->fiscalize(1, ReceiptSubType::FULL);
     }
 
     //######################################################################
 
     /**
      * @covers Innokassa\MDK\Services\PipelineBase
-     * @depends testManual
-     * @depends testAutomatic
-     * @depends testAutomaticAfterManual
+     * @depends testConnectorSuccess
      * @depends testStorage
+     * @depends testAdapter
+     * @depends testAutomatic
      */
     public function testPipelineSuccess()
     {
         $receipts = [];
-        $manual = self::$client->serviceManual();
+        $automatic = self::$client->serviceAutomatic();
 
         /*
             создадим два одинаковых чека для заказа 5, пробьем и специально установим статус WAIT,
             в тестах будем ждать COMPLETED | WAIT
         */
         $orderId = 5;
-        $items = self::$adapter->getItems($orderId, ReceiptSubType::PRE);
-        $total = self::$adapter->getTotal($orderId);
-        $amount = new Amount(Amount::CASHLESS, $total);
-        $notify = self::$adapter->getNotify($orderId);
-
-        $receiptComing = $manual->fiscalize($orderId, $items, $notify, $amount);
+        $receiptComing = $automatic->fiscalize($orderId);
         $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::WAIT));
         self::$storage->save($receiptComing);
         $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
 
-        $receiptComing = $manual->fiscalize($orderId, $items, $notify, $amount);
+        $receiptComing = $automatic->fiscalize($orderId);
         $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::WAIT));
         self::$storage->save($receiptComing);
         $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
@@ -282,7 +242,7 @@ class SystemTest extends TestCase
             в тестах будем ждать COMPLETED | WAIT
         */
         $orderId = 3;
-        $receiptComing = $manual->fiscalize($orderId, $items, $notify, $amount);
+        $receiptComing = $automatic->fiscalize($orderId);
         $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::PREPARED));
         self::$storage->save($receiptComing);
         $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
@@ -294,11 +254,7 @@ class SystemTest extends TestCase
             в тестах будем ждать COMPLETED | WAIT
         */
         $orderId = 4;
-        $items = self::$adapter->getItems($orderId, ReceiptSubType::PRE);
-        $total = self::$adapter->getTotal($orderId);
-        $amount = new Amount(Amount::CASHLESS, $total);
-        $notify = self::$adapter->getNotify($orderId);
-        $receiptComing = $manual->fiscalize($orderId, $items, $notify, $amount);
+        $receiptComing = $automatic->fiscalize($orderId);
         $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::REPEAT));
         self::$storage->save($receiptComing);
         $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
@@ -336,7 +292,8 @@ class SystemTest extends TestCase
         $pipeline->updateUnaccepted();
         $pipeline->updateAccepted();
         foreach ($receipts as $key => $value) {
-            $this->assertContains(self::$storage->getOne($key)->getStatus()->getCode(), $value);
+            $receipt = self::$storage->getOne($key);
+            $this->assertContains($receipt->getStatus()->getCode(), $value);
         }
 
         /*
@@ -360,17 +317,17 @@ class SystemTest extends TestCase
 
         $this->assertTrue($connector->testSettings(self::$settings));
 
-        $connector->testSettings(
-            new SettingsConcrete([
-                'actor_id' => '0',
-                'actor_token' => TEST_ACTOR_TOKEN,
-                'cashbox' => TEST_CASHBOX_WITHOUT_AGENT,
-                'site' => 'https://example.com/',
-                'taxation' => Taxation::USN,
-                'only2' => false,
-                'agent' => false,
-            ])
+        $transfer = new Transfer(
+            new NetClientCurl(),
+            new ConverterApi(),
+            self::$settings->getActorId(),
+            self::$settings->getActorToken(),
+            self::$settings->getCashbox(),
+            self::$logger
         );
+        $connector = new ConnectorBase($transfer);
+
+        $this->assertTrue($connector->testSettings(self::$settings));
     }
 
     /**

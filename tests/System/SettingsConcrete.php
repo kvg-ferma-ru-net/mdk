@@ -43,7 +43,7 @@ class SettingsConcrete implements SettingsInterface
 
     public function get(string $name)
     {
-        if (isset($this->aSettings[$name]) && strlen($this->aSettings[$name]) > 0) {
+        if (isset($this->aSettings[$name])) {
             return $this->aSettings[$name];
         }
 
