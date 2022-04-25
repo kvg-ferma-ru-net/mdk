@@ -28,6 +28,7 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptSubType
  * @uses Innokassa\MDK\Entities\Atoms\PaymentMethod
  * @uses Innokassa\MDK\Entities\Atoms\Vat
+ * @uses Innokassa\MDK\Entities\Atoms\Unit
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptItemType
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptStatus
  * @uses Innokassa\MDK\Entities\Primitives\Amount

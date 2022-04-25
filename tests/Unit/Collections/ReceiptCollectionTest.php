@@ -19,6 +19,7 @@ use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptSubType
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptType
  * @uses Innokassa\MDK\Entities\Atoms\Vat
+ * @uses Innokassa\MDK\Entities\Atoms\Unit
  * @uses Innokassa\MDK\Entities\Receipt
  * @uses Innokassa\MDK\Entities\ReceiptItem
  * @uses Innokassa\MDK\Entities\UUID

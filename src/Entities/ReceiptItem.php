@@ -5,6 +5,7 @@ namespace Innokassa\MDK\Entities;
 use Innokassa\MDK\Entities\Atoms\Vat;
 use Innokassa\MDK\Entities\Atoms\PaymentMethod;
 use Innokassa\MDK\Entities\Atoms\ReceiptItemType;
+use Innokassa\MDK\Entities\Atoms\Unit;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
@@ -17,6 +18,7 @@ class ReceiptItem
         $this->type = new ReceiptItemType(ReceiptItemType::PRODUCT);
         $this->vat = new Vat(Vat::CODE_WITHOUT);
         $this->paymentMethod = new PaymentMethod(PaymentMethod::PAYMENT_FULL);
+        $this->unit = new Unit(Unit::DEFAULT);
     }
 
     //######################################################################
@@ -247,6 +249,28 @@ class ReceiptItem
         return $this->additional;
     }
 
+    /**
+     * Установить меру количества предмета расчета
+     *
+     * @param int $unit
+     * @return self
+     */
+    public function setUnit(int $unit): self
+    {
+        $this->unit = new Unit($unit);
+        return $this;
+    }
+
+    /**
+     * Получить меру количества предмета расчета
+     *
+     * @return int
+     */
+    public function getUnit(): int
+    {
+        return ($this->unit ? $this->unit->getCode() : null);
+    }
+
     //######################################################################
     // PRIVATE
     //######################################################################
@@ -258,6 +282,7 @@ class ReceiptItem
     private $amount = 0.0;
     private $vat = null;
     private $paymentMethod = null;
+    private $unit = null;
 
     /**
      * @var string

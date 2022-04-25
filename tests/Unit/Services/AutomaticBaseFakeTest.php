@@ -40,6 +40,7 @@ use Innokassa\MDK\Exceptions\Services\AutomaticException;
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptType
  * @uses Innokassa\MDK\Entities\Atoms\Taxation
  * @uses Innokassa\MDK\Entities\Atoms\Vat
+ * @uses Innokassa\MDK\Entities\Atoms\Unit
  * @uses Innokassa\MDK\Storage\ReceiptFilter
  * @uses Innokassa\MDK\Entities\Primitives\Customer
  * @uses Innokassa\MDK\Services\FiscalizationBaseAbstract
