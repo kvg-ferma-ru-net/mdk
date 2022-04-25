@@ -83,8 +83,7 @@ class Transfer implements TransferInterface
                         'code' => $responseCode ?? '',
                         'body' => $responseBody ?? ''
                     ]
-                ],
-                true
+                ]
             );
             throw $e;
         }
@@ -117,8 +116,7 @@ class Transfer implements TransferInterface
                 throw new TransferException('converter error: ' . $e->getMessage(), ReceiptStatus::ERROR);
             }
 
-            $point = ($needAgent ? 'online_store_agent' : 'online_store');
-            $url = self::API_URL . "/c_groups/" . $this->cashbox . "/receipts/$point/" . $receipt->getUUID()->get();
+            $url = self::API_URL . "/c_groups/" . $this->cashbox . "/receipts/" . $receipt->getUUID()->get();
             $sBody = json_encode($body, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
             $this->client
                 ->reset()
@@ -161,8 +159,7 @@ class Transfer implements TransferInterface
                         'code' => $responseCode ?? '',
                         'body' => $responseBody ?? ''
                     ]
-                ],
-                true
+                ]
             );
             throw $e;
         }
@@ -233,8 +230,7 @@ class Transfer implements TransferInterface
                         'code' => $responseCode ?? '',
                         'body' => $responseBody ?? ''
                     ]
-                ],
-                true
+                ]
             );
             throw $e;
         }
