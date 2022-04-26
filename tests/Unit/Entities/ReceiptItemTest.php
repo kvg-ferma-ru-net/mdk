@@ -34,6 +34,24 @@ class ReceiptItemTest extends TestCase
     //######################################################################
 
     /**
+     * @covers Innokassa\MDK\Entities\ReceiptItem::setItemId
+     * @covers Innokassa\MDK\Entities\ReceiptItem::getItemId
+     */
+    public function testSetGetItemId()
+    {
+        $receiptItem = new ReceiptItem();
+
+        $this->assertSame('', $receiptItem->getItemId());
+        $this->assertSame($receiptItem, $receiptItem->setItemId('123'));
+        $this->assertSame('123', $receiptItem->getItemId());
+
+        $this->expectException(InvalidArgumentException::class);
+        $receiptItem->setType(0);
+    }
+
+    //######################################################################
+
+    /**
      * @covers Innokassa\MDK\Entities\ReceiptItem::setType
      * @covers Innokassa\MDK\Entities\ReceiptItem::getType
      */

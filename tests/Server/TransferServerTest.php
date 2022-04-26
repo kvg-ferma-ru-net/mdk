@@ -60,14 +60,14 @@ class TransferServerTest extends TestCase
                     ->setPrice(100.0)
                     ->setQuantity(2)
                     ->setName('name')
-                    ->setAdditional('additional')
+                    ->setItemId('123')
             )
             ->setTaxation(Taxation::USN)
             ->setAmount(new Amount(Amount::CASHLESS, 200.0))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
             ->setLocation('https://example.com/')
-            ->setAdditional('name', 'value');
+            ->setOrderId('456');
 
         $client = new NetClientCurl();
         $converter = new ConverterApi();

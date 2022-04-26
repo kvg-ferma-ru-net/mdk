@@ -213,7 +213,7 @@ class ConverterTest extends TestCase
             'amount' => 200.0,
             'payment_method' => PaymentMethod::PREPAYMENT_FULL,
             'vat' => Vat::CODE_WITHOUT,
-            'additional_props' => 'additional',
+            'item_id' => '123',
             'unit' => Unit::DEFAULT
         ];
         $receiptItem = $this->converter->itemFromArray($aOut);
@@ -307,7 +307,7 @@ class ConverterTest extends TestCase
             'amount' => 200.0,
             'payment_method' => PaymentMethod::PREPAYMENT_FULL,
             'vat' => Vat::CODE_WITHOUT,
-            'additional_props' => 'additional',
+            'item_id' => '123',
             'unit' => Unit::DEFAULT
         ];
         $items = [];

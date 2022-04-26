@@ -13,8 +13,8 @@ INSERT INTO `test_db_mdk`.`orders` (`id`, `items`, `customer`, `notify`) VALUES 
 
 INSERT INTO `test_db_mdk`.`orders` (`id`, `items`, `customer`, `notify`) VALUES (5, '[{\"name\":\"Сапоги детские\",\"price\":940.5,\"quantity\":1,\"paymentMethod\":4,\"type\":1,\"vat\":6,\"amount\":940.5}]', 'Test', 'box@domain.zone');
 
-CREATE TABLE `test_db_mdk`.`receipts` ( `id` INT NOT NULL AUTO_INCREMENT , `subType` TINYINT NOT NULL , `cashbox` VARCHAR(255) NOT NULL , `orderId` VARCHAR(255) NOT NULL , `siteId` VARCHAR(255) NOT NULL , `uuid` VARCHAR(32) NOT NULL , `status` TINYINT NOT NULL , `type` TINYINT NOT NULL , `items` TEXT NOT NULL , `taxation` TINYINT NOT NULL , `amount` TEXT NOT NULL , `customer` TEXT NOT NULL , `notify` TEXT NOT NULL , `location` VARCHAR(255) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB; 
+CREATE TABLE `test_db_mdk`.`receipts` ( `id` INT NOT NULL AUTO_INCREMENT , `subtype` TINYINT NOT NULL , `cashbox` VARCHAR(255) NOT NULL , `order_id` VARCHAR(255) NOT NULL , `site_id` VARCHAR(255) NOT NULL , `uuid` VARCHAR(32) NOT NULL , `status` TINYINT NOT NULL , `type` TINYINT NOT NULL , `items` TEXT NOT NULL , `taxation` TINYINT NOT NULL , `amount` TEXT NOT NULL , `customer` TEXT NOT NULL , `notify` TEXT NOT NULL , `location` VARCHAR(255) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB; 
 
-ALTER TABLE `test_db_mdk`.`receipts` ADD INDEX `filter` (`orderId`, `type`, `subType`, `status`); 
+ALTER TABLE `test_db_mdk`.`receipts` ADD INDEX `filter` (`order_id`, `type`, `subtype`, `status`); 
 
 USE `test_db_mdk`;

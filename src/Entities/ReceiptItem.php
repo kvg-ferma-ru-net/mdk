@@ -24,6 +24,30 @@ class ReceiptItem
     //######################################################################
 
     /**
+     * Установить идентификатор товара
+     *
+     * @param string $itemId
+     * @return self
+     */
+    public function setItemId(string $itemId): self
+    {
+        $this->itemId = $itemId;
+        return $this;
+    }
+
+    /**
+     * Получить идентификатор товара
+     *
+     * @return string
+     */
+    public function getItemId(): string
+    {
+        return $this->itemId;
+    }
+
+    //######################################################################
+
+    /**
      * Установить тип позиции
      *
      * @throws InvalidArgumentException
@@ -228,28 +252,6 @@ class ReceiptItem
     }
 
     /**
-     * Установить значение дополнительного поля
-     *
-     * @param non-empty-string $additional
-     * @return self
-     */
-    public function setAdditional(string $additional): self
-    {
-        $this->additional = $additional;
-        return $this;
-    }
-
-    /**
-     * Получить значение дополнительного поля
-     *
-     * @return string
-     */
-    public function getAdditional(): string
-    {
-        return $this->additional;
-    }
-
-    /**
      * Установить меру количества предмета расчета
      *
      * @param int $unit
@@ -284,8 +286,6 @@ class ReceiptItem
     private $paymentMethod = null;
     private $unit = null;
 
-    /**
-     * @var string
-     */
-    private $additional = '';
+    /** @var string */
+    private $itemId = '';
 }

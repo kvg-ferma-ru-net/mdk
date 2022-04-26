@@ -77,10 +77,10 @@ class ConnectorBaseFakeTest extends TestCase
             ]));
 
         $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            $this->settings->getActorId(), 
-            $this->settings->getActorToken(), 
+            $this->client,
+            $this->converter,
+            $this->settings->getActorId(),
+            $this->settings->getActorToken(),
             $this->settings->getCashbox(),
             $this->logger
         );
@@ -100,10 +100,10 @@ class ConnectorBaseFakeTest extends TestCase
             ]));
 
         $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            $this->settings->getActorId(), 
-            $this->settings->getActorToken(), 
+            $this->client,
+            $this->converter,
+            $this->settings->getActorId(),
+            $this->settings->getActorToken(),
             $this->settings->getCashbox(),
             $this->logger
         );
@@ -122,10 +122,10 @@ class ConnectorBaseFakeTest extends TestCase
             ->will($this->throwException(new NetConnectException()));
 
         $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            $this->settings->getActorId(), 
-            $this->settings->getActorToken(), 
+            $this->client,
+            $this->converter,
+            $this->settings->getActorId(),
+            $this->settings->getActorToken(),
             $this->settings->getCashbox(),
             $this->logger
         );
@@ -148,10 +148,10 @@ class ConnectorBaseFakeTest extends TestCase
             ]));
 
         $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            $this->settings->getActorId(), 
-            $this->settings->getActorToken(), 
+            $this->client,
+            $this->converter,
+            $this->settings->getActorId(),
+            $this->settings->getActorToken(),
             $this->settings->getCashbox(),
             $this->logger
         );
@@ -174,10 +174,10 @@ class ConnectorBaseFakeTest extends TestCase
             ]));
 
         $transfer = new Transfer(
-            $this->client, 
-            $this->converter, 
-            $this->settings->getActorId(), 
-            $this->settings->getActorToken(), 
+            $this->client,
+            $this->converter,
+            $this->settings->getActorId(),
+            $this->settings->getActorToken(),
             $this->settings->getCashbox(),
             $this->logger
         );

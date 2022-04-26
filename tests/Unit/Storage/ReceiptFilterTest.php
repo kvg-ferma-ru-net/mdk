@@ -46,7 +46,7 @@ class ReceiptFilterTest extends TestCase
                     'value' => ReceiptType::COMING,
                     'op' => ReceiptFilter::OP_GT
                 ],
-                'subType' => [
+                'subtype' => [
                     'value' => ReceiptSubType::FULL,
                     'op' => ReceiptFilter::OP_LT
                 ],
@@ -54,7 +54,7 @@ class ReceiptFilterTest extends TestCase
                     'value' => ReceiptStatus::COMPLETED,
                     'op' => ReceiptFilter::OP_NOTEQ
                 ],
-                'orderId' => [
+                'order_id' => [
                     'value' => '0',
                     'op' => ReceiptFilter::OP_EQ
                 ],

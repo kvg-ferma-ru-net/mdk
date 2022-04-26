@@ -54,23 +54,23 @@ class ConverterStorageTest extends TestCase
                     ->setPrice(100.0)
                     ->setQuantity(2)
                     ->setName('name')
-                    ->setAdditional('additional')
+                    ->setItemId('123')
                     ->setUnit(Unit::DEFAULT)
             )
             ->setTaxation(Taxation::ORN)
             ->setAmount(new Amount(Amount::CASHLESS, 200.0))
             ->setNotify(new Notify('box@domain.zone'))
             ->setLocation('http://example.com/')
-            ->setAdditional('name', 'value');
+            ->setOrderId('456');
 
         $a = [
             'id' => 0,
             'uuid' => $receipt->getUUID()->get(),
             'cashbox' => '',
-            'siteId' => '0',
-            'orderId' => '',
+            'site_id' => '0',
+            'order_id' => '456',
             'status' => ReceiptStatus::COMPLETED,
-            'subType' => ReceiptSubType::HAND,
+            'subtype' => ReceiptSubType::HAND,
             'type' => ReceiptType::COMING,
             'items' => [[
                 'type' => 1,
@@ -80,7 +80,7 @@ class ConverterStorageTest extends TestCase
                 'amount' => 200.0,
                 'payment_method' => 4,
                 'vat' => 6,
-                'additional_props' => 'additional',
+                'item_id' => '123',
                 'unit' => Unit::DEFAULT
             ]],
             'taxation' => Taxation::ORN,
@@ -92,9 +92,6 @@ class ConverterStorageTest extends TestCase
             ],
             'customer' => null,
             'location' =>  'http://example.com/',
-            'additional_attribute' => [
-                'name' => 'value'
-            ]
         ];
 
         $this->assertEquals($a, $conv->receiptToArray($receipt));
@@ -235,10 +232,10 @@ class ConverterStorageTest extends TestCase
             'id' => 0,
             'uuid' => $uuid->get(),
             'cashbox' => '',
-            'siteId' => '0',
-            'orderId' => '',
+            'site_id' => '0',
+            'order_id' => '',
             'status' => ReceiptStatus::COMPLETED,
-            'subType' => ReceiptSubType::HAND,
+            'subtype' => ReceiptSubType::HAND,
             'type' => ReceiptType::COMING,
             'items' => [[
                 'type' => 1,
@@ -300,10 +297,10 @@ class ConverterStorageTest extends TestCase
         $a = [
             'id' => 0,
             'cashbox' => '',
-            'siteId' => '0',
-            'orderId' => '',
+            'site_id' => '0',
+            'order_id' => '',
             'status' => ReceiptStatus::COMPLETED,
-            'subType' => ReceiptSubType::HAND,
+            'subtype' => ReceiptSubType::HAND,
             'type' => ReceiptType::COMING,
         ];
 
@@ -321,10 +318,10 @@ class ConverterStorageTest extends TestCase
             'id' => 0,
             'uuid' => '',
             'cashbox' => '',
-            'siteId' => '0',
-            'orderId' => '',
+            'site_id' => '0',
+            'order_id' => '',
             'status' => ReceiptStatus::COMPLETED,
-            'subType' => ReceiptSubType::HAND,
+            'subtype' => ReceiptSubType::HAND,
             'type' => ReceiptType::COMING,
             'items' => [[
                 'type' => 1,
