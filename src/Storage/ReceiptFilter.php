@@ -55,7 +55,7 @@ class ReceiptFilter
      */
     public function setSubType(int $subType, string $op = self::OP_EQ): self
     {
-        $this->subType = [
+        $this->subtype = [
             'value' => $subType,
             'op' => $op
         ];
@@ -109,7 +109,8 @@ class ReceiptFilter
         $a = [];
         foreach ($fields as $field) {
             if (!is_null($this->$field)) {
-                $a[$field] = $this->$field;
+                $column = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $field));
+                $a[$column] = $this->$field;
             }
         }
 
@@ -127,7 +128,7 @@ class ReceiptFilter
     private $type = null;
 
     /** @var array<string, int|string> */
-    private $subType = null;
+    private $subtype = null;
 
     /** @var array<string, int|string> */
     private $status = null;

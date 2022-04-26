@@ -389,32 +389,6 @@ class Receipt
         return $this->location;
     }
 
-    /**
-     * Установить дополнительное свойство
-     *
-     * @param non-empty-string $name
-     * @param non-empty-string $value
-     * @return self
-     */
-    public function setAdditional(string $name, string $value): self
-    {
-        $this->additional = [
-            $name => $value,
-        ];
-
-        return $this;
-    }
-
-    /**
-     * Получить дополнительное свойство
-     *
-     * @return array
-     */
-    public function getAdditional(): array
-    {
-        return $this->additional;
-    }
-
     //######################################################################
     // PRIVATE
     //######################################################################
@@ -430,11 +404,6 @@ class Receipt
     private $items = null;
     private $location = '';
     private $uuid = null;
-
-    /**
-     * @var array
-     */
-    private $additional = [];
 
     //**********************************************************************
     // идентификационные данные

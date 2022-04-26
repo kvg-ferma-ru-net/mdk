@@ -20,6 +20,7 @@ use Innokassa\MDK\Entities\ReceiptAdapterInterface;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
 use Innokassa\MDK\Exceptions\Services\ManualException;
 use Innokassa\MDK\Exceptions\Services\AutomaticException;
+use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
@@ -329,6 +330,25 @@ class AutomaticBaseFakeTest extends TestCase
         $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
 
         $this->expectException(AutomaticException::class);
+        $automatic->fiscalize('0');
+    }
+
+    /**
+     * @covers Innokassa\MDK\Services\AutomaticBase::__construct
+     * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
+     */
+    public function testFiscalizeFailErrorAdapter()
+    {
+        $this->adapter->method('getTotal')
+            ->will($this->throwException(new InvalidArgumentException()));
+
+        $this->storage
+            ->method('getCollection')
+            ->willReturn(new ReceiptCollection());
+
+        $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
+
+        $this->expectException(InvalidArgumentException::class);
         $automatic->fiscalize('0');
     }
 }

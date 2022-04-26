@@ -41,6 +41,7 @@ class ConverterApi extends ConverterAbstract
             throw new ConverterException("uninitialize required field 'location'");
         }
 
+        $a['order_id'] = $receipt->getOrderId();
         $a['type'] = $receipt->getType();
         $a['items'] = $this->itemsToArray($receipt->getItems());
         $a['taxation'] = $receipt->getTaxation();
@@ -49,14 +50,6 @@ class ConverterApi extends ConverterAbstract
         $a['loc'] = [
             'billing_place' => $receipt->getLocation()
         ];
-
-        if (($additional = $receipt->getAdditional())) {
-            $key = array_keys($additional)[0];
-            $a['additional_attribute'] = [
-                'name' => $key,
-                'value' => $additional[$key],
-            ];
-        }
 
         if ($receipt->getCustomer()) {
             $a['customer'] = $this->customerToArray($receipt->getCustomer());

@@ -43,13 +43,14 @@ class ConverterApiTest extends TestCase
         $conv = new ConverterApi();
         $receipt = new Receipt();
         $receipt
+            ->setOrderId('456')
             ->setType(ReceiptType::COMING)
             ->addItem(
                 (new ReceiptItem())
                     ->setPrice(100.0)
                     ->setQuantity(2)
                     ->setName('name')
-                    ->setAdditional('additional')
+                    ->setItemId('123')
                     ->setUnit(Unit::DEFAULT)
             )
             ->setTaxation(Taxation::ORN)
@@ -60,6 +61,7 @@ class ConverterApiTest extends TestCase
 
         $this->assertEquals(
             [
+                'order_id' => '456',
                 'type' => ReceiptType::COMING,
                 'items' => [[
                     'type' => 1,
@@ -69,7 +71,7 @@ class ConverterApiTest extends TestCase
                     'amount' => 200.0,
                     'payment_method' => 4,
                     'vat' => 6,
-                    'additional_props' => 'additional',
+                    'item_id' => '123',
                     'unit' => Unit::DEFAULT
                 ]],
                 'taxation' => Taxation::ORN,

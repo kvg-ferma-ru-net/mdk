@@ -102,6 +102,7 @@ abstract class ConverterAbstract
         }
 
         $a = [
+            "item_id" => $item->getItemId(),
             "type" => $item->getType(),
             "name" => $item->getName(),
             "price" => $item->getPrice(),
@@ -111,10 +112,6 @@ abstract class ConverterAbstract
             "vat" => $item->getVat()->getCode(),
             "unit" => $item->getUnit(),
         ];
-
-        if ($item->getAdditional()) {
-            $a["additional_props"] = $item->getAdditional();
-        }
 
         return $a;
     }
@@ -147,14 +144,26 @@ abstract class ConverterAbstract
                 ->setType($a['type'])
                 ->setName($a['name'])
                 ->setPrice($a['price'])
-                ->setQuantity($a['quantity'])
-                ->setAmount($a['amount'])
-                ->setPaymentMethod($a['payment_method'])
-                ->setVat(new Vat($a['vat']))
-                ->setUnit($a['unit']);
+                ->setPaymentMethod($a['payment_method']);
 
-            if (isset($a['additional_props']) && $a['additional_props']) {
-                $item->setAdditional($a['additional_props']);
+            if (isset($a['item_id'])) {
+                $item->setItemId($a['item_id']);
+            }
+
+            if (isset($a['quantity'])) {
+                $item->setQuantity($a['quantity']);
+            }
+
+            if (isset($a['amount'])) {
+                $item->setAmount($a['amount']);
+            }
+
+            if (isset($a['vat'])) {
+                $item->setVat(new Vat($a['vat']));
+            }
+
+            if (isset($a['unit'])) {
+                $item->setUnit($a['unit']);
             }
         } catch (InvalidArgumentException $e) {
             throw new ConverterException($e->getMessage());

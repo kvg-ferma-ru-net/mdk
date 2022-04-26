@@ -44,20 +44,16 @@ class ConverterStorage extends ConverterAbstract
         $a['id'] = $receipt->getId();
         $a['uuid'] = $receipt->getUUID()->get();
         $a['cashbox'] = $receipt->getCashbox();
-        $a['siteId'] = $receipt->getSiteId();
-        $a['orderId'] = $receipt->getOrderId();
+        $a['site_id'] = $receipt->getSiteId();
+        $a['order_id'] = $receipt->getOrderId();
         $a['status'] = $receipt->getStatus()->GetCode();
         $a['type'] = $receipt->getType();
-        $a['subType'] = $receipt->getSubType();
+        $a['subtype'] = $receipt->getSubType();
         $a['items'] = $this->itemsToArray($receipt->getItems());
         $a['taxation'] = $receipt->getTaxation();
         $a['amount'] = $this->amountToArray($receipt->getAmount());
         $a['notify'] = $this->notifyToArray($receipt->getNotify());
         $a['location'] = $receipt->getLocation();
-
-        if (($additional = $receipt->getAdditional())) {
-            $a['additional_attribute'] = $additional;
-        }
 
         if ($receipt->getCustomer()) {
             $a['customer'] = $this->customerToArray($receipt->getCustomer());
@@ -79,10 +75,10 @@ class ConverterStorage extends ConverterAbstract
 
         $fields = [
             'id',
-            'subType',
+            'subtype',
             'cashbox',
-            'orderId',
-            'siteId',
+            'order_id',
+            'site_id',
             'uuid',
             'status',
             'type',
@@ -105,10 +101,10 @@ class ConverterStorage extends ConverterAbstract
             $receipt
                 ->setId($a['id'])
                 ->setUUID(new UUID($a['uuid']))
-                ->setSubType($a['subType'])
+                ->setSubType($a['subtype'])
                 ->setCashbox($a['cashbox'])
-                ->setOrderId($a['orderId'])
-                ->setSiteId($a['siteId'])
+                ->setOrderId($a['order_id'])
+                ->setSiteId($a['site_id'])
                 ->setStatus(new ReceiptStatus($a['status']))
                 ->setType($a['type'])
                 ->setItems($this->itemsFromArray($a['items']))
@@ -116,14 +112,6 @@ class ConverterStorage extends ConverterAbstract
                 ->setAmount($this->amountFromArray($a['amount']))
                 ->setNotify($this->notifyFromArray($a['notify']))
                 ->setLocation($a['location']);
-
-            if (isset($a['additional_attribute']) && $a['additional_attribute']) {
-                $key = array_keys($a['additional_attribute'])[0];
-                $value = $a['additional_attribute'][$key];
-                if (is_string($key) && is_string($value) && !empty($key) && !empty($value)) {
-                    $receipt->setAdditional($key, $value);
-                }
-            }
 
             if (isset($a['customer'])) {
                 $receipt->setCustomer($this->customerFromArray($a['customer']));
