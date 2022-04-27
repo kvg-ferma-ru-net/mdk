@@ -28,7 +28,7 @@ class NetClientCurlTest extends TestCase
     public function testSendSuccessGet()
     {
         $client = new NetClientCurl();
-        $this->assertSame($client, $client->write(NetClientInterface::PATH, 'https://api.kassavoblake.com/'));
+        $this->assertSame($client, $client->write(NetClientInterface::PATH, 'https://api.innokassa.ru/v2/doc'));
         $this->assertSame($client, $client->send());
 
         $this->assertSame(200, $client->read(NetClientInterface::CODE));

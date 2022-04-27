@@ -3,7 +3,7 @@
 
 # Innokassa Module Development Kit
 
-**Innokassa MDK (Module Development Kit)** - набор программных средств на PHP для использования API облачной кассы [Pangaea V2](https://api.kassavoblake.com/v2/docs/pangaea_api.html) от [Innokassa](https://innokassa.ru/), содержащий в себе всю необходимую логику для фискализации заказов интернет-магазинов (ИМ). Для работы библиотеки требуется PHP версии не ниже 7.1 с библиотекой curl.
+**Innokassa MDK (Module Development Kit)** - набор программных средств на PHP для использования API облачной кассы [Pangaea V2](https://api.innokassa.ru/v2/doc) от [Innokassa](https://innokassa.ru/), содержащий в себе всю необходимую логику для фискализации заказов интернет-магазинов (ИМ). Для работы библиотеки требуется PHP версии не ниже 7.1 с библиотекой curl.
 
 Описание:
 * ОО стиль - все есть объект 
