@@ -10,7 +10,7 @@ use Innokassa\MDK\Exceptions\ConverterException;
 /**
  * Реализация интерфейса ConverterAbstract для Pangaea API v2
  *
- * @link https://api.kassavoblake.com/v2/docs/pangaea_api.html
+ * @link https://api.innokassa.ru/v2/doc
  */
 class ConverterApi extends ConverterAbstract
 {
