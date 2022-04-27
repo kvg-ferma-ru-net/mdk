@@ -1,14 +1,53 @@
-before_script:
-  - docker -v
-  - docker-compose -v
 
-stages:
-  - test
-
-test:
-  stage: test
-  script:
-    - docker-compose -f docker-compose-test.yml up --abort-on-container-exit
-  coverage: '/\s+Lines:\s{2,}(\d+[,.]\d+%)/'
+default:
   tags:
     - mdk
+
+cache:
+  paths:
+    - vendor/
+
+stages:
+  - analysis
+  - test
+
+pre-job:
+  stage: .pre
+  script:
+    - docker -v
+    - docker-compose -v
+    - docker-compose -f docker-compose-test.yml up -d --force-recreate --build
+    - docker-compose -f docker-compose-test.yml exec -T php composer install
+    - docker-compose -f docker-compose-test.yml exec -T php php -f /opt/wait-db.php
+
+analysis-cs-job:
+  stage: analysis
+  script:
+    - docker-compose -f docker-compose-test.yml exec -T php composer run-script cs
+
+analysis-lint-job:
+  stage: analysis
+  script:
+    - docker-compose -f docker-compose-test.yml exec -T php composer run-script lint
+
+test-unit-job:
+  stage: test
+  script:
+    - docker-compose -f docker-compose-test.yml exec -T php vendor/bin/phpunit --colors=always --coverage-text --bootstrap tests/Unit/bootstrap.php tests/Unit/
+  coverage: '/\s+Lines:\s{2,}(\d+[,.]\d+%)/'
+
+test-server-job:
+  stage: test
+  script:
+    - docker-compose -f docker-compose-test.yml exec -T php composer run-script test-server
+
+test-system-job:
+  stage: test
+  script:
+    - docker-compose -f docker-compose-test.yml exec -T php composer run-script test-system
+
+post-job:
+  stage: .post
+  when: always
+  script:
+    - docker-compose -f docker-compose-test.yml down
