@@ -48,7 +48,7 @@ class ConverterStorageTest extends TestCase
         $receipt
             ->setType(ReceiptType::COMING)
             ->setStatus(new ReceiptStatus(ReceiptStatus::COMPLETED))
-            ->setSubType(ReceiptSubType::HAND)
+            ->setSubType(ReceiptSubType::PRE)
             ->addItem(
                 (new ReceiptItem())
                     ->setPrice(100.0)
@@ -70,7 +70,7 @@ class ConverterStorageTest extends TestCase
             'site_id' => '0',
             'order_id' => '456',
             'status' => ReceiptStatus::COMPLETED,
-            'subtype' => ReceiptSubType::HAND,
+            'subtype' => ReceiptSubType::PRE,
             'type' => ReceiptType::COMING,
             'items' => [[
                 'type' => 1,
@@ -235,7 +235,7 @@ class ConverterStorageTest extends TestCase
             'site_id' => '0',
             'order_id' => '',
             'status' => ReceiptStatus::COMPLETED,
-            'subtype' => ReceiptSubType::HAND,
+            'subtype' => ReceiptSubType::PRE,
             'type' => ReceiptType::COMING,
             'items' => [[
                 'type' => 1,
@@ -268,7 +268,7 @@ class ConverterStorageTest extends TestCase
         $this->assertSame('', $receipt->getOrderId());
         $this->assertSame(ReceiptType::COMING, $receipt->getType());
         $this->assertSame(ReceiptStatus::COMPLETED, $receipt->getStatus()->getCode());
-        $this->assertSame(ReceiptSubType::HAND, $receipt->getSubType());
+        $this->assertSame(ReceiptSubType::PRE, $receipt->getSubType());
 
         $this->assertSame(Taxation::ORN, $receipt->getTaxation());
         $this->assertSame(null, $receipt->getCustomer());
@@ -300,7 +300,7 @@ class ConverterStorageTest extends TestCase
             'site_id' => '0',
             'order_id' => '',
             'status' => ReceiptStatus::COMPLETED,
-            'subtype' => ReceiptSubType::HAND,
+            'subtype' => ReceiptSubType::PRE,
             'type' => ReceiptType::COMING,
         ];
 
@@ -321,7 +321,7 @@ class ConverterStorageTest extends TestCase
             'site_id' => '0',
             'order_id' => '',
             'status' => ReceiptStatus::COMPLETED,
-            'subtype' => ReceiptSubType::HAND,
+            'subtype' => ReceiptSubType::PRE,
             'type' => ReceiptType::COMING,
             'items' => [[
                 'type' => 1,

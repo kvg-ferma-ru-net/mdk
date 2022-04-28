@@ -25,7 +25,6 @@ class Receipt
 
         $this->items = new ReceiptItemCollection();
         $this->type = new ReceiptType(ReceiptType::COMING);
-        $this->subType = new ReceiptSubType(ReceiptSubType::HAND);
         $this->status = new ReceiptStatus(ReceiptStatus::PREPARED);
     }
 

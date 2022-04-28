@@ -101,7 +101,6 @@ class ConverterStorage extends ConverterAbstract
             $receipt
                 ->setId($a['id'])
                 ->setUUID(new UUID($a['uuid']))
-                ->setSubType($a['subtype'])
                 ->setCashbox($a['cashbox'])
                 ->setOrderId($a['order_id'])
                 ->setSiteId($a['site_id'])
@@ -112,6 +111,10 @@ class ConverterStorage extends ConverterAbstract
                 ->setAmount($this->amountFromArray($a['amount']))
                 ->setNotify($this->notifyFromArray($a['notify']))
                 ->setLocation($a['location']);
+
+            if (isset($a['subtype']) && $a['subtype'] !== null) {
+                $receipt->setSubType($a['subtype']);
+            }
 
             if (isset($a['customer'])) {
                 $receipt->setCustomer($this->customerFromArray($a['customer']));

@@ -17,10 +17,6 @@ class ReceiptSubTypeTest extends TestCase
     public function testResponseCode()
     {
         $this->assertSame(
-            ReceiptSubType::HAND,
-            (new ReceiptSubType(ReceiptSubType::HAND))->getCode()
-        );
-        $this->assertSame(
             ReceiptSubType::PRE,
             (new ReceiptSubType(ReceiptSubType::PRE))->getCode()
         );
@@ -41,6 +37,6 @@ class ReceiptSubTypeTest extends TestCase
         $a = ReceiptSubType::all();
         $this->assertIsArray($a);
         $this->assertContainsOnlyInstancesOf(ReceiptSubType::class, $a);
-        $this->assertCount(3, $a);
+        $this->assertCount(2, $a);
     }
 }
