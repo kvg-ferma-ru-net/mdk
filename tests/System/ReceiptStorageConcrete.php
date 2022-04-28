@@ -91,6 +91,9 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
             ', ',
             array_map(
                 function ($val) {
+                    if ($val === null) {
+                        return 'null';
+                    }
                     $val = (is_array($val) ? json_encode($val, JSON_UNESCAPED_UNICODE) : strval($val));
                     return "'$val'";
                 },
@@ -105,7 +108,12 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
     {
         $a2 = [];
         foreach ($a as $key => $value) {
-            $a2[] = "`$key`='" . (is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : strval($value)) . "'";
+            if ($value === null) {
+                $value = 'null';
+            } else {
+                $value = sprintf("'%s'", (is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : strval($value)));
+            }
+            $a2[] = "`$key`=$value";
         }
 
         $set = implode(', ', $a2);

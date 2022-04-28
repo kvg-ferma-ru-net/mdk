@@ -10,9 +10,6 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
  */
 class ReceiptSubType extends AtomAbstract
 {
-    /** Чек создан вручную */
-    public const HAND  = 0;
-
     /** Предоплата - покупатель оплатил товар (чек создан автоматически) */
     public const PRE   = 1;
 
@@ -28,10 +25,6 @@ class ReceiptSubType extends AtomAbstract
     public function __construct(int $code)
     {
         switch ($code) {
-            case self::HAND:
-                $this->name = 'Ручной';
-                $this->code = $code;
-                break;
             case self::PRE:
                 $this->name = 'Предоплата';
                 $this->code = $code;
@@ -52,7 +45,6 @@ class ReceiptSubType extends AtomAbstract
     {
         $a = [];
 
-        $a[] = new self(self::HAND);
         $a[] = new self(self::PRE);
         $a[] = new self(self::FULL);
 

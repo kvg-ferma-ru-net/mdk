@@ -47,7 +47,7 @@ class ReceiptTest extends TestCase
         $receipt = new Receipt();
         $this->assertSame(0, $receipt->getId());
         $this->assertSame(ReceiptType::COMING, $receipt->getType());
-        $this->assertSame(ReceiptSubType::HAND, $receipt->getSubType());
+        $this->assertSame(null, $receipt->getSubType());
         $this->assertSame(ReceiptStatus::PREPARED, $receipt->getStatus()->getCode());
 
         $this->assertInstanceOf(ReceiptItemCollection::class, $receipt->getItems());
@@ -76,8 +76,8 @@ class ReceiptTest extends TestCase
     public function testSetGetSubType()
     {
         $receipt = new Receipt();
-        $this->assertSame($receipt, $receipt->setSubType(ReceiptSubType::HAND));
-        $this->assertSame(ReceiptSubType::HAND, $receipt->getSubType());
+        $this->assertSame($receipt, $receipt->setSubType(ReceiptSubType::PRE));
+        $this->assertSame(ReceiptSubType::PRE, $receipt->getSubType());
     }
 
     /**
