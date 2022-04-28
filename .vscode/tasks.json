@@ -11,7 +11,7 @@
                 "mdk-php-dev",
                 "/bin/bash",
                 "-c",
-                "vendor/bin/phpunit --colors=always --coverage-html --bootstrap tests/Unit/bootstrap.php tests/Unit/"
+                "vendor/bin/phpunit --colors=always --coverage-html coverage-report-html --bootstrap tests/Unit/bootstrap.php tests/Unit/"
             ],
             "group": "test",
             "presentation": {
