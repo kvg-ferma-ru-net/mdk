@@ -18,14 +18,13 @@ use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Entities\ReceiptAdapterInterface;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
-use Innokassa\MDK\Exceptions\Services\ManualException;
 use Innokassa\MDK\Exceptions\Services\AutomaticException;
+use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Services\AutomaticBase
- * @uses Innokassa\MDK\Entities\UUID
  * @uses Innokassa\MDK\Entities\ReceiptItem
  * @uses Innokassa\MDK\Entities\Receipt
  * @uses Innokassa\MDK\Entities\Primitives\Notify
@@ -45,6 +44,7 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
  * @uses Innokassa\MDK\Storage\ReceiptFilter
  * @uses Innokassa\MDK\Entities\Primitives\Customer
  * @uses Innokassa\MDK\Exceptions\TransferException
+ * @uses Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta
  */
 class AutomaticBaseFakeTest extends TestCase
 {
@@ -107,7 +107,13 @@ class AutomaticBaseFakeTest extends TestCase
             ->method('getCollection')
             ->willReturn(new ReceiptCollection());
 
-        $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
+        $automatic = new AutomaticBase(
+            $this->settings,
+            $this->storage,
+            $this->transfer,
+            $this->adapter,
+            new ReceiptIdFactoryMeta()
+        );
 
         $receipt = $automatic->fiscalize('0');
         $this->assertInstanceOf(Receipt::class, $receipt);
@@ -142,7 +148,13 @@ class AutomaticBaseFakeTest extends TestCase
             ->method('getCollection')
             ->willReturn(new ReceiptCollection());
 
-        $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
+        $automatic = new AutomaticBase(
+            $this->settings,
+            $this->storage,
+            $this->transfer,
+            $this->adapter,
+            new ReceiptIdFactoryMeta()
+        );
 
         $receipt = $automatic->fiscalize('0', ReceiptSubType::FULL);
         $this->assertInstanceOf(Receipt::class, $receipt);
@@ -171,7 +183,13 @@ class AutomaticBaseFakeTest extends TestCase
             ->method('getCollection')
             ->will($this->onConsecutiveCalls($receipts));
 
-        $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
+        $automatic = new AutomaticBase(
+            $this->settings,
+            $this->storage,
+            $this->transfer,
+            $this->adapter,
+            new ReceiptIdFactoryMeta()
+        );
         $receipt = $automatic->fiscalize('0');
         $this->assertInstanceOf(Receipt::class, $receipt);
         $this->assertSame(ReceiptSubType::FULL, $receipt->getSubType());
@@ -194,7 +212,13 @@ class AutomaticBaseFakeTest extends TestCase
             ->method('getCollection')
             ->willReturn(new ReceiptCollection());
 
-        $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
+        $automatic = new AutomaticBase(
+            $this->settings,
+            $this->storage,
+            $this->transfer,
+            $this->adapter,
+            new ReceiptIdFactoryMeta()
+        );
 
         $receipt = $automatic->fiscalize('0');
         $this->assertInstanceOf(Receipt::class, $receipt);
@@ -207,36 +231,6 @@ class AutomaticBaseFakeTest extends TestCase
     /**
      * @covers Innokassa\MDK\Services\AutomaticBase::__construct
      * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
-     * @covers Innokassa\MDK\Services\AutomaticBase::fiscalizeProc
-     */
-    public function testFiscalizeSuccessNotUniqUUID()
-    {
-        $this->settings->method('getOnly2')
-            ->willReturn(false);
-
-        $this->storage
-            ->method('getCollection')
-            ->willReturn(new ReceiptCollection());
-
-        $this->transfer
-            ->method('sendReceipt')
-            ->will(
-                $this->onConsecutiveCalls(
-                    $this->throwException(new TransferException('', 409)),
-                    $this->returnArgument(0)
-                )
-            );
-
-        $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
-
-        $receipt = $automatic->fiscalize('0');
-        $this->assertInstanceOf(Receipt::class, $receipt);
-    }
-
-    /**
-     * @covers Innokassa\MDK\Services\AutomaticBase::__construct
-     * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
-     * @covers Innokassa\MDK\Services\AutomaticBase::fiscalizeProc
      */
     public function testFiscalizeSuccessServerError()
     {
@@ -251,7 +245,13 @@ class AutomaticBaseFakeTest extends TestCase
             ->method('sendReceipt')
             ->will($this->throwException(new TransferException('', 500)));
 
-        $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
+        $automatic = new AutomaticBase(
+            $this->settings,
+            $this->storage,
+            $this->transfer,
+            $this->adapter,
+            new ReceiptIdFactoryMeta()
+        );
 
         $receipt = $automatic->fiscalize('0');
         $this->assertInstanceOf(Receipt::class, $receipt);
@@ -262,7 +262,6 @@ class AutomaticBaseFakeTest extends TestCase
     /**
      * @covers Innokassa\MDK\Services\AutomaticBase::__construct
      * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
-     * @covers Innokassa\MDK\Services\AutomaticBase::fiscalizeProc
      */
     public function testFiscalizeFailReceipt()
     {
@@ -277,7 +276,13 @@ class AutomaticBaseFakeTest extends TestCase
             ->method('sendReceipt')
             ->will($this->throwException(new TransferException('', 400)));
 
-        $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
+        $automatic = new AutomaticBase(
+            $this->settings,
+            $this->storage,
+            $this->transfer,
+            $this->adapter,
+            new ReceiptIdFactoryMeta()
+        );
 
         $this->expectException(TransferException::class);
         $automatic->fiscalize('0');
@@ -302,7 +307,13 @@ class AutomaticBaseFakeTest extends TestCase
             ->method('getCollection')
             ->will($this->onConsecutiveCalls($receipts));
 
-        $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
+        $automatic = new AutomaticBase(
+            $this->settings,
+            $this->storage,
+            $this->transfer,
+            $this->adapter,
+            new ReceiptIdFactoryMeta()
+        );
 
         $this->expectException(AutomaticException::class);
         $automatic->fiscalize('0', ReceiptSubType::PRE);
@@ -327,7 +338,13 @@ class AutomaticBaseFakeTest extends TestCase
             ->method('getCollection')
             ->will($this->onConsecutiveCalls($receipts));
 
-        $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
+        $automatic = new AutomaticBase(
+            $this->settings,
+            $this->storage,
+            $this->transfer,
+            $this->adapter,
+            new ReceiptIdFactoryMeta()
+        );
 
         $this->expectException(AutomaticException::class);
         $automatic->fiscalize('0');
@@ -346,7 +363,13 @@ class AutomaticBaseFakeTest extends TestCase
             ->method('getCollection')
             ->willReturn(new ReceiptCollection());
 
-        $automatic = new AutomaticBase($this->settings, $this->storage, $this->transfer, $this->adapter);
+        $automatic = new AutomaticBase(
+            $this->settings,
+            $this->storage,
+            $this->transfer,
+            $this->adapter,
+            new ReceiptIdFactoryMeta()
+        );
 
         $this->expectException(InvalidArgumentException::class);
         $automatic->fiscalize('0');

@@ -1,7 +1,6 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use Innokassa\MDK\Entities\UUID;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Entities\Atoms\Vat;
 use Innokassa\MDK\Entities\ReceiptItem;
@@ -15,13 +14,13 @@ use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Entities\Atoms\ReceiptItemType;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
+use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
  * @uses Innokassa\MDK\Entities\Receipt
  * @uses Innokassa\MDK\Entities\ReceiptItem
- * @uses Innokassa\MDK\Entities\UUID
  * @uses Innokassa\MDK\Entities\AtomAbstract
  * @uses Innokassa\MDK\Entities\Atoms\Taxation
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptType
@@ -36,6 +35,7 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
  * @uses Innokassa\MDK\Entities\Primitives\Customer
  * @uses Innokassa\MDK\Collections\BaseCollection
  * @uses Innokassa\MDK\Collections\ReceiptItemCollection
+ * @uses Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta
  */
 class ReceiptTest extends TestCase
 {
@@ -278,17 +278,18 @@ class ReceiptTest extends TestCase
 
     /**
      * @covers Innokassa\MDK\Entities\Receipt::__construct
-     * @covers Innokassa\MDK\Entities\Receipt::setUUID
-     * @covers Innokassa\MDK\Entities\Receipt::getUUID
+     * @covers Innokassa\MDK\Entities\Receipt::setReceiptId
+     * @covers Innokassa\MDK\Entities\Receipt::getReceiptId
      */
-    public function testSetGetUUID()
+    public function testSetGetReceiptId()
     {
         $receipt = new Receipt();
-        $this->assertIsString($receipt->getUUID()->get());
+        $this->assertIsString($receipt->getReceiptId());
 
-        $uuid = new UUID();
-        $this->assertSame($receipt, $receipt->setUUID($uuid));
-        $this->assertSame($uuid, $receipt->getUUID());
+        $receiptIdFactory = new ReceiptIdFactoryMeta();
+        $receiptId = $receiptIdFactory->build($receipt);
+        $this->assertSame($receipt, $receipt->setReceiptId($receiptId));
+        $this->assertSame($receiptId, $receipt->getReceiptId());
     }
 
     /**

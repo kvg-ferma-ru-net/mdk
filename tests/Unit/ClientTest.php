@@ -1,20 +1,19 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Client;
 use Innokassa\MDK\Net\Transfer;
+use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Net\ConverterApi;
+use Innokassa\MDK\Logger\LoggerFile;
 use Innokassa\MDK\Net\NetClientCurl;
-use Innokassa\MDK\Services\ManualBase;
-use Innokassa\MDK\Services\PrinterBase;
 use Innokassa\MDK\Services\PipelineBase;
+use Innokassa\MDK\Logger\LoggerInterface;
 use Innokassa\MDK\Services\AutomaticBase;
 use Innokassa\MDK\Services\ConnectorBase;
 use Innokassa\MDK\Settings\SettingsInterface;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Entities\ReceiptAdapterInterface;
-use Innokassa\MDK\Logger\LoggerInterface;
-use Innokassa\MDK\Logger\LoggerFile;
+use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
@@ -48,7 +47,7 @@ class ClientTest extends TestCase
 
         $transfer = new Transfer(new NetClientCurl(), new ConverterApi(), '0', '0', '0', $logger);
 
-        $automatic = new AutomaticBase($settings, $storage, $transfer, $adapter);
+        $automatic = new AutomaticBase($settings, $storage, $transfer, $adapter, new ReceiptIdFactoryMeta());
         $pipeline = new PipelineBase($storage, $transfer);
         $connector = new ConnectorBase($transfer);
 

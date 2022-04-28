@@ -12,6 +12,7 @@ use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Entities\Primitives\Customer;
+use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
 use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Logger\LoggerInterface;
 
@@ -21,7 +22,6 @@ use Innokassa\MDK\Logger\LoggerInterface;
  * @uses Innokassa\MDK\Entities\Receipt
  * @uses Innokassa\MDK\Net\ConverterApi
  * @uses Innokassa\MDK\Entities\ConverterAbstract
- * @uses Innokassa\MDK\Entities\UUID
  * @uses Innokassa\MDK\Collections\BaseCollection
  * @uses Innokassa\MDK\Entities\AtomAbstract
  * @uses Innokassa\MDK\Entities\Atoms\PaymentMethod
@@ -52,6 +52,7 @@ class TransferServerTest extends TestCase
      */
     public function testSendReceipt()
     {
+        $receiptIdFactory = new ReceiptIdFactoryMeta();
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -68,6 +69,8 @@ class TransferServerTest extends TestCase
             ->setCustomer(new Customer('Test'))
             ->setLocation('https://example.com/')
             ->setOrderId('456');
+
+        $receipt->setReceiptId($receiptIdFactory->build($receipt));
 
         $client = new NetClientCurl();
         $converter = new ConverterApi();
@@ -119,6 +122,7 @@ class TransferServerTest extends TestCase
      */
     public function testSendReceiptFailReceipt()
     {
+        $receiptIdFactory = new ReceiptIdFactoryMeta();
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -133,6 +137,8 @@ class TransferServerTest extends TestCase
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
             ->setLocation('https://example.com/');
+
+        $receipt->setReceiptId($receiptIdFactory->build($receipt));
 
         $client = new NetClientCurl();
         $converter = new ConverterApi();
