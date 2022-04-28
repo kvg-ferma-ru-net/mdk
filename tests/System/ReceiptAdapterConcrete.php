@@ -1,7 +1,9 @@
 <?php
 
+use Innokassa\MDK\Entities\Atoms\Vat;
 use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Entities\Primitives\Notify;
+use Innokassa\MDK\Settings\SettingsInterface;
 use Innokassa\MDK\Entities\Atoms\PaymentMethod;
 use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
@@ -11,9 +13,10 @@ use Innokassa\MDK\Collections\ReceiptItemCollection;
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 class ReceiptAdapterConcrete implements ReceiptAdapterInterface
 {
-    public function __construct(db $db)
+    public function __construct(db $db, SettingsInterface $settings)
     {
         $this->db = $db;
+        $this->settings = $settings;
     }
 
     public function getItems(string $orderId, int $subType): ReceiptItemCollection
@@ -24,10 +27,12 @@ class ReceiptAdapterConcrete implements ReceiptAdapterInterface
         $items = new ReceiptItemCollection();
         foreach ($a as $value) {
             $items[] = (new ReceiptItem())
+                ->setType($this->settings->getTypeDefaultItems())
                 ->setName($value['name'])
                 ->setPrice($value['price'])
                 ->setQuantity($value['quantity'])
-                ->setPaymentMethod($paymentMethod);
+                ->setPaymentMethod($paymentMethod)
+                ->setVat(new Vat($this->settings->getVatDefaultItems()));
         }
 
         return $items;
@@ -53,7 +58,8 @@ class ReceiptAdapterConcrete implements ReceiptAdapterInterface
 
     //######################################################################
 
-    private $db;
+    private $db = null;
+    private $settings = null;
 
     //######################################################################
 
