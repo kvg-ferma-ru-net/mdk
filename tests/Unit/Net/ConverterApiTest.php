@@ -29,7 +29,6 @@ use Innokassa\MDK\Exceptions\ConverterException;
  * @uses Innokassa\MDK\Entities\Primitives\Amount
  * @uses Innokassa\MDK\Entities\Receipt
  * @uses Innokassa\MDK\Entities\ReceiptItem
- * @uses Innokassa\MDK\Entities\UUID
  * @uses Innokassa\MDK\Entities\Primitives\Customer
  */
 class ConverterApiTest extends TestCase

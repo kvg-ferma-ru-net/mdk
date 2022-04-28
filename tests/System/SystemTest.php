@@ -3,18 +3,19 @@
 use Innokassa\MDK\Client;
 use Innokassa\MDK\Net\Transfer;
 use PHPUnit\Framework\TestCase;
-use Innokassa\MDK\Net\ConverterApi;
 use Innokassa\MDK\Entities\Receipt;
+use Innokassa\MDK\Net\ConverterApi;
+use Innokassa\MDK\Logger\LoggerFile;
 use Innokassa\MDK\Net\NetClientCurl;
 use Innokassa\MDK\Services\ManualBase;
 use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Services\PrinterBase;
 use Innokassa\MDK\Services\PipelineBase;
-use Innokassa\MDK\Storage\ConverterStorage;
 use Innokassa\MDK\Storage\ReceiptFilter;
 use Innokassa\MDK\Services\AutomaticBase;
 use Innokassa\MDK\Services\ConnectorBase;
 use Innokassa\MDK\Entities\Atoms\Taxation;
+use Innokassa\MDK\Storage\ConverterStorage;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
@@ -27,7 +28,7 @@ use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
 use Innokassa\MDK\Exceptions\Services\ManualException;
 use Innokassa\MDK\Exceptions\Services\AutomaticException;
-use Innokassa\MDK\Logger\LoggerFile;
+use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
@@ -46,7 +47,6 @@ use Innokassa\MDK\Logger\LoggerFile;
  * @uses Innokassa\MDK\Entities\Primitives\Notify
  * @uses Innokassa\MDK\Entities\Receipt
  * @uses Innokassa\MDK\Entities\ReceiptItem
- * @uses Innokassa\MDK\Entities\UUID
  * @uses Innokassa\MDK\Storage\ConverterStorage
  * @uses Innokassa\MDK\Storage\ReceiptFilter
  * @uses Innokassa\MDK\Client
@@ -81,7 +81,10 @@ class SystemTest extends TestCase
             'agent' => false,
         ]);
 
-        self::$storage = new ReceiptStorageConcrete(new ConverterStorage(), self::$db);
+        self::$storage = new ReceiptStorageConcrete(
+            new ConverterStorage(new ReceiptIdFactoryMeta()),
+            self::$db
+        );
         self::$adapter = new ReceiptAdapterConcrete(self::$db);
 
         self::$logger = new LoggerFile();
@@ -95,7 +98,13 @@ class SystemTest extends TestCase
             self::$logger
         );
 
-        $automatic = new AutomaticBase(self::$settings, self::$storage, $transfer, self::$adapter);
+        $automatic = new AutomaticBase(
+            self::$settings,
+            self::$storage,
+            $transfer,
+            self::$adapter,
+            new ReceiptIdFactoryMeta()
+        );
         $pipeline = new PipelineBase(self::$storage, $transfer);
         $connector = new ConnectorBase($transfer);
 
@@ -119,6 +128,7 @@ class SystemTest extends TestCase
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
+            ->setOrderId('456')
             ->addItem(
                 (new ReceiptItem())
                     ->setPrice(100.0)
@@ -130,6 +140,7 @@ class SystemTest extends TestCase
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
             ->setLocation('https://example.com/');
+        $receipt->setReceiptId((new ReceiptIdFactoryMeta())->build($receipt));
 
         $index = self::$storage->save($receipt);
         $this->assertSame($index, $receipt->getId());
@@ -280,6 +291,7 @@ class SystemTest extends TestCase
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
             ->setLocation('https://example.com/');
+        $receipt->setReceiptId((new ReceiptIdFactoryMeta())->build($receipt));
         self::$storage->save($receipt);
         $receipts[$receipt->getId()] = [ReceiptStatus::REPEAT];
 

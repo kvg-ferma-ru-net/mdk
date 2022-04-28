@@ -46,12 +46,4 @@ interface TransferInterface
      * @return Receipt
      */
     public function getReceipt(Receipt $receipt): Receipt;
-
-    /**
-     * Получить ссылку на рендер чека (без проверки статуса чека)
-     *
-     * @param Receipt $receipt
-     * @return string
-     */
-    public function getReceiptLink(Receipt $receipt): string;
 }

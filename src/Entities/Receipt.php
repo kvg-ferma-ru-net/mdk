@@ -2,7 +2,6 @@
 
 namespace Innokassa\MDK\Entities;
 
-use Innokassa\MDK\Entities\UUID;
 use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
@@ -21,8 +20,6 @@ class Receipt
 {
     public function __construct()
     {
-        $this->uuid = new UUID();
-
         $this->items = new ReceiptItemCollection();
         $this->type = new ReceiptType(ReceiptType::COMING);
         $this->status = new ReceiptStatus(ReceiptStatus::PREPARED);
@@ -55,25 +52,25 @@ class Receipt
     //**********************************************************************
 
     /**
-     * Установить новый UUID
+     * Установить id чека
      *
-     * @param UUID $uuid
+     * @param string $receiptId
      * @return self
      */
-    public function setUUID(UUID $uuid): self
+    public function setReceiptId(string $receiptId): self
     {
-        $this->uuid = $uuid;
+        $this->receiptId = $receiptId;
         return $this;
     }
 
     /**
-     * Получить текущий UUID
+     * Получить текущий id чека
      *
-     * @return UUID
+     * @return string
      */
-    public function getUUID(): UUID
+    public function getReceiptId(): string
     {
-        return $this->uuid;
+        return $this->receiptId;
     }
 
     //**********************************************************************
@@ -402,7 +399,7 @@ class Receipt
     private $customer = null;
     private $items = null;
     private $location = '';
-    private $uuid = null;
+    private $receiptId = '';
 
     //**********************************************************************
     // идентификационные данные

@@ -1,7 +1,6 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use Innokassa\MDK\Entities\UUID;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Entities\Atoms\Unit;
 use Innokassa\MDK\Entities\ReceiptItem;
@@ -14,6 +13,7 @@ use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Exceptions\ConverterException;
+use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
@@ -33,17 +33,18 @@ use Innokassa\MDK\Exceptions\ConverterException;
  * @uses Innokassa\MDK\Entities\Primitives\Amount
  * @uses Innokassa\MDK\Entities\Receipt
  * @uses Innokassa\MDK\Entities\ReceiptItem
- * @uses Innokassa\MDK\Entities\UUID
  * @uses Innokassa\MDK\Entities\Primitives\Customer
+ * @uses Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta
  */
 class ConverterStorageTest extends TestCase
 {
     /**
+     * @covers Innokassa\MDK\Storage\ConverterStorage::__construct
      * @covers Innokassa\MDK\Storage\ConverterStorage::receiptToArray
      */
     public function testReceiptToArray()
     {
-        $conv = new ConverterStorage();
+        $conv = new ConverterStorage(new ReceiptIdFactoryMeta());
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -65,7 +66,7 @@ class ConverterStorageTest extends TestCase
 
         $a = [
             'id' => 0,
-            'uuid' => $receipt->getUUID()->get(),
+            'receipt_id' => $receipt->getReceiptId(),
             'cashbox' => '',
             'site_id' => '0',
             'order_id' => '456',
@@ -109,7 +110,7 @@ class ConverterStorageTest extends TestCase
      */
     public function testReceiptToArrayFailItems()
     {
-        $conv = new ConverterStorage();
+        $conv = new ConverterStorage(new ReceiptIdFactoryMeta());
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -128,7 +129,7 @@ class ConverterStorageTest extends TestCase
      */
     public function testReceiptToArrayFailTaxation()
     {
-        $conv = new ConverterStorage();
+        $conv = new ConverterStorage(new ReceiptIdFactoryMeta());
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -152,7 +153,7 @@ class ConverterStorageTest extends TestCase
      */
     public function testReceiptToArrayFailAmount()
     {
-        $conv = new ConverterStorage();
+        $conv = new ConverterStorage(new ReceiptIdFactoryMeta());
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -176,7 +177,7 @@ class ConverterStorageTest extends TestCase
      */
     public function testReceiptToArrayFailNotify()
     {
-        $conv = new ConverterStorage();
+        $conv = new ConverterStorage(new ReceiptIdFactoryMeta());
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -200,7 +201,7 @@ class ConverterStorageTest extends TestCase
      */
     public function testReceiptToArrayFailLocation()
     {
-        $conv = new ConverterStorage();
+        $conv = new ConverterStorage(new ReceiptIdFactoryMeta());
         $receipt = new Receipt();
         $receipt
             ->setType(ReceiptType::COMING)
@@ -226,11 +227,12 @@ class ConverterStorageTest extends TestCase
      */
     public function testReceiptFromArray()
     {
-        $conv = new ConverterStorage();
-        $uuid = new UUID();
+        $receiptIdFactory = new ReceiptIdFactoryMeta();
+        $conv = new ConverterStorage($receiptIdFactory);
+        $receiptId = '20010310:171618-woo-mdk-1234567891234567-7c0b89b58d4f4af9';
         $a = [
             'id' => 0,
-            'uuid' => $uuid->get(),
+            'receipt_id' => $receiptId,
             'cashbox' => '',
             'site_id' => '0',
             'order_id' => '',
@@ -262,7 +264,7 @@ class ConverterStorageTest extends TestCase
         $this->assertInstanceOf(Receipt::class, $receipt);
 
         $this->assertSame(0, $receipt->getId());
-        $this->assertSame($uuid->get(), $receipt->getUUID()->get());
+        $this->assertSame($receiptId, $receipt->getReceiptId());
         $this->assertSame('', $receipt->getCashbox());
         $this->assertSame('0', $receipt->getSiteId());
         $this->assertSame('', $receipt->getOrderId());
@@ -283,7 +285,7 @@ class ConverterStorageTest extends TestCase
     public function testReceiptFromArrayFailEmpty()
     {
         $this->expectException(ConverterException::class);
-        $conv = new ConverterStorage();
+        $conv = new ConverterStorage(new ReceiptIdFactoryMeta());
         $conv->receiptFromArray([]);
     }
 
@@ -292,7 +294,7 @@ class ConverterStorageTest extends TestCase
      */
     public function testReceiptFromArrayFailPartial()
     {
-        $conv = new ConverterStorage();
+        $conv = new ConverterStorage(new ReceiptIdFactoryMeta());
 
         $a = [
             'id' => 0,
@@ -313,10 +315,10 @@ class ConverterStorageTest extends TestCase
      */
     public function testReceiptFromArrayFailInvalid()
     {
-        $conv = new ConverterStorage();
+        $conv = new ConverterStorage(new ReceiptIdFactoryMeta());
         $a = [
             'id' => 0,
-            'uuid' => '',
+            'receipt_id' => '',
             'cashbox' => '',
             'site_id' => '0',
             'order_id' => '',

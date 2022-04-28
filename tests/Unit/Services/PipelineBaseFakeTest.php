@@ -27,7 +27,6 @@ use Innokassa\MDK\Logger\LoggerInterface;
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptSubType
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptType
  * @uses Innokassa\MDK\Entities\Receipt
- * @uses Innokassa\MDK\Entities\UUID
  * @uses Innokassa\MDK\Storage\ReceiptFilter
  * @uses Innokassa\MDK\Exceptions\BaseException
  */

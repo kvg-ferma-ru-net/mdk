@@ -116,7 +116,7 @@ class Transfer implements TransferInterface
                 throw new TransferException('converter error: ' . $e->getMessage(), ReceiptStatus::ERROR);
             }
 
-            $url = self::API_URL . "/c_groups/" . $this->cashbox . "/receipts/" . $receipt->getUUID()->get();
+            $url = self::API_URL . "/c_groups/" . $this->cashbox . "/receipts/" . $receipt->getReceiptId();
             $sBody = json_encode($body, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
             $this->client
                 ->reset()
@@ -193,7 +193,7 @@ class Transfer implements TransferInterface
     public function getReceipt(Receipt $receipt): Receipt
     {
         try {
-            $url = self::API_URL . "/c_groups/" . $this->cashbox . "/receipts/" . $receipt->getUUID()->get();
+            $url = self::API_URL . "/c_groups/" . $this->cashbox . "/receipts/" . $receipt->getReceiptId();
             $this->client
                 ->reset()
                 ->write(NetClientInterface::PATH, $url)
@@ -253,16 +253,6 @@ class Transfer implements TransferInterface
         );
 
         return $receipt;
-    }
-
-    //**********************************************************************
-
-    /**
-     * @inheritDoc
-     */
-    public function getReceiptLink(Receipt $receipt): string
-    {
-        return self::API_URL . "/receipt/show/" . $receipt->getUUID()->get();
     }
 
     //######################################################################

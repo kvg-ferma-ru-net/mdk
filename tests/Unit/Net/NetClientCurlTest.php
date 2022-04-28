@@ -4,7 +4,6 @@ use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Net\Transfer;
 use Innokassa\MDK\Net\NetClientCurl;
 use Innokassa\MDK\Net\NetClientInterface;
-use Innokassa\MDK\Entities\UUID;
 use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\Atoms\PaymentMethod;
@@ -14,7 +13,6 @@ use Innokassa\MDK\Exceptions\NetConnectException;
 /**
  * @uses Innokassa\MDK\Net\NetClientCurl
  * @uses Innokassa\MDK\Exceptions\NetConnectException
- * @uses Innokassa\MDK\Entities\UUID
  */
 class NetClientCurlTest extends TestCase
 {
@@ -77,11 +75,17 @@ class NetClientCurlTest extends TestCase
             ]
         ];
 
+        $receiptId = sprintf(
+            '%04x%04x',
+            rand(0, 0xffff),
+            rand(0, 0xffff)
+        );
+
         $client = new NetClientCurl();
         $client
             ->write(
                 NetClientInterface::PATH,
-                Transfer::API_URL . "/c_groups/" . TEST_CASHBOX_WITHOUT_AGENT . "/receipts/online_store/" . (new UUID())->get()
+                Transfer::API_URL . "/c_groups/" . TEST_CASHBOX_WITHOUT_AGENT . "/receipts/" . $receiptId
             )
             ->write(NetClientInterface::TYPE, 'POST')
             ->write(NetClientInterface::BODY, json_encode($a))

@@ -2,18 +2,23 @@
 
 namespace Innokassa\MDK\Storage;
 
-use Innokassa\MDK\Entities\UUID;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Entities\ConverterAbstract;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Exceptions\ConverterException;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
+use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryInterface;
 
 /**
  * Базовая реализация интерфейса для хранилища (БД)
  */
 class ConverterStorage extends ConverterAbstract
 {
+    public function __construct(ReceiptIdFactoryInterface $receiptIdFactory)
+    {
+        $this->receiptIdFactory = $receiptIdFactory;
+    }
+
     /**
      * @inheritDoc
      */
@@ -42,7 +47,7 @@ class ConverterStorage extends ConverterAbstract
         }
 
         $a['id'] = $receipt->getId();
-        $a['uuid'] = $receipt->getUUID()->get();
+        $a['receipt_id'] = $receipt->getReceiptId();
         $a['cashbox'] = $receipt->getCashbox();
         $a['site_id'] = $receipt->getSiteId();
         $a['order_id'] = $receipt->getOrderId();
@@ -79,7 +84,7 @@ class ConverterStorage extends ConverterAbstract
             'cashbox',
             'order_id',
             'site_id',
-            'uuid',
+            'receipt_id',
             'status',
             'type',
             'items',
@@ -97,10 +102,14 @@ class ConverterStorage extends ConverterAbstract
         }
 
         try {
+            if (!$this->receiptIdFactory->verify($a['receipt_id'])) {
+                throw new InvalidArgumentException(sprintf("Invalid receiptId '%s'", $a['receipt_id']));
+            }
+
             $receipt = new Receipt();
             $receipt
                 ->setId($a['id'])
-                ->setUUID(new UUID($a['uuid']))
+                ->setReceiptId($a['receipt_id'])
                 ->setCashbox($a['cashbox'])
                 ->setOrderId($a['order_id'])
                 ->setSiteId($a['site_id'])
@@ -125,4 +134,11 @@ class ConverterStorage extends ConverterAbstract
 
         return $receipt;
     }
+
+    //######################################################################
+    // PRIVATE
+    //######################################################################
+
+    /** @var ReceiptIdFactoryInterface */
+    private $receiptIdFactory = null;
 }

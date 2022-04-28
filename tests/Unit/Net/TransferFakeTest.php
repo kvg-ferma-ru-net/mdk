@@ -16,7 +16,6 @@ use Innokassa\MDK\Logger\LoggerInterface;
  * @uses Innokassa\MDK\Net\Transfer
  * @uses Innokassa\MDK\Exceptions\TransferException
  * @uses Innokassa\MDK\Entities\Receipt
- * @uses Innokassa\MDK\Entities\UUID
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptType
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptSubType
  * @uses Innokassa\MDK\Entities\Atoms\ReceiptStatus
@@ -159,26 +158,6 @@ class TransferFakeTest extends TestCase
             $this->assertEquals(401, $e->getCode());
             $this->assertEquals(ReceiptStatus::REPEAT, $receipt->getStatus()->getCode());
         }
-    }
-
-    //######################################################################
-
-    /**
-     * @covers Innokassa\MDK\Net\Transfer::__construct
-     * @covers Innokassa\MDK\Net\Transfer::getReceiptLink
-     */
-    public function testGetReceiptLink()
-    {
-        $this->client->method('read')
-            ->will($this->returnValueMap([
-                [NetClientInterface::BODY, ''],
-                [NetClientInterface::CODE, 401]
-            ]));
-
-        $transfer = new Transfer($this->client, $this->converter, '0', '0', '0', $this->logger);
-        $receipt = new Receipt();
-
-        $this->assertIsString($transfer->getReceiptLink($receipt));
     }
 
     //######################################################################
