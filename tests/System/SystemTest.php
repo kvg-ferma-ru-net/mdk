@@ -7,6 +7,7 @@ use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Net\ConverterApi;
 use Innokassa\MDK\Logger\LoggerFile;
 use Innokassa\MDK\Net\NetClientCurl;
+use Innokassa\MDK\Entities\Atoms\Vat;
 use Innokassa\MDK\Services\ManualBase;
 use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Services\PrinterBase;
@@ -19,12 +20,14 @@ use Innokassa\MDK\Storage\ConverterStorage;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
+use Innokassa\MDK\Settings\SettingsInterface;
 use Innokassa\MDK\Entities\Atoms\PaymentMethod;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Exceptions\SettingsException;
 use Innokassa\MDK\Collections\ReceiptCollection;
 use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
+use Innokassa\MDK\Entities\Atoms\ReceiptItemType;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
 use Innokassa\MDK\Exceptions\Services\ManualException;
 use Innokassa\MDK\Exceptions\Services\AutomaticException;
@@ -77,15 +80,16 @@ class SystemTest extends TestCase
             'cashbox' => TEST_CASHBOX_WITHOUT_AGENT,
             'site' => 'https://example.com/',
             'taxation' => Taxation::USN,
-            'only2' => false,
-            'agent' => false,
+            'scheme' => SettingsInterface::SCHEME_PRE_FULL,
+            'type_default_items' => ReceiptItemType::PRODUCT,
+            'vat_default_items' => Vat::CODE_WITHOUT
         ]);
 
         self::$storage = new ReceiptStorageConcrete(
             new ConverterStorage(new ReceiptIdFactoryMeta()),
             self::$db
         );
-        self::$adapter = new ReceiptAdapterConcrete(self::$db);
+        self::$adapter = new ReceiptAdapterConcrete(self::$db, self::$settings);
 
         self::$logger = new LoggerFile();
 
@@ -353,8 +357,6 @@ class SystemTest extends TestCase
             'cashbox' => TEST_CASHBOX_WITHOUT_AGENT,
             'site' => 'https://example.com/',
             'taxation' => Taxation::USN,
-            'only2' => false,
-            'agent' => false,
         ]);
         $transfer = new Transfer(
             new NetClientCurl(),
@@ -381,8 +383,6 @@ class SystemTest extends TestCase
             'cashbox' => '0',
             'site' => 'https://example.com/',
             'taxation' => Taxation::USN,
-            'only2' => false,
-            'agent' => false,
         ]);
         $transfer = new Transfer(
             new NetClientCurl(),
@@ -413,8 +413,6 @@ class SystemTest extends TestCase
                 'cashbox' => '0',
                 'site' => 'https://example.com/',
                 'taxation' => Taxation::ESN,
-                'only2' => false,
-                'agent' => false,
             ])
         );
     }

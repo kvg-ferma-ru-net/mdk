@@ -100,8 +100,8 @@ class AutomaticBaseFakeTest extends TestCase
      */
     public function testFiscalizeSuccessPre()
     {
-        $this->settings->method('getOnly2')
-            ->willReturn(false);
+        $this->settings->method('getScheme')
+            ->willReturn(SettingsInterface::SCHEME_PRE_FULL);
 
         $this->storage
             ->method('getCollection')
@@ -141,8 +141,8 @@ class AutomaticBaseFakeTest extends TestCase
      */
     public function testFiscalizeSuccessFull1()
     {
-        $this->settings->method('getOnly2')
-            ->willReturn(false);
+        $this->settings->method('getScheme')
+            ->willReturn(SettingsInterface::SCHEME_PRE_FULL);
 
         $this->storage
             ->method('getCollection')
@@ -169,8 +169,8 @@ class AutomaticBaseFakeTest extends TestCase
      */
     public function testFiscalizeSuccessFull2()
     {
-        $this->settings->method('getOnly2')
-            ->willReturn(false);
+        $this->settings->method('getScheme')
+            ->willReturn(SettingsInterface::SCHEME_PRE_FULL);
 
         $receipts = new ReceiptCollection();
         $receipt = new Receipt();
@@ -203,10 +203,10 @@ class AutomaticBaseFakeTest extends TestCase
      * @covers Innokassa\MDK\Services\AutomaticBase::__construct
      * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
      */
-    public function testFiscalizeSuccessGetOnly()
+    public function testFiscalizeSuccessGetOnly2()
     {
-        $this->settings->method('getOnly2')
-            ->willReturn(true);
+        $this->settings->method('getScheme')
+            ->willReturn(SettingsInterface::SCHEME_ONLY_FULL);
 
         $this->storage
             ->method('getCollection')
@@ -234,8 +234,8 @@ class AutomaticBaseFakeTest extends TestCase
      */
     public function testFiscalizeSuccessServerError()
     {
-        $this->settings->method('getOnly2')
-            ->willReturn(false);
+        $this->settings->method('getScheme')
+            ->willReturn(SettingsInterface::SCHEME_PRE_FULL);
 
         $this->storage
             ->method('getCollection')
@@ -265,8 +265,8 @@ class AutomaticBaseFakeTest extends TestCase
      */
     public function testFiscalizeFailReceipt()
     {
-        $this->settings->method('getOnly2')
-            ->willReturn(true);
+        $this->settings->method('getScheme')
+            ->willReturn(SettingsInterface::SCHEME_ONLY_FULL);
 
         $this->storage
             ->method('getCollection')
@@ -294,8 +294,8 @@ class AutomaticBaseFakeTest extends TestCase
      */
     public function testFiscalizeFailExistsType()
     {
-        $this->settings->method('getOnly2')
-            ->willReturn(false);
+        $this->settings->method('getScheme')
+            ->willReturn(SettingsInterface::SCHEME_PRE_FULL);
 
         $receipts = new ReceiptCollection();
         $receipt = new Receipt();
@@ -325,8 +325,8 @@ class AutomaticBaseFakeTest extends TestCase
      */
     public function testFiscalizeFailExistsComingFull()
     {
-        $this->settings->method('getOnly2')
-            ->willReturn(false);
+        $this->settings->method('getScheme')
+            ->willReturn(SettingsInterface::SCHEME_PRE_FULL);
 
         $receipts = new ReceiptCollection();
         $receipt = new Receipt();

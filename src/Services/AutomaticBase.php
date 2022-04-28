@@ -53,7 +53,10 @@ class AutomaticBase implements AutomaticInterface
 
         if ($receiptSubType === null) {
             $receiptSubType = (
-                !$receipts->getByType(ReceiptType::COMING, ReceiptSubType::PRE) && !$this->settings->getOnly2()
+                (
+                    !$receipts->getByType(ReceiptType::COMING, ReceiptSubType::PRE)
+                    && $this->settings->getScheme() == SettingsInterface::SCHEME_PRE_FULL
+                )
                 ? ReceiptSubType::PRE
                 : ReceiptSubType::FULL
             );
