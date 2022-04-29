@@ -2,7 +2,7 @@
 
 namespace Innokassa\MDK\Services;
 
-use Innokassa\MDK\Settings\SettingsInterface;
+use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Exceptions\SettingsException;
 
 /**
@@ -14,7 +14,10 @@ interface ConnectorInterface
      * Тестирование соединения и настроек модуля на соответствие данным кассы
      *
      * @throws SettingsException
+     *
+     * @param SettingsAbstract $settings
+     * @param string $siteId
      * @return bool true в случае успеха
      */
-    public function testSettings(SettingsInterface $settings): bool;
+    public function testSettings(SettingsAbstract $settings, string $siteId = ''): bool;
 }

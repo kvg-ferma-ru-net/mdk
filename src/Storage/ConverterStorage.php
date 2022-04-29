@@ -14,6 +14,9 @@ use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryInterface;
  */
 class ConverterStorage extends ConverterAbstract
 {
+    /**
+     * @param ReceiptIdFactoryInterface $receiptIdFactory
+     */
     public function __construct(ReceiptIdFactoryInterface $receiptIdFactory)
     {
         $this->receiptIdFactory = $receiptIdFactory;

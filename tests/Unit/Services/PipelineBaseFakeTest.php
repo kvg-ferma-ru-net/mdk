@@ -3,16 +3,15 @@
 use Innokassa\MDK\Net\Transfer;
 use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Entities\Receipt;
-use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Services\PipelineBase;
+use Innokassa\MDK\Settings\SettingsConn;
+use Innokassa\MDK\Logger\LoggerInterface;
 use Innokassa\MDK\Net\NetClientInterface;
+use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Entities\ConverterAbstract;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
-use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Collections\ReceiptCollection;
-use Innokassa\MDK\Exceptions\NetConnectException;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
-use Innokassa\MDK\Logger\LoggerInterface;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
@@ -29,6 +28,7 @@ use Innokassa\MDK\Logger\LoggerInterface;
  * @uses Innokassa\MDK\Entities\Receipt
  * @uses Innokassa\MDK\Storage\ReceiptFilter
  * @uses Innokassa\MDK\Exceptions\BaseException
+ * @uses Innokassa\MDK\Settings\SettingsConn
  */
 class PipelineBaseFakeTest extends TestCase
 {
@@ -36,6 +36,7 @@ class PipelineBaseFakeTest extends TestCase
     private $converter;
     private $storage;
     private $logger;
+    private $settings;
 
     protected function setUp(): void
     {
@@ -50,6 +51,16 @@ class PipelineBaseFakeTest extends TestCase
         $this->converter = $this->createMock(ConverterAbstract::class);
         $this->storage = $this->createMock(ReceiptStorageInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+
+        $this->settings = $this->createMock(SettingsAbstract::class);
+        $this->settings->method('getActorId')
+            ->willReturn(TEST_ACTOR_ID);
+        $this->settings->method('getActorToken')
+            ->willReturn(TEST_ACTOR_TOKEN);
+        $this->settings->method('getCashbox')
+            ->willReturn(TEST_CASHBOX_WITHOUT_AGENT);
+        $this->settings->method('extrudeConn')
+            ->willReturn(new SettingsConn(TEST_ACTOR_ID, TEST_ACTOR_TOKEN, TEST_CASHBOX_WITHOUT_AGENT));
     }
 
     //######################################################################
@@ -63,12 +74,9 @@ class PipelineBaseFakeTest extends TestCase
         $transfer = new Transfer(
             $this->client,
             $this->converter,
-            TEST_ACTOR_ID,
-            TEST_ACTOR_TOKEN,
-            TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
-        $pipeline = new PipelineBase($this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
 
         $fp = fopen(PipelineBase::LOCK_FILE_ACCEPTED, "w+");
         flock($fp, LOCK_EX);
@@ -119,12 +127,9 @@ class PipelineBaseFakeTest extends TestCase
         $transfer = new Transfer(
             $this->client,
             $this->converter,
-            TEST_ACTOR_ID,
-            TEST_ACTOR_TOKEN,
-            TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
-        $pipeline = new PipelineBase($this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
         $this->assertTrue($pipeline->updateAccepted());
 
         for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
@@ -165,12 +170,9 @@ class PipelineBaseFakeTest extends TestCase
         $transfer = new Transfer(
             $this->client,
             $this->converter,
-            TEST_ACTOR_ID,
-            TEST_ACTOR_TOKEN,
-            TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
-        $pipeline = new PipelineBase($this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
         $this->assertTrue($pipeline->updateAccepted());
 
         $this->assertSame(ReceiptStatus::REPEAT, $receipts[0]->getStatus()->getCode());
@@ -214,12 +216,9 @@ class PipelineBaseFakeTest extends TestCase
         $transfer = new Transfer(
             $this->client,
             $this->converter,
-            TEST_ACTOR_ID,
-            TEST_ACTOR_TOKEN,
-            TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
-        $pipeline = new PipelineBase($this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
         $this->assertTrue($pipeline->updateAccepted());
 
         for ($i = 0; $i < PipelineBase::MAX_COUNT_ERR; ++$i) {
@@ -240,12 +239,9 @@ class PipelineBaseFakeTest extends TestCase
         $transfer = new Transfer(
             $this->client,
             $this->converter,
-            TEST_ACTOR_ID,
-            TEST_ACTOR_TOKEN,
-            TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
-        $pipeline = new PipelineBase($this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
         $fp = fopen(PipelineBase::LOCK_FILE_UNACCEPTED, "w+");
         flock($fp, LOCK_EX);
         $this->assertFalse($pipeline->updateUnaccepted());
@@ -295,12 +291,9 @@ class PipelineBaseFakeTest extends TestCase
         $transfer = new Transfer(
             $this->client,
             $this->converter,
-            TEST_ACTOR_ID,
-            TEST_ACTOR_TOKEN,
-            TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
-        $pipeline = new PipelineBase($this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
         $this->assertTrue($pipeline->updateUnaccepted());
 
         for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
@@ -337,12 +330,9 @@ class PipelineBaseFakeTest extends TestCase
         $transfer = new Transfer(
             $this->client,
             $this->converter,
-            TEST_ACTOR_ID,
-            TEST_ACTOR_TOKEN,
-            TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
-        $pipeline = new PipelineBase($this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
         $this->assertTrue($pipeline->updateUnaccepted());
 
         $this->assertSame(ReceiptStatus::ERROR, $receipts[0]->getStatus()->getCode());
@@ -386,12 +376,9 @@ class PipelineBaseFakeTest extends TestCase
         $transfer = new Transfer(
             $this->client,
             $this->converter,
-            TEST_ACTOR_ID,
-            TEST_ACTOR_TOKEN,
-            TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
-        $pipeline = new PipelineBase($this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
         $this->assertTrue($pipeline->updateUnaccepted());
 
         for ($i = 0; $i < PipelineBase::MAX_COUNT_ERR; ++$i) {

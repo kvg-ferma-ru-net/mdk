@@ -22,8 +22,9 @@ interface AutomaticInterface
      * @throws AutomaticException
      *
      * @param string $orderId
+     * @param string $siteId
      * @param integer|null $receiptSubType подтип чека для конкретизации, либо null для автоматического определения типа
      * @return Receipt
      */
-    public function fiscalize(string $orderId, int $receiptSubType = null): Receipt;
+    public function fiscalize(string $orderId, string $siteId = '', int $receiptSubType = null): Receipt;
 }

@@ -4,13 +4,14 @@ use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Net\TransferInterface;
+use Innokassa\MDK\Settings\SettingsConn;
 use Innokassa\MDK\Services\AutomaticBase;
 use Innokassa\MDK\Entities\Atoms\Taxation;
+use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\ConverterAbstract;
 use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
-use Innokassa\MDK\Settings\SettingsInterface;
 use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Collections\ReceiptCollection;
@@ -45,6 +46,7 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
  * @uses Innokassa\MDK\Entities\Primitives\Customer
  * @uses Innokassa\MDK\Exceptions\TransferException
  * @uses Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta
+ * @uses Innokassa\MDK\Settings\SettingsConn
  */
 class AutomaticBaseFakeTest extends TestCase
 {
@@ -74,11 +76,11 @@ class AutomaticBaseFakeTest extends TestCase
         $this->transfer = $this->createMock(TransferInterface::class);
         $this->transfer
             ->method('sendReceipt')
-            ->will($this->returnArgument(0));
+            ->will($this->returnArgument(1));
 
         $this->storage = $this->createMock(ReceiptStorageInterface::class);
 
-        $this->settings = $this->createMock(SettingsInterface::class);
+        $this->settings = $this->createMock(SettingsAbstract::class);
         $this->settings->method('getActorId')
             ->willReturn(TEST_ACTOR_ID);
         $this->settings->method('getActorToken')
@@ -89,6 +91,8 @@ class AutomaticBaseFakeTest extends TestCase
             ->willReturn(Taxation::ORN);
         $this->settings->method('getLocation')
             ->willReturn('https://example.com/');
+        $this->settings->method('extrudeConn')
+            ->willReturn(new SettingsConn(TEST_ACTOR_ID, TEST_ACTOR_TOKEN, TEST_CASHBOX_WITHOUT_AGENT));
     }
 
     //######################################################################
@@ -101,7 +105,7 @@ class AutomaticBaseFakeTest extends TestCase
     public function testFiscalizeSuccessPre()
     {
         $this->settings->method('getScheme')
-            ->willReturn(SettingsInterface::SCHEME_PRE_FULL);
+            ->willReturn(SettingsAbstract::SCHEME_PRE_FULL);
 
         $this->storage
             ->method('getCollection')
@@ -142,7 +146,7 @@ class AutomaticBaseFakeTest extends TestCase
     public function testFiscalizeSuccessFull1()
     {
         $this->settings->method('getScheme')
-            ->willReturn(SettingsInterface::SCHEME_PRE_FULL);
+            ->willReturn(SettingsAbstract::SCHEME_PRE_FULL);
 
         $this->storage
             ->method('getCollection')
@@ -156,7 +160,7 @@ class AutomaticBaseFakeTest extends TestCase
             new ReceiptIdFactoryMeta()
         );
 
-        $receipt = $automatic->fiscalize('0', ReceiptSubType::FULL);
+        $receipt = $automatic->fiscalize('0', '', ReceiptSubType::FULL);
         $this->assertInstanceOf(Receipt::class, $receipt);
         $this->assertSame(ReceiptSubType::FULL, $receipt->getSubType());
         $this->assertSame(200.0, $receipt->getAmount()->get(Amount::CASHLESS));
@@ -170,7 +174,7 @@ class AutomaticBaseFakeTest extends TestCase
     public function testFiscalizeSuccessFull2()
     {
         $this->settings->method('getScheme')
-            ->willReturn(SettingsInterface::SCHEME_PRE_FULL);
+            ->willReturn(SettingsAbstract::SCHEME_PRE_FULL);
 
         $receipts = new ReceiptCollection();
         $receipt = new Receipt();
@@ -206,7 +210,7 @@ class AutomaticBaseFakeTest extends TestCase
     public function testFiscalizeSuccessGetOnly2()
     {
         $this->settings->method('getScheme')
-            ->willReturn(SettingsInterface::SCHEME_ONLY_FULL);
+            ->willReturn(SettingsAbstract::SCHEME_ONLY_FULL);
 
         $this->storage
             ->method('getCollection')
@@ -235,7 +239,7 @@ class AutomaticBaseFakeTest extends TestCase
     public function testFiscalizeSuccessServerError()
     {
         $this->settings->method('getScheme')
-            ->willReturn(SettingsInterface::SCHEME_PRE_FULL);
+            ->willReturn(SettingsAbstract::SCHEME_PRE_FULL);
 
         $this->storage
             ->method('getCollection')
@@ -266,7 +270,7 @@ class AutomaticBaseFakeTest extends TestCase
     public function testFiscalizeFailReceipt()
     {
         $this->settings->method('getScheme')
-            ->willReturn(SettingsInterface::SCHEME_ONLY_FULL);
+            ->willReturn(SettingsAbstract::SCHEME_ONLY_FULL);
 
         $this->storage
             ->method('getCollection')
@@ -295,7 +299,7 @@ class AutomaticBaseFakeTest extends TestCase
     public function testFiscalizeFailExistsType()
     {
         $this->settings->method('getScheme')
-            ->willReturn(SettingsInterface::SCHEME_PRE_FULL);
+            ->willReturn(SettingsAbstract::SCHEME_PRE_FULL);
 
         $receipts = new ReceiptCollection();
         $receipt = new Receipt();
@@ -316,7 +320,7 @@ class AutomaticBaseFakeTest extends TestCase
         );
 
         $this->expectException(AutomaticException::class);
-        $automatic->fiscalize('0', ReceiptSubType::PRE);
+        $automatic->fiscalize('0', '', ReceiptSubType::PRE);
     }
 
     /**
@@ -326,7 +330,7 @@ class AutomaticBaseFakeTest extends TestCase
     public function testFiscalizeFailExistsComingFull()
     {
         $this->settings->method('getScheme')
-            ->willReturn(SettingsInterface::SCHEME_PRE_FULL);
+            ->willReturn(SettingsAbstract::SCHEME_PRE_FULL);
 
         $receipts = new ReceiptCollection();
         $receipt = new Receipt();

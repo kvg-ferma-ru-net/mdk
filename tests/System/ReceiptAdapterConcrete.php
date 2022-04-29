@@ -3,7 +3,7 @@
 use Innokassa\MDK\Entities\Atoms\Vat;
 use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Entities\Primitives\Notify;
-use Innokassa\MDK\Settings\SettingsInterface;
+use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Entities\Atoms\PaymentMethod;
 use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
@@ -13,13 +13,13 @@ use Innokassa\MDK\Collections\ReceiptItemCollection;
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 class ReceiptAdapterConcrete implements ReceiptAdapterInterface
 {
-    public function __construct(db $db, SettingsInterface $settings)
+    public function __construct(db $db, SettingsAbstract $settings)
     {
         $this->db = $db;
         $this->settings = $settings;
     }
 
-    public function getItems(string $orderId, int $subType): ReceiptItemCollection
+    public function getItems(string $orderId, ?string $siteId, int $subType): ReceiptItemCollection
     {
         $paymentMethod = $this->getPaymentMethod($subType);
 
@@ -38,19 +38,19 @@ class ReceiptAdapterConcrete implements ReceiptAdapterInterface
         return $items;
     }
 
-    public function getTotal(string $orderId): float
+    public function getTotal(string $orderId, ?string $siteId): float
     {
-        $items = $this->getItems($orderId, ReceiptSubType::PRE);
+        $items = $this->getItems($orderId, $siteId, ReceiptSubType::PRE);
         return $items->getAmount();
     }
 
-    public function getCustomer(string $orderId): ?Customer
+    public function getCustomer(string $orderId, ?string $siteId): ?Customer
     {
         $a = $this->get($orderId);
         return new Customer($a['customer']);
     }
 
-    public function getNotify(string $orderId): Notify
+    public function getNotify(string $orderId, ?string $siteId): Notify
     {
         $a = $this->get($orderId);
         return new Notify($a['notify']);

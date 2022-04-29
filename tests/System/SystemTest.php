@@ -20,7 +20,7 @@ use Innokassa\MDK\Storage\ConverterStorage;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
-use Innokassa\MDK\Settings\SettingsInterface;
+use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Entities\Atoms\PaymentMethod;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Entities\Primitives\Customer;
@@ -63,10 +63,20 @@ use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
 class SystemTest extends TestCase
 {
     protected static $db;
+
+    /** @var SettingsConcrete */
     protected static $settings;
+
+    /** @var ReceiptStorageConcrete */
     protected static $storage;
+
+    /** @var ReceiptStorageConcrete */
     protected static $adapter;
+
+    /** @var Client */
     protected static $client;
+
+    /** @var LoggerFile */
     protected static $logger;
 
     public static function setUpBeforeClass(): void
@@ -80,7 +90,7 @@ class SystemTest extends TestCase
             'cashbox' => TEST_CASHBOX_WITHOUT_AGENT,
             'site' => 'https://example.com/',
             'taxation' => Taxation::USN,
-            'scheme' => SettingsInterface::SCHEME_PRE_FULL,
+            'scheme' => SettingsAbstract::SCHEME_PRE_FULL,
             'type_default_items' => ReceiptItemType::PRODUCT,
             'vat_default_items' => Vat::CODE_WITHOUT
         ]);
@@ -96,9 +106,6 @@ class SystemTest extends TestCase
         $transfer = new Transfer(
             new NetClientCurl(),
             new ConverterApi(),
-            self::$settings->getActorId(),
-            self::$settings->getActorToken(),
-            self::$settings->getCashbox(),
             self::$logger
         );
 
@@ -109,7 +116,7 @@ class SystemTest extends TestCase
             self::$adapter,
             new ReceiptIdFactoryMeta()
         );
-        $pipeline = new PipelineBase(self::$storage, $transfer);
+        $pipeline = new PipelineBase(self::$settings, self::$storage, $transfer);
         $connector = new ConnectorBase($transfer);
 
         self::$client = new Client(
@@ -185,21 +192,21 @@ class SystemTest extends TestCase
      */
     public function testAdapter()
     {
-        $items = self::$adapter->getItems(1, ReceiptSubType::PRE);
+        $items = self::$adapter->getItems(1, null, ReceiptSubType::PRE);
         $this->assertInstanceOf(ReceiptItemCollection::class, $items);
         $this->assertSame(PaymentMethod::PREPAYMENT_FULL, $items[0]->getPaymentMethod());
 
-        $items = self::$adapter->getItems(1, ReceiptSubType::FULL);
+        $items = self::$adapter->getItems(1, null, ReceiptSubType::FULL);
         $this->assertSame(PaymentMethod::PAYMENT_FULL, $items[0]->getPaymentMethod());
 
-        $total = self::$adapter->getTotal(1);
+        $total = self::$adapter->getTotal(1, null);
         $this->assertIsFloat($total);
         $this->assertTrue($total > 0);
 
-        $customer = self::$adapter->getCustomer(1);
+        $customer = self::$adapter->getCustomer(1, null);
         $this->assertInstanceOf(Customer::class, $customer);
 
-        $notify = self::$adapter->getNotify(1);
+        $notify = self::$adapter->getNotify(1, null);
         $this->assertInstanceOf(Notify::class, $notify);
     }
 
@@ -214,13 +221,13 @@ class SystemTest extends TestCase
     public function testAutomatic()
     {
         $automatic = self::$client->serviceAutomatic();
-        $receipt1 = $automatic->fiscalize(1, ReceiptSubType::PRE);
+        $receipt1 = $automatic->fiscalize(1, '', ReceiptSubType::PRE);
         $this->assertTrue($receipt1->getStatus()->getCode() != ReceiptStatus::ERROR);
-        $receipt2 = $automatic->fiscalize(1, ReceiptSubType::FULL);
+        $receipt2 = $automatic->fiscalize(1, '', ReceiptSubType::FULL);
         $this->assertTrue($receipt2->getStatus()->getCode() != ReceiptStatus::ERROR);
 
         $this->expectException(AutomaticException::class);
-        $automatic->fiscalize(1, ReceiptSubType::FULL);
+        $automatic->fiscalize(1, '', ReceiptSubType::FULL);
     }
 
     //######################################################################
@@ -336,9 +343,6 @@ class SystemTest extends TestCase
         $transfer = new Transfer(
             new NetClientCurl(),
             new ConverterApi(),
-            self::$settings->getActorId(),
-            self::$settings->getActorToken(),
-            self::$settings->getCashbox(),
             self::$logger
         );
         $connector = new ConnectorBase($transfer);
@@ -361,9 +365,6 @@ class SystemTest extends TestCase
         $transfer = new Transfer(
             new NetClientCurl(),
             new ConverterApi(),
-            $settings->getActorId(),
-            $settings->getActorToken(),
-            $settings->getCashbox(),
             self::$logger
         );
         $connector = new ConnectorBase($transfer);
@@ -387,9 +388,6 @@ class SystemTest extends TestCase
         $transfer = new Transfer(
             new NetClientCurl(),
             new ConverterApi(),
-            $settings->getActorId(),
-            $settings->getActorToken(),
-            $settings->getCashbox(),
             self::$logger
         );
         $connector = new ConnectorBase($transfer);

@@ -258,6 +258,7 @@ class ReceiptTest extends TestCase
     public function testSetGetSiteId()
     {
         $receipt = new Receipt();
+        $this->assertSame('', $receipt->getSiteId());
         $this->assertSame($receipt, $receipt->setSiteId('s1'));
         $this->assertSame('s1', $receipt->getSiteId());
     }

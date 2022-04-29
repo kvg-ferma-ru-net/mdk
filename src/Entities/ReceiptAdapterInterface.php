@@ -2,7 +2,6 @@
 
 namespace Innokassa\MDK\Entities;
 
-use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
 use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
@@ -22,7 +21,7 @@ interface ReceiptAdapterInterface
      * @param int $subType подтип создаваемого чека (ReceiptSubType::PRE || ReceiptSubType::FULL)
      * @return ReceiptItemCollection
      */
-    public function getItems(string $orderId, int $subType): ReceiptItemCollection;
+    public function getItems(string $orderId, string $siteId, int $subType): ReceiptItemCollection;
 
     /**
      * Получить общую сумму заказа
@@ -32,7 +31,7 @@ interface ReceiptAdapterInterface
      * @param string $orderId
      * @return float
      */
-    public function getTotal(string $orderId): float;
+    public function getTotal(string $orderId, string $siteId): float;
 
     /**
      * Получить данные покупателя
@@ -40,7 +39,7 @@ interface ReceiptAdapterInterface
      * @param string $orderId
      * @return Customer|null
      */
-    public function getCustomer(string $orderId): ?Customer;
+    public function getCustomer(string $orderId, string $siteId): ?Customer;
 
     /**
      * Получить данные для уведомления покупателя
@@ -48,5 +47,5 @@ interface ReceiptAdapterInterface
      * @param string $orderId
      * @return Notify
      */
-    public function getNotify(string $orderId): Notify;
+    public function getNotify(string $orderId, string $siteId): Notify;
 }

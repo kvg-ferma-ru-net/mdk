@@ -94,6 +94,22 @@ class ReceiptFilter
         return $this;
     }
 
+    /**
+     * Установить идентификатор сайта
+     *
+     * @param string $siteId
+     * @param string $op операция сравнения
+     * @return self
+     */
+    public function setSiteId(string $siteId, string $op = self::OP_EQ): self
+    {
+        $this->siteId = [
+            'value' => $siteId,
+            'op' => $op
+        ];
+        return $this;
+    }
+
     //######################################################################
 
     /**
@@ -135,4 +151,7 @@ class ReceiptFilter
 
     /** @var array<string, int|string> */
     private $orderId = null;
+
+    /** @var array<string, int|string> */
+    private $siteId = null;
 }
