@@ -4,10 +4,11 @@ namespace Innokassa\MDK\Services;
 
 use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Storage\ReceiptFilter;
-use Innokassa\MDK\Storage\ReceiptStorageInterface;
+use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
-use Innokassa\MDK\Collections\ReceiptCollection;
 use Innokassa\MDK\Exceptions\TransferException;
+use Innokassa\MDK\Collections\ReceiptCollection;
+use Innokassa\MDK\Storage\ReceiptStorageInterface;
 
 /**
  * Базовая реализация PipelineInterface.
@@ -29,10 +30,19 @@ class PipelineBase implements PipelineInterface
 
     //######################################################################
 
-    public function __construct(ReceiptStorageInterface $receiptStorage, TransferInterface $transfer)
-    {
+    /**
+     * @param SettingsAbstract $settings
+     * @param ReceiptStorageInterface $receiptStorage
+     * @param TransferInterface $transfer
+     */
+    public function __construct(
+        SettingsAbstract $settings,
+        ReceiptStorageInterface $receiptStorage,
+        TransferInterface $transfer
+    ) {
         $this->receiptStorage = $receiptStorage;
         $this->transfer = $transfer;
+        $this->settings = $settings;
     }
 
     /**
@@ -71,6 +81,7 @@ class PipelineBase implements PipelineInterface
 
     private $receiptStorage = null;
     private $transfer = null;
+    private $settings = null;
     private $countError = 0;
 
     //######################################################################
@@ -115,7 +126,10 @@ class PipelineBase implements PipelineInterface
             $idLast = ($receipt->getId() > $idLast ? $receipt->getId() : $idLast);
 
             try {
-                $receipt = $this->transfer->getReceipt($receipt);
+                $receipt = $this->transfer->getReceipt(
+                    $this->settings->extrudeConn($receipt->getSiteId()),
+                    $receipt
+                );
             } catch (TransferException $e) {
                 /*
                     если чека с таким uuid нет на сервере (ASSSUME),
@@ -151,12 +165,18 @@ class PipelineBase implements PipelineInterface
             $idLast = ($receipt->getId() > $idLast ? $receipt->getId() : $idLast);
 
             try {
-                $receipt = $this->transfer->sendReceipt($receipt);
+                $receipt = $this->transfer->sendReceipt(
+                    $this->settings->extrudeConn($receipt->getSiteId()),
+                    $receipt
+                );
             } catch (TransferException $e) {
                 // если чек с таким id уже был принят сервером фискализации - узнаем его статус
                 if ($e->getCode() == 409) {
                     try {
-                        $receipt = $this->transfer->getReceipt($receipt);
+                        $receipt = $this->transfer->getReceipt(
+                            $this->settings->extrudeConn($receipt->getSiteId()),
+                            $receipt
+                        );
                     } catch (TransferException $e) {
                     }
                 }

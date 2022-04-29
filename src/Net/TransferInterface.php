@@ -3,6 +3,7 @@
 namespace Innokassa\MDK\Net;
 
 use Innokassa\MDK\Entities\Receipt;
+use Innokassa\MDK\Settings\SettingsConn;
 use Innokassa\MDK\Exceptions\TransferException;
 
 /**
@@ -18,9 +19,10 @@ interface TransferInterface
      *
      * @throws TransferException
      *
+     * @param SettingsConn $settingsConn
      * @return object
      */
-    public function getCashbox(): object;
+    public function getCashbox(SettingsConn $settingsConn): object;
 
     /**
      * Отправка чека на фискализацию
@@ -29,11 +31,11 @@ interface TransferInterface
      *
      * @throws TransferException
      *
+     * @param SettingsConn $settingsConn
      * @param Receipt $receipt
-     * @param bool $needAgent нужен ли агентский запрос, касса должна быть агентской, а в чеке агентские данные
      * @return Receipt
      */
-    public function sendReceipt(Receipt $receipt, bool $needAgent = false): Receipt;
+    public function sendReceipt(SettingsConn $settingsConn, Receipt $receipt): Receipt;
 
     /**
      * Получение информации о чеке
@@ -42,8 +44,9 @@ interface TransferInterface
      *
      * @throws TransferException
      *
+     * @param SettingsConn $settingsConn
      * @param Receipt $receipt
      * @return Receipt
      */
-    public function getReceipt(Receipt $receipt): Receipt;
+    public function getReceipt(SettingsConn $settingsConn, Receipt $receipt): Receipt;
 }

@@ -1,8 +1,9 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Net\Transfer;
+use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Net\NetClientCurl;
+use Innokassa\MDK\Entities\Atoms\Unit;
 use Innokassa\MDK\Net\NetClientInterface;
 use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
@@ -54,7 +55,8 @@ class NetClientCurlTest extends TestCase
                 'quantity' => 1.0,
                 'amount' => 100.0,
                 'payment_method' => PaymentMethod::PAYMENT_FULL,
-                'vat' => 1
+                'vat' => 1,
+                'unit' => Unit::DEFAULT
             ]],
             'taxation' => Taxation::ORN,
             'amount' => [

@@ -5,9 +5,9 @@ namespace Innokassa\MDK\Services;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Storage\ReceiptFilter;
+use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\Primitives\Amount;
-use Innokassa\MDK\Settings\SettingsInterface;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
@@ -23,13 +23,13 @@ use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryInterface;
 class AutomaticBase implements AutomaticInterface
 {
     /**
-     * @param SettingsInterface $settings
+     * @param SettingsAbstract $settings
      * @param ReceiptStorageInterface $receiptStorage
      * @param TransferInterface $transfer
      * @param ReceiptAdapterInterface $receiptAdapter
      */
     public function __construct(
-        SettingsInterface $settings,
+        SettingsAbstract $settings,
         ReceiptStorageInterface $receiptStorage,
         TransferInterface $transfer,
         ReceiptAdapterInterface $receiptAdapter,
@@ -45,17 +45,17 @@ class AutomaticBase implements AutomaticInterface
     /**
      * @inheritDoc
      */
-    public function fiscalize(string $orderId, int $receiptSubType = null): Receipt
+    public function fiscalize(string $orderId, string $siteId = '', int $receiptSubType = null): Receipt
     {
         $receipts = $this->receiptStorage->getCollection(
-            (new ReceiptFilter())->setOrderId($orderId)
+            (new ReceiptFilter())->setOrderId($orderId)->setSiteId($siteId)
         );
 
         if ($receiptSubType === null) {
             $receiptSubType = (
                 (
                     !$receipts->getByType(ReceiptType::COMING, ReceiptSubType::PRE)
-                    && $this->settings->getScheme() == SettingsInterface::SCHEME_PRE_FULL
+                    && $this->settings->getScheme($siteId) == SettingsAbstract::SCHEME_PRE_FULL
                 )
                 ? ReceiptSubType::PRE
                 : ReceiptSubType::FULL
@@ -71,10 +71,10 @@ class AutomaticBase implements AutomaticInterface
         }
 
         try {
-            $total = $this->receiptAdapter->getTotal($orderId);
-            $items = $this->receiptAdapter->getItems($orderId, $receiptSubType);
-            $customer = $this->receiptAdapter->getCustomer($orderId);
-            $notify = $this->receiptAdapter->getNotify($orderId);
+            $total = $this->receiptAdapter->getTotal($orderId, $siteId);
+            $items = $this->receiptAdapter->getItems($orderId, $siteId, $receiptSubType);
+            $customer = $this->receiptAdapter->getCustomer($orderId, $siteId);
+            $notify = $this->receiptAdapter->getNotify($orderId, $siteId);
         } catch (InvalidArgumentException $e) {
             throw $e;
         }
@@ -99,13 +99,13 @@ class AutomaticBase implements AutomaticInterface
         $receipt->setCustomer($customer);
         $receipt->setNotify($notify);
         $receipt->setAmount($amount);
-        $receipt->setTaxation($this->settings->getTaxation());
-        $receipt->setLocation($this->settings->getLocation());
-        $receipt->setCashbox($this->settings->getCashbox());
+        $receipt->setTaxation($this->settings->getTaxation($siteId));
+        $receipt->setLocation($this->settings->getLocation($siteId));
+        $receipt->setCashbox($this->settings->getCashbox($siteId));
         $receipt->setReceiptId($this->receiptIdFactory->build($receipt));
 
         try {
-            $receipt = $this->transfer->sendReceipt($receipt);
+            $receipt = $this->transfer->sendReceipt($this->settings->extrudeConn($siteId), $receipt);
         } catch (TransferException $e) {
             if ((new ReceiptStatus($e->getCode()))->getCode() == ReceiptStatus::ERROR) {
                 throw $e;
@@ -121,7 +121,7 @@ class AutomaticBase implements AutomaticInterface
     // PRIVATE
     //######################################################################
 
-    /** @var SettingsInterface */
+    /** @var SettingsAbstract */
     private $settings = null;
 
     /** @var ReceiptStorageInterface */

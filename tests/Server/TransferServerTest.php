@@ -1,20 +1,21 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Net\Transfer;
+use PHPUnit\Framework\TestCase;
+use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Net\ConverterApi;
 use Innokassa\MDK\Net\NetClientCurl;
-use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Entities\ReceiptItem;
+use Innokassa\MDK\Settings\SettingsConn;
+use Innokassa\MDK\Logger\LoggerInterface;
 use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Entities\Primitives\Customer;
-use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
 use Innokassa\MDK\Exceptions\TransferException;
-use Innokassa\MDK\Logger\LoggerInterface;
+use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
@@ -37,14 +38,17 @@ use Innokassa\MDK\Logger\LoggerInterface;
  * @uses Innokassa\MDK\Entities\Atoms\Taxation
  * @uses Innokassa\MDK\Entities\Atoms\Vat
  * @uses Innokassa\MDK\Exceptions\TransferException
+ * @uses Innokassa\MDK\Settings\SettingsConn
  */
 class TransferServerTest extends TestCase
 {
     protected $logger;
+    protected $settingsConn;
 
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
+        $this->settingsConn = new SettingsConn(TEST_ACTOR_ID, TEST_ACTOR_TOKEN, TEST_CASHBOX_WITHOUT_AGENT);
     }
 
     /**
@@ -77,13 +81,10 @@ class TransferServerTest extends TestCase
         $transfer = new Transfer(
             $client,
             $converter,
-            TEST_ACTOR_ID,
-            TEST_ACTOR_TOKEN,
-            TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
 
-        $transfer->sendReceipt($receipt, false);
+        $transfer->sendReceipt($this->settingsConn, $receipt);
         $this->assertTrue(
             $receipt->getStatus()->getCode() == ReceiptStatus::COMPLETED
             || $receipt->getStatus()->getCode() == ReceiptStatus::WAIT
@@ -103,12 +104,9 @@ class TransferServerTest extends TestCase
         $transfer = new Transfer(
             $client,
             $converter,
-            TEST_ACTOR_ID,
-            TEST_ACTOR_TOKEN,
-            TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
-        $receipt = $transfer->getReceipt($receipt);
+        $receipt = $transfer->getReceipt($this->settingsConn, $receipt);
         $this->assertTrue(
             $receipt->getStatus()->getCode() == ReceiptStatus::COMPLETED
             || $receipt->getStatus()->getCode() == ReceiptStatus::WAIT
@@ -145,15 +143,12 @@ class TransferServerTest extends TestCase
         $transfer = new Transfer(
             $client,
             $converter,
-            TEST_ACTOR_ID,
-            TEST_ACTOR_TOKEN,
-            TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
 
         $this->expectException(TransferException::class);
         $this->expectExceptionCode(400);
-        $receipt = $transfer->sendReceipt($receipt, false);
+        $receipt = $transfer->sendReceipt($this->settingsConn, $receipt);
     }
 
     /**
@@ -166,15 +161,12 @@ class TransferServerTest extends TestCase
         $transfer = new Transfer(
             $client,
             $converter,
-            TEST_ACTOR_ID,
-            TEST_ACTOR_TOKEN,
-            TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
 
         $this->expectException(TransferException::class);
         $this->expectExceptionCode(404);
-        $receipt = $transfer->getReceipt(new Receipt());
+        $receipt = $transfer->getReceipt($this->settingsConn, new Receipt());
     }
 
     /**
@@ -182,13 +174,14 @@ class TransferServerTest extends TestCase
      */
     public function testGetReceiptFailAuth()
     {
+        $settingsConn = new SettingsConn(0, 0, 0);
         $client = new NetClientCurl();
         $converter = new ConverterApi();
-        $transfer = new Transfer($client, $converter, '0', '0', '0', $this->logger);
+        $transfer = new Transfer($client, $converter, $this->logger);
 
         $this->expectException(TransferException::class);
         $this->expectExceptionCode(401);
-        $receipt = $transfer->getReceipt(new Receipt());
+        $receipt = $transfer->getReceipt($settingsConn, new Receipt());
     }
 
     //######################################################################
@@ -203,12 +196,9 @@ class TransferServerTest extends TestCase
         $transfer = new Transfer(
             $client,
             $converter,
-            TEST_ACTOR_ID,
-            TEST_ACTOR_TOKEN,
-            TEST_CASHBOX_WITHOUT_AGENT,
             $this->logger
         );
-        $cashbox = $transfer->getCashBox();
+        $cashbox = $transfer->getCashBox($this->settingsConn);
 
         $this->assertIsObject($cashbox);
         $this->assertObjectHasAttribute('type', $cashbox);
@@ -221,13 +211,15 @@ class TransferServerTest extends TestCase
      */
     public function testGetCashBoxFail()
     {
+        $settingsConn = new SettingsConn(TEST_ACTOR_ID, TEST_ACTOR_TOKEN, -1);
+
         $client = new NetClientCurl();
         $converter = new ConverterApi();
-        $transfer = new Transfer($client, $converter, TEST_ACTOR_ID, TEST_ACTOR_TOKEN, 0, $this->logger);
+        $transfer = new Transfer($client, $converter, $this->logger);
 
         $this->expectException(TransferException::class);
         $this->expectExceptionCode(404);
         $this->expectExceptionMessage(TransferException::CODE_404);
-        $transfer->getCashBox();
+        $transfer->getCashBox($settingsConn);
     }
 }

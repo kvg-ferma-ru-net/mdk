@@ -47,8 +47,13 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
         $aWhere2 = [];
         foreach ($aWhere as $key => $value) {
             $val = $value['value'];
+            if ($val === null) {
+                $val = 'null';
+            } else {
+                $val = "'$val'";
+            }
             $op = $value['op'];
-            $aWhere2[] = "{$key}{$op}'{$val}'";
+            $aWhere2[] = "{$key}{$op}$val";
         }
 
         $where = implode(' AND ', $aWhere2);

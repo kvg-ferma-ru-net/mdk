@@ -7,7 +7,7 @@ use Innokassa\MDK\Net\NetClientInterface;
 use Innokassa\MDK\Services\ConnectorBase;
 use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Entities\ConverterAbstract;
-use Innokassa\MDK\Settings\SettingsInterface;
+use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Exceptions\SettingsException;
 use Innokassa\MDK\Exceptions\NetConnectException;
@@ -47,7 +47,7 @@ class ConnectorBaseFakeTest extends TestCase
 
         $this->converter = $this->createMock(ConverterAbstract::class);
 
-        $this->settings = $this->createMock(SettingsInterface::class);
+        $this->settings = $this->createMock(SettingsAbstract::class);
         $this->settings->method('getActorId')
             ->willReturn(TEST_ACTOR_ID);
         $this->settings->method('getActorToken')
@@ -78,9 +78,6 @@ class ConnectorBaseFakeTest extends TestCase
         $transfer = new Transfer(
             $this->client,
             $this->converter,
-            $this->settings->getActorId(),
-            $this->settings->getActorToken(),
-            $this->settings->getCashbox(),
             $this->logger
         );
         $connector = new ConnectorBase($transfer);
@@ -101,9 +98,6 @@ class ConnectorBaseFakeTest extends TestCase
         $transfer = new Transfer(
             $this->client,
             $this->converter,
-            $this->settings->getActorId(),
-            $this->settings->getActorToken(),
-            $this->settings->getCashbox(),
             $this->logger
         );
         $connector = new ConnectorBase($transfer);
@@ -123,9 +117,6 @@ class ConnectorBaseFakeTest extends TestCase
         $transfer = new Transfer(
             $this->client,
             $this->converter,
-            $this->settings->getActorId(),
-            $this->settings->getActorToken(),
-            $this->settings->getCashbox(),
             $this->logger
         );
         $connector = new ConnectorBase($transfer);
@@ -149,9 +140,6 @@ class ConnectorBaseFakeTest extends TestCase
         $transfer = new Transfer(
             $this->client,
             $this->converter,
-            $this->settings->getActorId(),
-            $this->settings->getActorToken(),
-            $this->settings->getCashbox(),
             $this->logger
         );
         $connector = new ConnectorBase($transfer);
@@ -175,9 +163,6 @@ class ConnectorBaseFakeTest extends TestCase
         $transfer = new Transfer(
             $this->client,
             $this->converter,
-            $this->settings->getActorId(),
-            $this->settings->getActorToken(),
-            $this->settings->getCashbox(),
             $this->logger
         );
         $connector = new ConnectorBase($transfer);

@@ -10,7 +10,7 @@ use Innokassa\MDK\Services\PipelineBase;
 use Innokassa\MDK\Logger\LoggerInterface;
 use Innokassa\MDK\Services\AutomaticBase;
 use Innokassa\MDK\Services\ConnectorBase;
-use Innokassa\MDK\Settings\SettingsInterface;
+use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Entities\ReceiptAdapterInterface;
 use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
@@ -39,16 +39,16 @@ class ClientTest extends TestCase
      */
     public function test()
     {
-        $settings = $this->createMock(SettingsInterface::class);
+        $settings = $this->createMock(SettingsAbstract::class);
         $storage = $this->createMock(ReceiptStorageInterface::class);
         $adapter = $this->createMock(ReceiptAdapterInterface::class);
 
         $logger = new LoggerFile();
 
-        $transfer = new Transfer(new NetClientCurl(), new ConverterApi(), '0', '0', '0', $logger);
+        $transfer = new Transfer(new NetClientCurl(), new ConverterApi(), $logger);
 
         $automatic = new AutomaticBase($settings, $storage, $transfer, $adapter, new ReceiptIdFactoryMeta());
-        $pipeline = new PipelineBase($storage, $transfer);
+        $pipeline = new PipelineBase($settings, $storage, $transfer);
         $connector = new ConnectorBase($transfer);
 
         $client = new Client(

@@ -68,12 +68,13 @@ class ConverterStorageTest extends TestCase
             'id' => 0,
             'receipt_id' => $receipt->getReceiptId(),
             'cashbox' => '',
-            'site_id' => '0',
+            'site_id' => '',
             'order_id' => '456',
             'status' => ReceiptStatus::COMPLETED,
             'subtype' => ReceiptSubType::PRE,
             'type' => ReceiptType::COMING,
             'items' => [[
+                'item_id' => '123',
                 'type' => 1,
                 'name' => 'name',
                 'price' => 100.0,
@@ -81,7 +82,6 @@ class ConverterStorageTest extends TestCase
                 'amount' => 200.0,
                 'payment_method' => 4,
                 'vat' => 6,
-                'item_id' => '123',
                 'unit' => Unit::DEFAULT
             ]],
             'taxation' => Taxation::ORN,
@@ -95,14 +95,21 @@ class ConverterStorageTest extends TestCase
             'location' =>  'http://example.com/',
         ];
 
-        $this->assertEquals($a, $conv->receiptToArray($receipt));
+        $expect = $a;
+        ksort($expect);
+        $actual = $conv->receiptToArray($receipt);
+        ksort($actual);
 
-        $a['customer'] = [
+        $this->assertSame($expect, $actual);
+
+        $expect['customer'] = [
             'name' => 'Test'
         ];
         $receipt->setCustomer(new Customer('Test'));
+        $actual = $conv->receiptToArray($receipt);
+        ksort($actual);
 
-        $this->assertEquals($a, $conv->receiptToArray($receipt));
+        $this->assertSame($expect, $actual);
     }
 
     /**

@@ -4,7 +4,7 @@ namespace Innokassa\MDK;
 
 use Innokassa\MDK\Logger\LoggerInterface;
 use Innokassa\MDK\Services\PipelineInterface;
-use Innokassa\MDK\Settings\SettingsInterface;
+use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Services\AutomaticInterface;
 use Innokassa\MDK\Services\ConnectorInterface;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
@@ -15,7 +15,7 @@ use Innokassa\MDK\Storage\ReceiptStorageInterface;
 class Client
 {
     public function __construct(
-        SettingsInterface $settings,
+        SettingsAbstract $settings,
         ReceiptStorageInterface $storage,
         AutomaticInterface $atomatic,
         PipelineInterface $pipeline,
@@ -68,9 +68,9 @@ class Client
     /**
      * Получить компонент настроек
      *
-     * @return SettingsInterface
+     * @return SettingsAbstract
      */
-    public function componentSettings(): SettingsInterface
+    public function componentSettings(): SettingsAbstract
     {
         return $this->settings;
     }
@@ -111,7 +111,7 @@ class Client
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var SettingsInterface */
+    /** @var SettingsAbstract */
     private $settings;
 
     /** @var ReceiptStorageInterface */

@@ -407,7 +407,10 @@ class Receipt
     private $id = 0;
     private $subType = null;
     private $cashbox = '';
-    private $siteId = '0';
+
+    /** @var string */
+    private $siteId = '';
+
     private $orderId = '';
 
     //**********************************************************************

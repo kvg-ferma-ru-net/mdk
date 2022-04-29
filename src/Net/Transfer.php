@@ -2,15 +2,16 @@
 
 namespace Innokassa\MDK\Net;
 
-use Innokassa\MDK\Net\NetClientInterface;
+use Innokassa\MDK\Logger\LogLevel;
 use Innokassa\MDK\Entities\Receipt;
+use Innokassa\MDK\Settings\SettingsConn;
+use Innokassa\MDK\Logger\LoggerInterface;
+use Innokassa\MDK\Net\NetClientInterface;
 use Innokassa\MDK\Entities\ConverterAbstract;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Exceptions\ConverterException;
 use Innokassa\MDK\Exceptions\NetConnectException;
-use Innokassa\MDK\Logger\LoggerInterface;
-use Innokassa\MDK\Logger\LogLevel;
 
 /**
  * Реализация TransferInterface
@@ -27,23 +28,11 @@ class Transfer implements TransferInterface
     public function __construct(
         NetClientInterface $client,
         ConverterAbstract $converter,
-        string $actorId,
-        string $actorToken,
-        string $cashbox,
         LoggerInterface $logger
     ) {
         $this->client = $client;
         $this->converter = $converter;
-
         $this->logger = $logger;
-
-        $this->actorId = $actorId;
-        $this->actorToken = $actorToken;
-        $this->cashbox = $cashbox;
-        $this->headers = [
-            "Authorization: Basic " . base64_encode($this->actorId . ":" . $this->actorToken),
-            "Content-type: application/json; charset=utf-8"
-        ];
     }
 
     //######################################################################
@@ -51,14 +40,19 @@ class Transfer implements TransferInterface
     /**
      * @inheritDoc
      */
-    public function getCashbox(): object
+    public function getCashbox(SettingsConn $settingsConn): object
     {
+        $headers = [
+            "Authorization: Basic " . base64_encode($settingsConn->getActorId() . ":" . $settingsConn->getActorToken()),
+            "Content-type: application/json; charset=utf-8"
+        ];
+
         try {
-            $url = self::API_URL . "/c_groups/" . $this->cashbox;
+            $url = self::API_URL . "/c_groups/" . $settingsConn->getCashbox();
             $this->client
                 ->reset()
                 ->write(NetClientInterface::PATH, $url)
-                ->write(NetClientInterface::HEAD, $this->headers);
+                ->write(NetClientInterface::HEAD, $headers);
 
             try {
                 $this->client->send();
@@ -106,8 +100,13 @@ class Transfer implements TransferInterface
     /**
      * @inheritDoc
      */
-    public function sendReceipt(Receipt $receipt, bool $needAgent = false): Receipt
+    public function sendReceipt(SettingsConn $settingsConn, Receipt $receipt): Receipt
     {
+        $headers = [
+            "Authorization: Basic " . base64_encode($settingsConn->getActorId() . ":" . $settingsConn->getActorToken()),
+            "Content-type: application/json; charset=utf-8"
+        ];
+
         try {
             try {
                 $body = $this->converter->receiptToArray($receipt);
@@ -116,12 +115,12 @@ class Transfer implements TransferInterface
                 throw new TransferException('converter error: ' . $e->getMessage(), ReceiptStatus::ERROR);
             }
 
-            $url = self::API_URL . "/c_groups/" . $this->cashbox . "/receipts/" . $receipt->getReceiptId();
+            $url = self::API_URL . "/c_groups/" . $settingsConn->getCashbox() . "/receipts/" . $receipt->getReceiptId();
             $sBody = json_encode($body, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
             $this->client
                 ->reset()
                 ->write(NetClientInterface::PATH, $url)
-                ->write(NetClientInterface::HEAD, $this->headers)
+                ->write(NetClientInterface::HEAD, $headers)
                 ->write(NetClientInterface::TYPE, 'POST')
                 ->write(NetClientInterface::BODY, $sBody);
 
@@ -190,14 +189,19 @@ class Transfer implements TransferInterface
     /**
      * @inheritDoc
      */
-    public function getReceipt(Receipt $receipt): Receipt
+    public function getReceipt(SettingsConn $settingsConn, Receipt $receipt): Receipt
     {
+        $headers = [
+            "Authorization: Basic " . base64_encode($settingsConn->getActorId() . ":" . $settingsConn->getActorToken()),
+            "Content-type: application/json; charset=utf-8"
+        ];
+
         try {
-            $url = self::API_URL . "/c_groups/" . $this->cashbox . "/receipts/" . $receipt->getReceiptId();
+            $url = self::API_URL . "/c_groups/" . $settingsConn->getCashbox() . "/receipts/" . $receipt->getReceiptId();
             $this->client
                 ->reset()
                 ->write(NetClientInterface::PATH, $url)
-                ->write(NetClientInterface::HEAD, $this->headers);
+                ->write(NetClientInterface::HEAD, $headers);
 
             try {
                 $this->client->send();
@@ -265,18 +269,6 @@ class Transfer implements TransferInterface
     /** @var ConverterAbstract */
     private $converter = null;
 
-    /** @var string */
-    private $actorId = '';
-
-    /** @var string */
-    private $actorToken = '';
-
-    /** @var string */
-    private $cashbox = '';
-
     /** @var LoggerInterface */
     private $logger = null;
-
-    /** @var array<string> */
-    private $headers = [];
 }
