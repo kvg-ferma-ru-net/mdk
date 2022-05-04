@@ -119,18 +119,20 @@ class AutomaticBaseFakeTest extends TestCase
             new ReceiptIdFactoryMeta()
         );
 
-        $receipt = $automatic->fiscalize('0');
+        $receipt = $automatic->fiscalize('0', 's1');
         $this->assertInstanceOf(Receipt::class, $receipt);
         $this->assertSame(ReceiptType::COMING, $receipt->getType());
         $this->assertSame(ReceiptSubType::PRE, $receipt->getSubType());
+        $this->assertSame('s1', $receipt->getSiteId());
         $this->assertSame(200.0, $receipt->getAmount()->get(Amount::CASHLESS));
         $this->assertSame('Test', $receipt->getCustomer()->getName());
         $this->assertSame('+79998887766', $receipt->getNotify()->getPhone());
 
-        $receipt = $automatic->fiscalize('0', ReceiptSubType::PRE);
+        $receipt = $automatic->fiscalize('0', '', ReceiptSubType::PRE);
         $this->assertInstanceOf(Receipt::class, $receipt);
         $this->assertSame(ReceiptType::COMING, $receipt->getType());
         $this->assertSame(ReceiptSubType::PRE, $receipt->getSubType());
+        $this->assertSame('', $receipt->getSiteId());
         $this->assertSame(200.0, $receipt->getAmount()->get(Amount::CASHLESS));
         $this->assertSame('Test', $receipt->getCustomer()->getName());
         $this->assertSame('+79998887766', $receipt->getNotify()->getPhone());

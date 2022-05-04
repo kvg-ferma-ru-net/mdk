@@ -93,6 +93,7 @@ class AutomaticBase implements AutomaticInterface
 
         $receipt = new Receipt();
         $receipt->setOrderId($orderId);
+        $receipt->setSiteId($siteId);
         $receipt->setType(ReceiptType::COMING);
         $receipt->setSubType($receiptSubType);
         $receipt->setItems($items);
