@@ -61,11 +61,13 @@ class Transfer implements TransferInterface
             }
 
             $responseCode = $this->client->read(NetClientInterface::CODE);
-            $responseBody = json_decode($this->client->read(NetClientInterface::BODY));
+            $responseBody = $this->client->read(NetClientInterface::BODY);
 
             if ($responseCode != 200) {
                 throw new TransferException($responseBody, $responseCode);
             }
+
+            $responseBody = json_decode($responseBody);
         } catch (TransferException $e) {
             $this->logger->log(
                 LogLevel::ERROR,

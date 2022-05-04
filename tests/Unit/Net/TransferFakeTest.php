@@ -112,7 +112,7 @@ class TransferFakeTest extends TestCase
         $this->client
             ->method('read')
             ->will($this->returnValueMap([
-                [NetClientInterface::BODY, ''],
+                [NetClientInterface::BODY, '[]'],
                 [NetClientInterface::CODE, 401]
             ]));
 
