@@ -208,6 +208,7 @@ class TransferServerTest extends TestCase
 
     /**
      * @covers Innokassa\MDK\Net\Transfer::getCashBox
+     * @example curl -i -H 'Authorization: Basic dGVzdDojSyEtayhEN3hbUm9feTQwW3wtWA==' https://api.innokassa.ru/v2/c_groups/0
      */
     public function testGetCashBoxFail()
     {

@@ -88,7 +88,7 @@ class ConnectorBaseFakeTest extends TestCase
      * @covers Innokassa\MDK\Services\ConnectorBase::__construct
      * @covers Innokassa\MDK\Services\ConnectorBase::testSettings
      */
-    public function testSettingsFailServer()
+    public function testSettingsFailServer500()
     {
         $this->client->method('read')
             ->will($this->returnValueMap([
@@ -102,6 +102,57 @@ class ConnectorBaseFakeTest extends TestCase
         );
         $connector = new ConnectorBase($transfer);
         $this->expectException(SettingsException::class);
+        $this->expectExceptionMessage(
+            sprintf('Сервер временно недоступен (%d), попробуйте позже', 500)
+        );
+        $connector->testSettings($this->settings);
+    }
+
+    /**
+     * @covers Innokassa\MDK\Services\ConnectorBase::__construct
+     * @covers Innokassa\MDK\Services\ConnectorBase::testSettings
+     */
+    public function testSettingsFailServer28()
+    {
+        $this->client->method('read')
+            ->will($this->returnValueMap([
+                [NetClientInterface::CODE, 28]
+            ]));
+
+        $transfer = new Transfer(
+            $this->client,
+            $this->converter,
+            $this->logger
+        );
+        $connector = new ConnectorBase($transfer);
+        $this->expectException(SettingsException::class);
+        $this->expectExceptionMessage(
+            sprintf('Сервер временно недоступен (%d), попробуйте позже', 28)
+        );
+        $connector->testSettings($this->settings);
+    }
+
+    /**
+     * @covers Innokassa\MDK\Services\ConnectorBase::__construct
+     * @covers Innokassa\MDK\Services\ConnectorBase::testSettings
+     */
+    public function testSettingsFailServer401402403404()
+    {
+        $this->client->method('read')
+            ->will($this->returnValueMap([
+                [NetClientInterface::CODE, 401]
+            ]));
+
+        $transfer = new Transfer(
+            $this->client,
+            $this->converter,
+            $this->logger
+        );
+        $connector = new ConnectorBase($transfer);
+        $this->expectException(SettingsException::class);
+        $this->expectExceptionMessage(
+            sprintf('Неверные авторизационные данные (%d)', 401)
+        );
         $connector->testSettings($this->settings);
     }
 
