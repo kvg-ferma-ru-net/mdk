@@ -29,10 +29,16 @@ class ConnectorBase implements ConnectorInterface
         try {
             $response = $this->transfer->getCashBox($settings->extrudeConn($siteId));
         } catch (TransferException $e) {
-            if ($e->getCode() >= 500) {
-                throw new SettingsException('Сервер временно недоступен, попробуйте позже', $e->getCode());
+            if ($e->getCode() >= 500 || $e->getCode() < 100) {
+                throw new SettingsException(
+                    sprintf('Сервер временно недоступен (%d), попробуйте позже', $e->getCode()),
+                    $e->getCode()
+                );
             } else {
-                throw new SettingsException('Неверные авторизационные данные', $e->getCode());
+                throw new SettingsException(
+                    sprintf('Неверные авторизационные данные (%d)', $e->getCode()),
+                    $e->getCode()
+                );
             }
         }
 
