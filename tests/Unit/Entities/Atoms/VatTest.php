@@ -2,7 +2,6 @@
 
 use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Entities\Atoms\Vat;
-use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
@@ -64,14 +63,6 @@ class VatTest extends TestCase
         $this->assertSame("0", $vat->getName());
 
         $vat = new Vat(6);
-        $this->assertSame(Vat::CODE_WITHOUT, $vat->getCode());
-        $this->assertSame("Не облагается", $vat->getName());
-
-        $vat = new Vat("20%", Taxation::ORN);
-        $this->assertSame(Vat::CODE_20, $vat->getCode());
-        $this->assertSame("20", $vat->getName());
-
-        $vat = new Vat("20%", Taxation::USN);
         $this->assertSame(Vat::CODE_WITHOUT, $vat->getCode());
         $this->assertSame("Не облагается", $vat->getName());
 

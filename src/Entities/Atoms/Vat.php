@@ -33,17 +33,10 @@ class Vat extends AtomAbstract
 
     /**
      * @throws InvalidArgumentException
-     * @param string|int $value значение НДС (20% == 20) или код НДС для API из констант
-     * @param int|null $taxation налогообложение, для вычисления НДСс учетом налогообложения
+     * @param string|int $value значение НДС (20% == 20, пустая строка - без НДС) или код НДС для API из констант
      */
-    public function __construct($value, int $taxation = null)
+    public function __construct($value)
     {
-        if ($taxation && $taxation != Taxation::ORN) {
-            $this->code = self::CODE_WITHOUT;
-            $this->name = 'Не облагается';
-            return;
-        }
-
         $value = trim($value);
         $value = str_replace("%", "", $value);
 
