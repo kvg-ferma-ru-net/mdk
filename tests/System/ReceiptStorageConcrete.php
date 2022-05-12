@@ -49,6 +49,14 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
             $val = $value['value'];
             if ($val === null) {
                 $val = 'null';
+            } elseif (is_array($val)) {
+                $val = '(' . implode(',', $val) . ')';
+
+                if ($value['op'] == '=') {
+                    $value['op'] = ' IN ';
+                } else {
+                    $value['op'] = ' NOT IN ';
+                }
             } else {
                 $val = "'$val'";
             }
@@ -116,7 +124,14 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
             if ($value === null) {
                 $value = 'null';
             } else {
-                $value = sprintf("'%s'", (is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : strval($value)));
+                $value = sprintf(
+                    "'%s'",
+                    (
+                        is_array($value)
+                        ? json_encode($value, JSON_UNESCAPED_UNICODE)
+                        : strval($value)
+                    )
+                );
             }
             $a2[] = "`$key`=$value";
         }
@@ -137,7 +152,7 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
     {
         $sql = "SELECT * FROM `receipts` WHERE $where";
         if ($limit > 0) {
-            $sql .= " LIMIT $limit";
+            $sql .= " ORDER BY `id` ASC LIMIT $limit";
         }
         return $this->db->query($sql, true);
     }

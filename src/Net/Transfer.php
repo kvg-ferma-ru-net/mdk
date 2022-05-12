@@ -140,7 +140,7 @@ class Transfer implements TransferInterface
 
             $receipt->setStatus(new ReceiptStatus($responseCode));
 
-            if ($responseCode != 201 && $responseCode != 202) {
+            if (!($responseCode == 201 || $responseCode == 202)) {
                 throw new TransferException($responseBody, $responseCode);
             }
         } catch (TransferException $e) {

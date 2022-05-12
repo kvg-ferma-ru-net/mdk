@@ -62,6 +62,7 @@ class ConverterStorage extends ConverterAbstract
         $a['amount'] = $this->amountToArray($receipt->getAmount());
         $a['notify'] = $this->notifyToArray($receipt->getNotify());
         $a['location'] = $receipt->getLocation();
+        $a['start_time'] = $receipt->getStartTime();
 
         if ($receipt->getCustomer()) {
             $a['customer'] = $this->customerToArray($receipt->getCustomer());
@@ -96,6 +97,7 @@ class ConverterStorage extends ConverterAbstract
             'customer',
             'notify',
             'location',
+            'start_time',
         ];
 
         if ($diff = array_diff($fields, array_keys($a))) {
@@ -122,7 +124,8 @@ class ConverterStorage extends ConverterAbstract
                 ->setTaxation($a['taxation'])
                 ->setAmount($this->amountFromArray($a['amount']))
                 ->setNotify($this->notifyFromArray($a['notify']))
-                ->setLocation($a['location']);
+                ->setLocation($a['location'])
+                ->setStartTime($a['start_time']);
 
             if (isset($a['subtype']) && $a['subtype'] !== null) {
                 $receipt->setSubType($a['subtype']);

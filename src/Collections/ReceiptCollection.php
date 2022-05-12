@@ -9,6 +9,18 @@ use Innokassa\MDK\Entities\Receipt;
  */
 class ReceiptCollection extends BaseCollection
 {
+    public function offsetGet($offset): Receipt
+    {
+        return parent::offsetGet($offset);
+    }
+
+    public function current(): Receipt
+    {
+        return $this->objects[$this->position];
+    }
+
+    //######################################################################
+
     /**
      * Получить общую сумму всех позиции всех чеков
      *

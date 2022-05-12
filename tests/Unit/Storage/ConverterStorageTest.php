@@ -93,6 +93,7 @@ class ConverterStorageTest extends TestCase
             ],
             'customer' => null,
             'location' =>  'http://example.com/',
+            'start_time' => date("Y-m-d H:i:s")
         ];
 
         $expect = $a;
@@ -264,7 +265,8 @@ class ConverterStorageTest extends TestCase
                 'email' => 'box@domain.zone'
             ],
             'customer' => null,
-            'location' =>  'http://example.com/'
+            'location' =>  'http://example.com/',
+            'start_time' => date("Y-m-d H:i:s")
         ];
 
         $receipt = $conv->receiptFromArray($a);
@@ -349,7 +351,8 @@ class ConverterStorageTest extends TestCase
                 'email' => 'box@domain.zone'
             ],
             'customer' => null,
-            'location' =>  'http://example.com/'
+            'location' =>  'http://example.com/',
+            'start_time' => date('Y-m-d H:i:s')
         ];
 
         $this->expectException(ConverterException::class);

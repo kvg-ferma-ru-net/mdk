@@ -245,7 +245,7 @@ class SystemTest extends TestCase
         $automatic = self::$client->serviceAutomatic();
 
         /*
-            создадим два одинаковых чека для заказа 5, пробьем и специально установим статус WAIT,
+            создадим чек для заказа 5, пробьем и специально установим статус WAIT,
             в тестах будем ждать COMPLETED | WAIT
         */
         $orderId = 5;
@@ -254,13 +254,18 @@ class SystemTest extends TestCase
         self::$storage->save($receiptComing);
         $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
 
+        /*
+            создадим чек для заказа 5, пробьем и специально установим статус REPEAT,
+            в тестах будем ждать EXPIRED
+        */
         $receiptComing = $automatic->fiscalize($orderId);
-        $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::WAIT));
+        $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::REPEAT));
+        $receiptComing->setStartTime(date('Y-m-d H:i:s', time() - (Receipt::ALLOWED_ATTEMPT_TIME + 1)));
         self::$storage->save($receiptComing);
-        $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
+        $receipts[$receiptComing->getId()] = [ReceiptStatus::EXPIRED];
 
         /*
-            создадим чек для заказа 3, присвоим ему статус PREPARED (подготовлен, но соединение с сервером не удалось),
+            создадим чек для заказа 3, присвоим ему статус PREPARED,
             в тестах будем ждать COMPLETED | WAIT
         */
         $orderId = 3;
@@ -272,7 +277,6 @@ class SystemTest extends TestCase
 
         /*
             создадим чек для заказа 4, пробьем и специально установим статус REPEAT,
-            чтобы при updateUnaccepted получить 409 от сервера,
             в тестах будем ждать COMPLETED | WAIT
         */
         $orderId = 4;
@@ -304,28 +308,15 @@ class SystemTest extends TestCase
             ->setLocation('https://example.com/');
         $receipt->setReceiptId((new ReceiptIdFactoryMeta())->build($receipt));
         self::$storage->save($receipt);
-        $receipts[$receipt->getId()] = [ReceiptStatus::REPEAT];
+        $receipts[$receipt->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
 
 
         $pipeline = self::$client->servicePipeline();
-
-        /*
-            сначала отклоненные чеки, а затем принятые, так у нас чек заказа 10 изменит статус на REPEAT
-        */
-        $pipeline->updateUnaccepted();
-        $pipeline->updateAccepted();
+        $pipeline->update();
         foreach ($receipts as $key => $value) {
             $receipt = self::$storage->getOne($key);
-            $this->assertContains($receipt->getStatus()->getCode(), $value);
-        }
-
-        /*
-            еще раз прогоняем отправку отклоненных чеков, теперь чек заказа 10 изменит статус на COMPLETED
-        */
-        $receipts[$receipt->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
-        $pipeline->updateUnaccepted();
-        foreach ($receipts as $key => $value) {
-            $this->assertContains(self::$storage->getOne($key)->getStatus()->getCode(), $value);
+            $statusCode = $receipt->getStatus()->getCode();
+            $this->assertContains($statusCode, $value);
         }
     }
 

@@ -3,8 +3,7 @@ vendor
 composer.lock
 .phpunit.cache
 coverage-report-html
-.updateAccepted
-.updateUnaccepted
+.pipeline
 logs
 docker-data
 xdebug.log

@@ -12,18 +12,12 @@ use Innokassa\MDK\Storage\ReceiptStorageInterface;
 
 /**
  * Базовая реализация PipelineInterface.
- * Только один инстанс каждого публичного метода будет работать (используется файловая блокировка)
+ * Только один инстанс класса будет работать одновременно (используется файловая блокировка)
  */
 class PipelineBase implements PipelineInterface
 {
     /** Лок файл для обработки очереди принятых чеков */
-    public const LOCK_FILE_ACCEPTED = __DIR__ . '/../../.updateAccepted';
-
-    /** Лок файл для обработки непринятых чеков */
-    public const LOCK_FILE_UNACCEPTED = __DIR__ . '/../../.updateUnaccepted';
-
-    /** Максимальное количество последовательных вызовов, при превышении которого обработка прервется */
-    public const MAX_COUNT_ERR = 10;
+    public const LOCK_FILE = __DIR__ . '/../../.pipeline';
 
     /** Количество выбираемых элементов из БД */
     public const COUNT_SELECT = 50;
@@ -48,29 +42,30 @@ class PipelineBase implements PipelineInterface
     /**
      * @inheritDoc
      */
-    public function updateAccepted(): bool
+    public function update(): bool
     {
-        $fp = fopen(self::LOCK_FILE_ACCEPTED, "w+");
+        $fp = fopen(self::LOCK_FILE, "w+");
         if (!flock($fp, LOCK_EX | LOCK_NB)) {
             return false;
         }
 
-        $this->runCycle([ReceiptStatus::WAIT, ReceiptStatus::ASSUME], 'processingAccepted');
+        $idLast = 0;
+        do {
+            $receipts = $this->receiptStorage->getCollection(
+                (new ReceiptFilter())
+                    ->setId($idLast, ReceiptFilter::OP_GT)
+                    ->setStatus([
+                        ReceiptStatus::PREPARED,
+                        ReceiptStatus::WAIT,
+                        ReceiptStatus::ASSUME,
+                        ReceiptStatus::REPEAT
+                    ]),
+                self::COUNT_SELECT
+            );
+            $idLast = $this->processing($receipts);
+        } while ($receipts->count() == self::COUNT_SELECT && $idLast > 0);
 
-        return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function updateUnaccepted(): bool
-    {
-        $fp = fopen(self::LOCK_FILE_UNACCEPTED, "w+");
-        if (!flock($fp, LOCK_EX | LOCK_NB)) {
-            return false;
-        }
-
-        $this->runCycle([ReceiptStatus::PREPARED, ReceiptStatus::REPEAT], 'processingUnaccepted');
+        unlink(self::LOCK_FILE);
 
         return true;
     }
@@ -79,39 +74,16 @@ class PipelineBase implements PipelineInterface
     // PRIVATE
     //######################################################################
 
+    /** @var ReceiptStorageInterface */
     private $receiptStorage = null;
+
+    /** @var TransferInterface */
     private $transfer = null;
+
+    /** @var SettingsAbstract */
     private $settings = null;
-    private $countError = 0;
 
     //######################################################################
-
-    /**
-     * Запуск цикла обработки чеков
-     *
-     * @param array $statuses массив статусов, чеки которых надо обработать
-     * @param string $method
-     * @return void
-     */
-    private function runCycle(array $statuses, string $method)
-    {
-        foreach ($statuses as $status) {
-            $idLast = 0;
-            do {
-                $receipts = $this->receiptStorage->getCollection(
-                    (new ReceiptFilter())
-                        ->setId($idLast, ReceiptFilter::OP_GT)
-                        ->setStatus($status),
-                    self::COUNT_SELECT
-                );
-                $idLast = $this->$method($receipts);
-            } while ($receipts->count() == self::COUNT_SELECT && $idLast > 0);
-
-            if ($receipts->count() > 0 && $idLast == 0) {
-                break;
-            }
-        }
-    }
 
     /**
      * Обработка коллекции принятых чеков
@@ -119,50 +91,25 @@ class PipelineBase implements PipelineInterface
      * @param ReceiptCollection $receipts
      * @return integer наибольший идентификатор чека из коллекции
      */
-    private function processingAccepted(ReceiptCollection $receipts): int
+    private function processing(ReceiptCollection $receipts): int
     {
+        // ошибочные статусы
+        static $errStatuses = [ReceiptStatus::REPEAT, ReceiptStatus::ASSUME];
+        $countError = 0;
+
         $idLast = 0;
         foreach ($receipts as $receipt) {
             $idLast = ($receipt->getId() > $idLast ? $receipt->getId() : $idLast);
 
-            try {
-                $receipt = $this->transfer->getReceipt(
-                    $this->settings->extrudeConn($receipt->getSiteId()),
-                    $receipt
-                );
-            } catch (TransferException $e) {
-                /*
-                    если чека с таким uuid нет на сервере (ASSSUME),
-                    тогда заканчиваем работу цикла - чек становится REPEAT
-                */
-                if ($e->getCode() == 404) {
-                    continue;
-                }
-            } finally {
-                // в любом случае сохраняем чек
+            // если время фискализации истекло
+            if (
+                $receipt->getStatus()->getCode() == ReceiptStatus::REPEAT
+                && $receipt->isExpired()
+            ) {
+                $receipt->setStatus(new ReceiptStatus(ReceiptStatus::EXPIRED));
                 $this->receiptStorage->save($receipt);
+                continue;
             }
-
-            // если нельзя больше продолжать проверять статусы чеков - останавливаем цикл
-            if (!$this->canContinue($receipt->getStatus()->getCode())) {
-                return 0;
-            }
-        }
-
-        return $idLast;
-    }
-
-    /**
-     * Обработка коллекции непринятых чеков
-     *
-     * @param ReceiptCollection $receipts
-     * @return integer наибольший идентификатор чека из коллекции
-     */
-    private function processingUnaccepted(ReceiptCollection $receipts): int
-    {
-        $idLast = 0;
-        foreach ($receipts as $receipt) {
-            $idLast = ($receipt->getId() > $idLast ? $receipt->getId() : $idLast);
 
             try {
                 $receipt = $this->transfer->sendReceipt(
@@ -170,58 +117,15 @@ class PipelineBase implements PipelineInterface
                     $receipt
                 );
             } catch (TransferException $e) {
-                // если чек с таким id уже был принят сервером фискализации - узнаем его статус
-                if ($e->getCode() == 409) {
-                    try {
-                        $receipt = $this->transfer->getReceipt(
-                            $this->settings->extrudeConn($receipt->getSiteId()),
-                            $receipt
-                        );
-                    } catch (TransferException $e) {
-                    }
-                }
-
-                // иные коды ответов не обрабатываем
             } finally {
+                if (array_search($receipt->getStatus()->getCode(), $errStatuses) !== false) {
+                    $countError++;
+                }
                 // в любом случае сохраняем чек
                 $this->receiptStorage->save($receipt);
             }
-
-            // если нельзя больше продолжать проверять статусы чеков - останавливаем цикл
-            if (!$this->canContinue($receipt->getStatus()->getCode())) {
-                return 0;
-            }
         }
 
-        return $idLast;
-    }
-
-    //######################################################################
-
-    /**
-     * Можно ли продолжать обработку
-     *
-     * @param integer $receiptStatus
-     * @return boolean
-     */
-    private function canContinue(int $receiptStatus): bool
-    {
-        // ошибочные статусы
-        static $errStatuses = [ReceiptStatus::REPEAT, ReceiptStatus::ASSUME];
-
-        /*
-            проверка количества последовательных неудачных ответов
-            если их будет >= 10 то надо прервать цикл, иначе неудачные ответы это норма
-        */
-        if (
-            $this->countError >= 0
-            && array_search($receiptStatus, $errStatuses) !== false
-        ) {
-            ++$this->countError;
-        } else {
-            $this->countError = -1;
-        }
-
-        return ($this->countError < self::MAX_COUNT_ERR);
+        return ($countError == $receipts->count() ? 0 : $idLast);
     }
 }
