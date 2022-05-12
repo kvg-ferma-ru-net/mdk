@@ -29,6 +29,8 @@ class ReceiptCollectionTest extends TestCase
      * @covers Innokassa\MDK\Collections\ReceiptCollection::getAmount
      * @covers Innokassa\MDK\Collections\ReceiptCollection::merge
      * @covers Innokassa\MDK\Collections\ReceiptCollection::getByType
+     * @covers Innokassa\MDK\Collections\ReceiptCollection::offsetGet
+     * @covers Innokassa\MDK\Collections\ReceiptCollection::current
      */
     public function test()
     {
@@ -58,5 +60,9 @@ class ReceiptCollectionTest extends TestCase
         $this->assertInstanceOf(Receipt::class, $receipts->getByType(ReceiptType::COMING, ReceiptSubType::FULL));
         $this->assertInstanceOf(Receipt::class, $receipts->getByType(ReceiptType::REFUND_COMING));
         $this->assertNull($receipts->getByType(ReceiptType::REFUND_COMING, ReceiptSubType::FULL));
+
+        $this->assertInstanceOf(Receipt::class, $receipts[0]);
+        $receipts->rewind();
+        $this->assertInstanceOf(Receipt::class, $receipts->current());
     }
 }

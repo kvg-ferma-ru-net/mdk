@@ -18,11 +18,17 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
  */
 class Receipt
 {
+    /** время в течении которого можно пробить чек, после первой попытки */
+    public const ALLOWED_ATTEMPT_TIME = 60 * 60 * 24;
+
+    //######################################################################
+
     public function __construct()
     {
         $this->items = new ReceiptItemCollection();
         $this->type = new ReceiptType(ReceiptType::COMING);
         $this->status = new ReceiptStatus(ReceiptStatus::PREPARED);
+        $this->startTime = date('Y-m-d H:i:s');
     }
 
     //######################################################################
@@ -386,6 +392,40 @@ class Receipt
     }
 
     //######################################################################
+
+    /**
+     * Установить дату и время первой попытки фискализации
+     *
+     * @param string $startTime
+     * @return self
+     */
+    public function setStartTime(string $startTime): self
+    {
+        $this->startTime = $startTime;
+        return $this;
+    }
+
+    /**
+     * Получить дату и время первой попытки фискализации
+     *
+     * @return string
+     */
+    public function getStartTime(): string
+    {
+        return $this->startTime;
+    }
+
+    /**
+     * Истекло ли время ожидания фискализации
+     *
+     * @return boolean
+     */
+    public function isExpired(): bool
+    {
+        return (time() - strtotime($this->startTime) > self::ALLOWED_ATTEMPT_TIME);
+    }
+
+    //######################################################################
     // PRIVATE
     //######################################################################
 
@@ -417,4 +457,10 @@ class Receipt
     // статусные данные
 
     private $status = null;
+
+    //**********************************************************************
+    // прочее
+
+    /** @var string */
+    private $startTime = '';
 }

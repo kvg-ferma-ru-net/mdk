@@ -42,9 +42,10 @@ class ReceiptTest extends TestCase
     /**
      * @covers Innokassa\MDK\Entities\Receipt::__construct
      */
-    public function testConstructEmpty()
+    public function testConstruct()
     {
         $receipt = new Receipt();
+        $this->assertSame(date("Y-m-d H:i:s"), $receipt->getStartTime());
         $this->assertSame(0, $receipt->getId());
         $this->assertSame(ReceiptType::COMING, $receipt->getType());
         $this->assertSame(null, $receipt->getSubType());
@@ -303,7 +304,26 @@ class ReceiptTest extends TestCase
         $receipt = new Receipt();
         $this->assertSame(0, $receipt->getId());
 
-        $receipt->setId(10);
+        $this->assertSame($receipt, $receipt->setId(10));
         $this->assertSame(10, $receipt->getId());
+    }
+
+    /**
+     * @covers Innokassa\MDK\Entities\Receipt::__construct
+     * @covers Innokassa\MDK\Entities\Receipt::setStartTime
+     * @covers Innokassa\MDK\Entities\Receipt::getStartTime
+     * @covers Innokassa\MDK\Entities\Receipt::isExpired
+     */
+    public function testSetGetStartTimeIsExpired()
+    {
+        $receipt = new Receipt();
+
+        $time = date("Y-m-d H:i:s");
+        $this->assertSame($receipt, $receipt->setStartTime($time));
+        $this->assertSame($time, $receipt->getStartTime());
+        $this->assertFalse($receipt->isExpired());
+
+        $receipt->setStartTime(date("Y-m-d H:i:s", time() - (Receipt::ALLOWED_ATTEMPT_TIME + 1)));
+        $this->assertTrue($receipt->isExpired());
     }
 }

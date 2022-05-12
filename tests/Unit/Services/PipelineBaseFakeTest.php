@@ -67,9 +67,9 @@ class PipelineBaseFakeTest extends TestCase
 
     /**
      * @covers Innokassa\MDK\Services\PipelineBase::__construct
-     * @covers Innokassa\MDK\Services\PipelineBase::updateAccepted
+     * @covers Innokassa\MDK\Services\PipelineBase::update
      */
-    public function testUpdateAcceptedLock()
+    public function testUpdateLock()
     {
         $transfer = new Transfer(
             $this->client,
@@ -78,19 +78,17 @@ class PipelineBaseFakeTest extends TestCase
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
 
-        $fp = fopen(PipelineBase::LOCK_FILE_ACCEPTED, "w+");
+        $fp = fopen(PipelineBase::LOCK_FILE, "w+");
         flock($fp, LOCK_EX);
-        $this->assertFalse($pipeline->updateAccepted());
+        $this->assertFalse($pipeline->update());
     }
 
     /**
      * @covers Innokassa\MDK\Services\PipelineBase::__construct
-     * @covers Innokassa\MDK\Services\PipelineBase::updateAccepted
-     * @covers Innokassa\MDK\Services\PipelineBase::processingAccepted
-     * @covers Innokassa\MDK\Services\PipelineBase::canContinue
-     * @covers Innokassa\MDK\Services\PipelineBase::runCycle
+     * @covers Innokassa\MDK\Services\PipelineBase::update
+     * @covers Innokassa\MDK\Services\PipelineBase::processing
      */
-    public function testUpdateAcceptedSuccess200()
+    public function testUpdateSuccess200()
     {
         $receipts = new ReceiptCollection();
         for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
@@ -98,12 +96,11 @@ class PipelineBaseFakeTest extends TestCase
         }
 
         /*
-            ожидание 3 вызова т.к. в БД PipelineBase::COUNT_SELECT чеков, для одной итерации одного статуса хватит,
-            но будет взведена вторая, в которой будет пустая коллекция,
-            а на второй статус будет получена пустая коллекция и цикл будет прерван
+            ожидание 2 вызова т.к. в БД PipelineBase::COUNT_SELECT чеков, для одной итерации одного статуса хватит,
+            но будет взведена вторая, в которой будет пустая коллекция
         */
         $this->storage
-            ->expects($this->exactly(3))
+            ->expects($this->exactly(2))
             ->method('getCollection')
             ->will(
                 $this->onConsecutiveCalls(
@@ -130,7 +127,7 @@ class PipelineBaseFakeTest extends TestCase
             $this->logger
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
-        $this->assertTrue($pipeline->updateAccepted());
+        $this->assertTrue($pipeline->update());
 
         for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
             $this->assertSame(ReceiptStatus::COMPLETED, $receipts[$i]->getStatus()->getCode());
@@ -139,20 +136,18 @@ class PipelineBaseFakeTest extends TestCase
 
     /**
      * @covers Innokassa\MDK\Services\PipelineBase::__construct
-     * @covers Innokassa\MDK\Services\PipelineBase::updateAccepted
-     * @covers Innokassa\MDK\Services\PipelineBase::processingAccepted
-     * @covers Innokassa\MDK\Services\PipelineBase::canContinue
-     * @covers Innokassa\MDK\Services\PipelineBase::runCycle
+     * @covers Innokassa\MDK\Services\PipelineBase::update
+     * @covers Innokassa\MDK\Services\PipelineBase::processing
      */
-    public function testUpdateAcceptedSuccess404()
+    public function testUpdateSuccess404()
     {
         $receipts = new ReceiptCollection();
         $receipts[] = (new Receipt())->setId(1);
         $receipts[] = (new Receipt())->setId(2);
 
-        // ожидание двух вызовов т.к. запросы из БД по двум статусам
+        // ожидание одного вызова т.к. запросы из БД по двум статусам
         $this->storage
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(1))
             ->method('getCollection')
             ->will($this->onConsecutiveCalls($receipts, new ReceiptCollection()));
 
@@ -173,7 +168,7 @@ class PipelineBaseFakeTest extends TestCase
             $this->logger
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
-        $this->assertTrue($pipeline->updateAccepted());
+        $this->assertTrue($pipeline->update());
 
         $this->assertSame(ReceiptStatus::REPEAT, $receipts[0]->getStatus()->getCode());
         $this->assertSame(ReceiptStatus::REPEAT, $receipts[1]->getStatus()->getCode());
@@ -181,29 +176,30 @@ class PipelineBaseFakeTest extends TestCase
 
     /**
      * @covers Innokassa\MDK\Services\PipelineBase::__construct
-     * @covers Innokassa\MDK\Services\PipelineBase::updateAccepted
-     * @covers Innokassa\MDK\Services\PipelineBase::processingAccepted
-     * @covers Innokassa\MDK\Services\PipelineBase::canContinue
-     * @covers Innokassa\MDK\Services\PipelineBase::runCycle
+     * @covers Innokassa\MDK\Services\PipelineBase::update
+     * @covers Innokassa\MDK\Services\PipelineBase::processing
      */
-    public function testUpdateAcceptedError()
+    public function testUpdateError()
     {
-        $receipts = new ReceiptCollection();
-        for ($i = 0; $i < PipelineBase::MAX_COUNT_ERR + 1; ++$i) {
-            $receipts[] = new Receipt();
+        $receipts1 = new ReceiptCollection();
+        for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
+            $receipts1[] = new Receipt();
         }
 
+        $receipts2 = new ReceiptCollection();
+        $receipts2[] = new Receipt();
+
         /*
-            ожидание одного вызова потому что в БД только PipelineBase::MAX_COUNT_ERR+1 чеков
+            ожидание одного вызова потому что в БД только PipelineBase::COUNT_SELECT+1 чеков
             и все получат ошибочный статус
         */
         $this->storage
             ->expects($this->exactly(1))
             ->method('getCollection')
-            ->willReturn($receipts);
+            ->will($this->onConsecutiveCalls($receipts1, $receipts2));
 
         $this->storage
-            ->expects($this->exactly(PipelineBase::MAX_COUNT_ERR))
+            ->expects($this->exactly(PipelineBase::COUNT_SELECT))
             ->method('save');
 
         $this->client
@@ -219,72 +215,39 @@ class PipelineBaseFakeTest extends TestCase
             $this->logger
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
-        $this->assertTrue($pipeline->updateAccepted());
+        $this->assertTrue($pipeline->update());
 
-        for ($i = 0; $i < PipelineBase::MAX_COUNT_ERR; ++$i) {
-            $this->assertSame(ReceiptStatus::ASSUME, $receipts[$i]->getStatus()->getCode());
+        for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
+            $this->assertSame(ReceiptStatus::ASSUME, $receipts1[$i]->getStatus()->getCode());
         }
 
-        $this->assertSame(ReceiptStatus::PREPARED, $receipts[PipelineBase::MAX_COUNT_ERR]->getStatus()->getCode());
-    }
-
-    //######################################################################
-
-    /**
-     * @covers Innokassa\MDK\Services\PipelineBase::__construct
-     * @covers Innokassa\MDK\Services\PipelineBase::updateUnaccepted
-     */
-    public function testUpdateUnacceptedLock()
-    {
-        $transfer = new Transfer(
-            $this->client,
-            $this->converter,
-            $this->logger
-        );
-        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
-        $fp = fopen(PipelineBase::LOCK_FILE_UNACCEPTED, "w+");
-        flock($fp, LOCK_EX);
-        $this->assertFalse($pipeline->updateUnaccepted());
+        $this->assertSame(ReceiptStatus::PREPARED, $receipts2[0]->getStatus()->getCode());
     }
 
     /**
      * @covers Innokassa\MDK\Services\PipelineBase::__construct
-     * @covers Innokassa\MDK\Services\PipelineBase::updateUnaccepted
-     * @covers Innokassa\MDK\Services\PipelineBase::processingUnaccepted
-     * @covers Innokassa\MDK\Services\PipelineBase::canContinue
-     * @covers Innokassa\MDK\Services\PipelineBase::runCycle
+     * @covers Innokassa\MDK\Services\PipelineBase::update
+     * @covers Innokassa\MDK\Services\PipelineBase::processing
      */
-    public function testUpdateUnacceptedSuccess200()
+    public function testUpdateExpired()
     {
         $receipts = new ReceiptCollection();
-        for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
-            $receipts[] = (new Receipt())->setId($i + 1);
-        }
+        $receipts[] = (new Receipt())
+            ->setStartTime(date("Y-m-d H:i:s", time() - (Receipt::ALLOWED_ATTEMPT_TIME + 1)))
+            ->setStatus(new ReceiptStatus(ReceiptStatus::REPEAT));
 
-        /*
-            ожидание 3 вызова т.к. в БД PipelineBase::COUNT_SELECT чеков, для одной итерации одного статуса хватит,
-            но будет взведена вторая, в которой будет пустая коллекция,
-            а на второй статус будет получена пустая коллекция и цикл будет прерван
-        */
         $this->storage
-            ->expects($this->exactly(3))
             ->method('getCollection')
-            ->will(
-                $this->onConsecutiveCalls(
-                    $receipts,
-                    new ReceiptCollection(),
-                    new ReceiptCollection()
-                )
-            );
+            ->willReturn($receipts);
 
         $this->storage
-            ->expects($this->exactly(PipelineBase::COUNT_SELECT))
+            ->expects($this->exactly(1))
             ->method('save');
 
         $this->client
             ->method('read')
             ->will($this->returnValueMap([
-                [NetClientInterface::BODY, '{}'],
+                [NetClientInterface::BODY, ''],
                 [NetClientInterface::CODE, 200]
             ]));
 
@@ -294,97 +257,8 @@ class PipelineBaseFakeTest extends TestCase
             $this->logger
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
-        $this->assertTrue($pipeline->updateUnaccepted());
 
-        for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
-            $this->assertSame(ReceiptStatus::COMPLETED, $receipts[$i]->getStatus()->getCode());
-        }
-    }
-
-    /**
-     * @covers Innokassa\MDK\Services\PipelineBase::__construct
-     * @covers Innokassa\MDK\Services\PipelineBase::updateUnaccepted
-     * @covers Innokassa\MDK\Services\PipelineBase::processingUnaccepted
-     * @covers Innokassa\MDK\Services\PipelineBase::canContinue
-     * @covers Innokassa\MDK\Services\PipelineBase::runCycle
-     */
-    public function testUpdateUnacceptedSuccess409()
-    {
-        $receipts = new ReceiptCollection();
-        $receipts[] = (new Receipt())->setId(1);
-        $receipts[] = (new Receipt())->setId(2);
-
-        // ожидание двух вызовов т.к. запросы из БД по двум статусам
-        $this->storage
-            ->expects($this->exactly(2))
-            ->method('getCollection')
-            ->will($this->onConsecutiveCalls($receipts, new ReceiptCollection()));
-
-        $this->client
-            ->method('read')
-            ->will($this->returnValueMap([
-                [NetClientInterface::BODY, '{}'],
-                [NetClientInterface::CODE, 409]
-            ]));
-
-        $transfer = new Transfer(
-            $this->client,
-            $this->converter,
-            $this->logger
-        );
-        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
-        $this->assertTrue($pipeline->updateUnaccepted());
-
-        $this->assertSame(ReceiptStatus::ERROR, $receipts[0]->getStatus()->getCode());
-        $this->assertSame(ReceiptStatus::ERROR, $receipts[1]->getStatus()->getCode());
-    }
-
-    /**
-     * @covers Innokassa\MDK\Services\PipelineBase::__construct
-     * @covers Innokassa\MDK\Services\PipelineBase::updateUnaccepted
-     * @covers Innokassa\MDK\Services\PipelineBase::processingUnaccepted
-     * @covers Innokassa\MDK\Services\PipelineBase::canContinue
-     * @covers Innokassa\MDK\Services\PipelineBase::runCycle
-     */
-    public function testUpdateUnacceptedError()
-    {
-        $receipts = new ReceiptCollection();
-        for ($i = 0; $i < PipelineBase::MAX_COUNT_ERR + 1; ++$i) {
-            $receipts[] = (new Receipt())->setId($i + 1);
-        }
-
-        /*
-            ожидание одного вызова потому что в БД только PipelineBase::MAX_COUNT_ERR+1 чеков
-            и все получат ошибочный статус
-        */
-        $this->storage
-            ->expects($this->exactly(1))
-            ->method('getCollection')
-            ->willReturn($receipts);
-
-        $this->storage
-            ->expects($this->exactly(PipelineBase::MAX_COUNT_ERR))
-            ->method('save');
-
-        $this->client
-            ->method('read')
-            ->will($this->returnValueMap([
-                [NetClientInterface::BODY, ''],
-                [NetClientInterface::CODE, 500]
-            ]));
-
-        $transfer = new Transfer(
-            $this->client,
-            $this->converter,
-            $this->logger
-        );
-        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
-        $this->assertTrue($pipeline->updateUnaccepted());
-
-        for ($i = 0; $i < PipelineBase::MAX_COUNT_ERR; ++$i) {
-            $this->assertSame(ReceiptStatus::ASSUME, $receipts[$i]->getStatus()->getCode());
-        }
-
-        $this->assertSame(ReceiptStatus::PREPARED, $receipts[PipelineBase::MAX_COUNT_ERR]->getStatus()->getCode());
+        $this->assertTrue($pipeline->update());
+        $this->assertSame(ReceiptStatus::EXPIRED, $receipts[0]->getStatus()->getCode());
     }
 }

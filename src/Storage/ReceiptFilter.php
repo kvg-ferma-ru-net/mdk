@@ -65,11 +65,11 @@ class ReceiptFilter
     /**
      * Установить статус чека
      *
-     * @param integer $status из констант ReceiptStatus
+     * @param integer|array $status из констант ReceiptStatus
      * @param string $op операция сравнения
      * @return self
      */
-    public function setStatus(int $status, string $op = self::OP_EQ): self
+    public function setStatus($status, string $op = self::OP_EQ): self
     {
         $this->status = [
             'value' => $status,

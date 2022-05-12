@@ -56,16 +56,16 @@ class ReceiptStatusTest extends TestCase
         );
         $this->assertSame(
             ReceiptStatus::REPEAT,
-            (new ReceiptStatus(402))->getCode()
-        );
-        $this->assertSame(
-            ReceiptStatus::REPEAT,
             (new ReceiptStatus(404))->getCode()
         );
 
         $this->assertSame(
             ReceiptStatus::ERROR,
             (new ReceiptStatus(400))->getCode()
+        );
+        $this->assertSame(
+            ReceiptStatus::ERROR,
+            (new ReceiptStatus(402))->getCode()
         );
         $this->assertSame(
             ReceiptStatus::ERROR,
@@ -116,6 +116,11 @@ class ReceiptStatusTest extends TestCase
             ReceiptStatus::ERROR,
             (new ReceiptStatus(ReceiptStatus::ERROR))->getCode()
         );
+
+        $this->assertSame(
+            ReceiptStatus::EXPIRED,
+            (new ReceiptStatus(ReceiptStatus::EXPIRED))->getCode()
+        );
     }
 
     /**
@@ -126,6 +131,6 @@ class ReceiptStatusTest extends TestCase
         $a = ReceiptStatus::all();
         $this->assertIsArray($a);
         $this->assertContainsOnlyInstancesOf(ReceiptStatus::class, $a);
-        $this->assertCount(6, $a);
+        $this->assertCount(7, $a);
     }
 }

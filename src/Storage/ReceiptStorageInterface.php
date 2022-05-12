@@ -35,7 +35,7 @@ interface ReceiptStorageInterface
     public function getOne(int $id): ?Receipt;
 
     /**
-     * Извлечение коллекции чеков
+     * Извлечение коллекции чеков (сортировка по id по возврастанию)
      *
      * @throws StorageException
      *

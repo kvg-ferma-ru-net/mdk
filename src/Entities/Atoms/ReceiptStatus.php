@@ -30,6 +30,9 @@ class ReceiptStatus extends AtomAbstract
     /** Ошибка фискализации */
     public const ERROR      = 5;
 
+    /** Время фискализации чека истекло */
+    public const EXPIRED    = 6;
+
     //######################################################################
 
     /**
@@ -62,6 +65,10 @@ class ReceiptStatus extends AtomAbstract
                 $this->code = self::ERROR;
                 $this->name = 'Ошибка фискализации';
                 return;
+            case self::EXPIRED:
+                $this->code = self::EXPIRED;
+                $this->name = 'Время фискализации чека истекло';
+                return;
             default:
                 break;
         }
@@ -78,7 +85,7 @@ class ReceiptStatus extends AtomAbstract
             // пробовать еще раз фискализировать с тем же КИ (чек отправлен на сервер, но не известно что с там с ним)
             $this->code = self::ASSUME;
             $this->name = 'Чек отправлен на сервер';
-        } elseif ($code == 401 || $code == 402 || $code == 404) {
+        } elseif ($code == 401 || $code == 404) {
             // проблемы авторизации, надо попробовать фискализировать еще раз, но с большим периодом времени
             $this->code = self::REPEAT;
             $this->name = 'Ошибка авторизации, помещен в отложенную очередь';
@@ -102,6 +109,7 @@ class ReceiptStatus extends AtomAbstract
         $a[] = new self(self::ASSUME);
         $a[] = new self(self::REPEAT);
         $a[] = new self(self::ERROR);
+        $a[] = new self(self::EXPIRED);
 
         return $a;
     }
