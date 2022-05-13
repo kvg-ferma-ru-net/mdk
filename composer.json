@@ -1,7 +1,7 @@
 {
     "name": "innokassa/mdk",
     "description": "PHP Module Development Kit for Pangaea Server by Innokassa",
-    "version": "1.2.0",
+    "version": "2.0.0",
     "type": "library",
     "license": "MIT",
     "homepage": "https://innokassa.ru/",
@@ -10,6 +10,10 @@
             "name": "Buturlin Vitaliy (Byurrer)",
             "email": "byurrer@mail.ru",
             "homepage": "https://byurrer.ru/"
+        },
+        {
+            "name": "Igor Kripak",
+            "email": "drakosha99997@gmail.com"
         }
     ],
     "require": {
@@ -30,6 +34,6 @@
         "test-server": "vendor/bin/phpunit --colors=always --bootstrap tests/Server/bootstrap.php tests/Server/",
         "test-system": "vendor/bin/phpunit --colors=always --bootstrap tests/System/bootstrap.php tests/System/",
         "cs": "vendor/bin/phpcs --standard=PSR12 src/",
-        "lint": "vendor/bin/phpstan analyse -l 5 src"
+        "lint": "vendor/bin/phpstan analyse src"
     }
 }

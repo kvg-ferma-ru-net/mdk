@@ -3,7 +3,9 @@
 
 # Innokassa Module Development Kit
 
-**Innokassa MDK (Module Development Kit)** - набор программных средств на PHP для использования API облачной кассы [Pangaea V2](https://api.innokassa.ru/v2/doc) от [Innokassa](https://innokassa.ru/), содержащий в себе всю необходимую логику для фискализации заказов интернет-магазинов (ИМ). Для работы библиотеки требуется PHP версии не ниже 7.1 с библиотекой curl.
+**Innokassa MDK (Module Development Kit)** - набор программных средств на PHP для использования API облачной кассы [Pangaea V2](https://api.innokassa.ru/v2/doc) от [Innokassa](https://innokassa.ru/), содержащий в себе всю необходимую логику для фискализации заказов интернет-магазинов (ИМ), с поддержкой мультисайтовости. 
+
+Для работы библиотеки требуется PHP версии не ниже 7.1 с библиотекой curl.
 
 Описание:
 * ОО стиль - все есть объект 
@@ -20,8 +22,6 @@
         * [Инициализация](#инициализация)
         * [Настройки](#настройки)
         * [Automatic](#automatic)
-        * [Manual](#manual)
-        * [Printer](#printer)
         * [Pipeline](#pipeline)
     * [Обработка ошибок](#обработка-ошибок)
     * [Логи](#логи)
@@ -31,23 +31,30 @@
 
 ## Установка
 
+Клонирование репозитория:
 ```
 git clone https://git.innokassa.ru/Byurrer/mdk.git
+```
+
+Через `composer`:
+```
+composer require innokassa/mdk
 ```
 
 ## Использование
 
 В проектах не использующих `composer` необходимо подключить [автозагрузку классов](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader-examples.md):
 ```php
-include_once('mdk/src/autoload.php');
+require_once('mdk/src/autoload.php');
 ```
 
 ### Реализация на стороне клиента
 
 Перед использованием необходимо реализовать на стороне клиента:
-* [SettingsInterface](/src/Settings/SettingsInterface.php) - получение настроек
+* [SettingsAbstract](/src/Settings/SettingsAbstract.php) - получение настроек
 * [ReceiptStorageInterface](/src/Storage/ReceiptStorageInterface.php) - хранилище данных чеков
 * [ReceiptAdapterInterface](/src/Entities/ReceiptAdapterInterface.php) - адаптер чеков под заказы, чтобы сервис `Automatic` мог формировать чек из заказа
+* [ReceiptIdFactoryInterface](/src/Entities/ReceiptId/ReceiptIdFactoryInterface.php) - фабрика идентификаторов чеков, есть базовая реализация [ReceiptIdFactoryMeta](/src/Entities/ReceiptId/ReceiptIdFactoryMeta.php), в которой необходимо переопределить метод `getEngine`
 
 Для сериализации/десериализации данных чеков `БД`<=>`MDK` существует базовый конвертер [ConverterStorage](/src/Storage/ConverterStorage.php). При необходимости можно создать новую реализацию [ConverterAbstract](/src/Entities/ConverterAbstract.php).
 
@@ -60,13 +67,10 @@ include_once('mdk/src/autoload.php');
 [Клиент API Pangaea V2](/src/Client.php) состоит из:
 * [сервисов](/src/Services/) (для каждого сервиса существует базовая реализация):
     * [Autmotaic](/src/Services/AutomaticInterface.php) - автоматическая фискализация приходов заказов для выдачи чеков без вмешательства администратора ИМ, например при оплате заказа покупателем
-    * [Manual](/src/Services/ManualInterface.php) - ручная фискализация заказов (приход, расход) для осуществления дополнительных расчетов, например в случае измнения заказа после оформления, а также для осуществления возврата (возвратов)
     * [Pipeline](/src/Services/PipelineInterface.php) - обработка очереди чеков когда сервер фискализации пробивает чеки не сразу
-    * [Connector](/src/Services/ConnectorInterface.php) - проверка соответсвия введенных настроек на соответсвие данным на кассе
-    * [Printer](/src/Services/PrinterInterface.php) - печать чеков (получение ссылки на электронный чек), для показа ссылки на чек администратору ИМ
+    * [Connector](/src/Services/ConnectorInterface.php) - проверка введенных настроек на соответсвие данным на кассе
 * компонентов (для дополнительного взаимодействия с MDK):
-    * [Settings](/src/Settings/SettingsInterface.php)
-    * [Adapter](/src/Entities/ReceiptAdapterInterface.php)
+    * [Settings](/src/Settings/SettingsAbstract.php)
     * [Storage](/src/Storage/ReceiptStorageInterface.php)
     * [Logger](/src/Logger/LoggerInterface.php)
 
@@ -79,32 +83,31 @@ $settings = new SettingsConcrete();
 $storage = new ReceiptStorageConcrete(new ConverterStorage());
 $adapter = new ReceiptAdapterConcrete();
 $logger = new LoggerFile();
+$receiptIdFactory = new ReceiptIdFactoryMetaConcrete();
 
 $transfer = new Transfer(
-    new NetClientCurl(), 
-    new ConverterApi(), 
-    $settings->getActorId(), 
-    $settings->getActorToken(), 
-    $settings->getCashbox(),
+    new NetClientCurl(),
+    new ConverterApi(),
     $logger
 );
 
 // создание сервисов
-$automatic = new AutomaticBase($settings, $storage, $transfer, $adapter);
-$manual = new ManualBase($storage, $transfer, $settings);
-$pipeline = new PipelineBase($storage, $transfer);
-$printer = new PrinterBase($storage, $transfer);
+$automatic = new AutomaticBase(
+    $settings,
+    $storage,
+    $transfer,
+    $adapter,
+    $receiptIdFactory
+);
+$pipeline = new PipelineBase($settings, $storage, $transfer);
 $connector = new ConnectorBase($transfer);
 
 // создание клиента
-$checkoutClient = new Client(
-    $settings, 
-    $adapter, 
+$mdk = new Client(
+    $settings,
     $storage,
-    $automatic, 
-    $manual, 
-    $pipeline, 
-    $printer, 
+    $automatic,
+    $pipeline,
     $connector,
     $logger
 );
@@ -112,19 +115,32 @@ $checkoutClient = new Client(
 
 #### Настройки
 
-> Минимальный список настроек содержится в файле [SettingsInterface](/src/Settings/SettingsInterface.php).
-
 Перед сохранением настроек необходимо проверить корректность введенных данных на соответствие данным на кассе:
 ```php
-// $settings - ассоциативный массив новых настроек
+// ассоциативный массив новых настроек введенных пользователем в интерфейсе сайта
+$settings = [
+    'actor_id' => 'actor_id',
+    'actor_token' => 'actor_token',
+    'cashbox' => 'cashbox',
+    'site' => 'https://example.com/',
+    'taxation' => Taxation::USN,
+    'scheme' => SettingsInterface::SCHEME_PRE_FULL,
+    'vat_shipping' => Vat::CODE_WITHOUT,
+    'type_default_items' => ReceiptItemType::PRODUCT,
+    'vat_default_items' => Vat::CODE_WITHOUT,
+    'order_status_receipt_pre' => 'payed',
+    'order_status_receipt_full' => 'delivered'
+];
+
 try {
+    // формирование трансфера с указанием минимальных данных для соединения
     $transfer = new Transfer(
-        new NetClientCurl(), 
-        new ConverterApi(), 
-        $settings['actor_id'], 
-        $settings['actor_token'], 
-        $settings['cashbox']
+        new NetClientCurl(),
+        new ConverterApi(),
+        new LoggerFile()
     );
+
+    // создание коннектора и тестирование настроек
     $conn = new ConnectorBase($transfer);
     $conn->testSettings(new SettingsConcrete($settings));
 } catch(SettingsException $e) {
@@ -134,125 +150,63 @@ try {
 
 #### Automatic
 
-> Автоматическая фискализация действует в контексте конкретного заказа. Если по заказу были созданы чеки вручную, тогда автоматическая фискализация для данного заказа будет отключена.
+> Автоматическая фискализация действует в контексте конкретного заказа.
 
-Пример использования ([список исключений](/src/Services/AutomaticInterface.php)):
+Пример использования ([список исключений](/src/Services/AutomaticInterface.php), [типы чеков](/src/Entities/Atoms/ReceiptSubType.php)):
 ```php
 try {
-    $automatic = $checkoutClient->serviceAutomatic();
+    $automatic = $mdk->serviceAutomatic();
 
     // автоматическое определение типа чека
     $automatic->fiscalize($idOrder);
 
     // указание конкретного типа чека, например полный расчет в момент передачи товара покупателю
-    // automatic->fiscalize($idOrder, ReceiptSubType::FULL);
+    // automatic->fiscalize($idOrder, 's1', ReceiptSubType::FULL);
 } catch(Exception $e) {
     throw $e;
-}
-```
-
-Интеграция с `MDK` может предусматривать:
-* конкретные типы создаваемых чеков:
-    * для предоплаты `automatic->fiscalize($idOrder, ReceiptSubType::PRE)`
-    * для полного расчета `automatic->fiscalize($idOrder, ReceiptSubType::FULL)`
-* автоматическое определение типа чека на основании настроек `$automatic->fiscalize($idOrder)`
-
-#### Manual
-
-Для ручной фискализации нужно самостоятельно сформировать:
-* [items](/src/Collections/ReceiptItemCollection.php) - коллекцию [позиций](/src/Entities/ReceiptItem.php) к возврату
-* [notify](/src/Entities/Primitives/Notify.php) - объект контактов покупателя
-* [amount](/src/Entities/Primitives/Amount.php) - объект данных об оплате, если не передать данные тогда вся сумма позиций будет в счет `Amount::CASHLESS`.
-
-Пример ручной фискализации прихода:
-```php
-try {
-    $manual = $checkoutClient->serviceManual();
-    $receipt = $manual->fiscalize($idOrder, $items, $notify);
-} catch(Exception $e) {
-    throw $e;
-}
-```
-
-Аналогичным образом оформляется возврат:
-```php
-try {
-    $manual = $checkoutClient->serviceManual();
-    $receipt = $manual->refund($idOrder, $items, $notify);
-} catch(Exception $e) {
-    throw $e;
-}
-```
-
-Однако, внутри сервиса происходит вычисление возможности осуществить возврат, если оставшаяся сумма приходов по данному заказу >= сумме возврата, тогда будет осуществлен возврат, иначе будет выброшено исключение `ManualException`.
-
-> Интеграция должна предоставлять интерфейс для ручного формирования чека
-
-#### Printer
-
-Пример получения ссылки на рендер чека:
-```php
-$printer = $checkoutClient->servicePrinter();
-
-// получение ссылки на чек без валидации
-$link = $printer->getLinkRaw($receipt);
-
-try {
-    // получение ссылки на рендер чека с проверкой на существование чека и факт его пробития
-    $link = $printer->getLinkVerify($idReceipt);
-} catch(PrinterException $e) {
-
 }
 ```
 
 #### Pipeline
 
-Сервер фискализации может не сразу пробить чек по разным причинам, но может принять его. После чего необходимо узнать текущий статус чеков. Эту задачу решает `Pipeline` ([PipelineBase](/src/Services/PipelineBase.php) базовая реализация [PipelineInterface](/src/Services/PipelineInterface.php)), методы которого должны запускаться (каждый в отдельном экземпляре) в планировщике задач (например в `cron`), желательно каждые 10 минут.
+Сервер фискализации может не сразу пробить чек по разным причинам, но примет сразу ответив кодом 202. После чего необходимо узнать текущий статус чеков. Эту задачу решает `Pipeline` ([PipelineBase](/src/Services/PipelineBase.php) базовая реализация [PipelineInterface](/src/Services/PipelineInterface.php)), методы которого должны запускаться (каждый в отдельном экземпляре) в планировщике задач (например через `cron`), желательно каждые 10 минут.
 
-Существует 2 вида [статусов чека](/src/Entities/Atoms/ReceiptStatus.php) (2 метода `Pipeline`):
-* `accepted` - приняты сервером (`WAIT` | `ASSUME`), но еще не пробились
-* `unaccepted` - не были приняты сервером по причинам отказа доступа или связи с сервером (`PREPARED` | `REPEAT`)
+Существует несколько [статусов чека](/src/Entities/Atoms/ReceiptStatus.php), но все чеки со статусом подлежащим фискализации обработаются вместе.
 
 Пример:
 ```php
-$pipeline = $checkoutClient->servicePipeline();
+$pipeline = $mdk->servicePipeline();
 
-// обновление статусов принятых чеков
-$pipeline->updateAccepted();
-
-// обновление статусов непринятых чеков
-$pipeline->updateUnaccepted();
+// обновление статусов чеков
+$pipeline->update();
 ```
 
 ### Обработка ошибок
 
-Сервисы и компоненты могут выбрасывать исключения, это однозначно означает что **операция не удалась и с теми же данными не пройдет**. Каждый объект выбрасывает свойственные ему исключения (подробнее к исходном коде интерфейсов/классов).
+Сервисы и компоненты могут выбрасывать исключения, это однозначно означает что **операция не удалась и с теми же данными не пройдет**, за исключением проблем со связью. Каждый объект выбрасывает свойственные ему исключения (подробнее к исходном коде интерфейсов/классов).
 
 Ответсвенность за обработку исключений ложится на клиентский код.
 
 Рекомендации:
-* при ручных действиях (ручная фискализация, проверка настроек и прочее) показывать ошибку через интерфейс
 * при автоматических действиях оповещать пользователя интеграции через email или другими доступными средствами
 
 ### Логи
 
-Для логирования используются файловые логи [LoggerFile](/src/Logger/LoggerFile.php) интерфейса [LoggerInterface](/src/Logger/LoggerInterface.php), хранимые в директории `logs`, которая должна быть доступна извне для анализа работы `MDK`. 
+Для логирования используются файловые логи [LoggerFile](/src/Logger/LoggerFile.php) интерфейса [LoggerInterface](/src/Logger/LoggerInterface.php), хранимые в директории `logs`. 
 
 Логи применяются в классе [Transfer](/src/Net/Transfer.php) для хранения истории взаимодействия с сервером фискализации.
-
-Клиентский код также может использовать логирование предоставляемое `MDK`.
 
 ## Разработка
 
 > Для разработки потребуется `docker` и `docker-compose`
 
 Репозиторий содержит [docker-compose-dev.yml](/docker-compose-dev.yml) для организации среды разработки `MDK`, состоит из двух контейнеров:
-* `mdk-php-dev` - основан на [php:7.3-cli](https://hub.docker.com/_/php) с модификациями, внутри используется `xdebug` для отладки и `composer` для установки `phpunit`
+* `mdk-php-dev` - основан на [php:7.3-cli](https://hub.docker.com/_/php) с модификациями, внутри используется `xdebug` для отладки и `composer` для установки зависимостей разработки
 * `mdk-mysql-dev` - основан [mysql:5.7](https://hub.docker.com/_/mysql) без модификаций (логин:пароль от БД root:root)
 
 Запуск контейнеров:
 ```bash
-docker-compose -f docker-compose-dev.yml up
+docker-compose -f docker-compose-dev.yml --force-recreate --build
 ```
 
 После запуска будет развернута изолированная среда со всем необходимым ПО для разработки `MDK`.
@@ -260,19 +214,22 @@ docker-compose -f docker-compose-dev.yml up
 Для `VS Code` есть вспомогательные инструменты:
 * отладчик [PHP Debug](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-debug), настройки которого можно найти в [launch.json](/.vscode/launch.json) послеовательность действий:
     * запускается отладчик в редакторе
-    * в docker контейнере запускается нужный скрипт, например `docker exec -it mdk-php-dev /bin/bash -c "php -f file.php"`
+    * в `docker` контейнере запускается нужный скрипт, например `docker exec -it mdk-php-dev /bin/bash -c "php -f file.php"`
     * отладчик в редакторе получает отладочные данные из контейнера
 * задания  [tasks.json](/.vscode/tasks.json) (задания запускаются в `docker` контейнере):
     * Run unit tests all - запуск всех unit тестов
     * Run unit test current file - запуск текущего тестового скрипта на тестирование
 
-> Рекомендуемые расширения для `VS Code` [intelephense](https://marketplace.visualstudio.com/items?itemName=bmewburn.vscode-intelephense-client), [phpcs](https://marketplace.visualstudio.com/items?itemName=ikappas.phpcs), нужные настройки для них подгрузятся из конфига в репозитории
+Рекомендуемые расширения для `VS Code` (нужные настройки подгрузятся из конфига в репозитории):
+* [intelephense](https://marketplace.visualstudio.com/items?itemName=bmewburn.vscode-intelephense-client)
+* [phpcs](https://marketplace.visualstudio.com/items?itemName=ikappas.phpcs)
+* [phpstan](https://marketplace.visualstudio.com/items?itemName=swordev.phpstan)
 
 ## Issues и Contributing
 
 Если при использовании библиотеки у вас возникли проблемы, вы можете составить `Issue`.
 
-Вы можете предложить свои изменения исходного кода, через `Issue`/`Pull request`. Они будут рассмотрены и приняты/отклонены или проигнорированы если в этих изменениях нет необходимости в данный момент.
+Вы можете предложить свои изменения исходного кода, через `Issue`/`Pull request`.
 
 Каждые внесенные изменения должны быть протестированы, а соответствующие тесты должны быть внесены в директорию с тестами.
 
