@@ -15,6 +15,7 @@ use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Entities\ReceiptAdapterInterface;
 use Innokassa\MDK\Exceptions\Services\AutomaticException;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
+use Innokassa\MDK\Exceptions\Services\AutomaticErrorException;
 use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryInterface;
 
 /**
@@ -90,6 +91,13 @@ class AutomaticBase implements AutomaticInterface
             $receiptSubType == ReceiptSubType::FULL
             && ($receiptPre = $receipts->getByType(ReceiptType::COMING, ReceiptSubType::PRE))
         ) {
+            if (($totalPre = $receiptPre->getItems()->getAmount()) != $total) {
+                throw new AutomaticErrorException(sprintf(
+                    "Сумма второго чека '%01.2f' не равна сумме первого чека '%01.2f'",
+                    $total,
+                    $totalPre
+                ));
+            }
             $amount->set(Amount::PREPAYMENT, $total);
         } else {
             $amount->set(Amount::CASHLESS, $total);

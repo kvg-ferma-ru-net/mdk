@@ -48,6 +48,8 @@ interface ReceiptStorageInterface
     /**
      * Получить минимальное значение столбца
      *
+     * @throws StorageException
+     *
      * @param ReceiptFilter $filter
      * @param string $column
      * @return mixed
@@ -57,6 +59,8 @@ interface ReceiptStorageInterface
     /**
      * Получить максимальное значение столбца
      *
+     * @throws StorageException
+     *
      * @param ReceiptFilter $filter
      * @param string $column
      * @return mixed
@@ -65,6 +69,8 @@ interface ReceiptStorageInterface
 
     /**
      * Получить количество записей
+     *
+     * @throws StorageException
      *
      * @param ReceiptFilter $filter
      * @return int

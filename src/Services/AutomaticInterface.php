@@ -7,6 +7,7 @@ use Innokassa\MDK\Exceptions\StorageException;
 use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Exceptions\Services\AutomaticException;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
+use Innokassa\MDK\Exceptions\Services\AutomaticErrorException;
 
 /**
  * Интерфейс сервиса автоматической фискализации заказов
@@ -20,6 +21,7 @@ interface AutomaticInterface
      * @throws TransferException
      * @throws StorageException
      * @throws AutomaticException
+     * @throws AutomaticErrorException
      *
      * @param string $orderId
      * @param string $siteId
