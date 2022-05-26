@@ -12,6 +12,7 @@ use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\ConverterAbstract;
 use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
+use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Collections\ReceiptCollection;
@@ -169,6 +170,39 @@ class AutomaticBaseFakeTest extends TestCase
     }
 
     /**
+     * Тест чека полного расчета с еще не пробитым чеком предоплаты
+     * @covers Innokassa\MDK\Services\AutomaticBase::__construct
+     * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
+     */
+    /*public function testFiscalizeFailFull2()
+    {
+        $this->settings->method('getScheme')
+            ->willReturn(SettingsAbstract::SCHEME_PRE_FULL);
+
+        $receipts = new ReceiptCollection();
+        $receipt = new Receipt();
+        $receipt->setType(ReceiptType::COMING);
+        $receipt->setSubType(ReceiptSubType::PRE);
+        $receipts[] = $receipt;
+
+        $this->storage = $this->createMock(ReceiptStorageInterface::class);
+        $this->storage
+            ->method('getCollection')
+            ->will($this->onConsecutiveCalls($receipts));
+
+        $automatic = new AutomaticBase(
+            $this->settings,
+            $this->storage,
+            $this->transfer,
+            $this->adapter,
+            new ReceiptIdFactoryMeta()
+        );
+
+        $this->expectException(AutomaticException::class);
+        $receipt = $automatic->fiscalize('0');
+    }*/
+
+    /**
      * Тест чека полного расчета с чеком предоплаты
      * @covers Innokassa\MDK\Services\AutomaticBase::__construct
      * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
@@ -182,6 +216,7 @@ class AutomaticBaseFakeTest extends TestCase
         $receipt = new Receipt();
         $receipt->setType(ReceiptType::COMING);
         $receipt->setSubType(ReceiptSubType::PRE);
+        $receipt->setStatus(new ReceiptStatus(ReceiptStatus::COMPLETED));
         $receipts[] = $receipt;
 
         $this->storage = $this->createMock(ReceiptStorageInterface::class);

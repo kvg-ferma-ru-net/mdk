@@ -49,6 +49,8 @@ class ReceiptFilter
     /**
      * Установить подтип чека
      *
+     * @deprecated
+     *
      * @param integer $subType из констант ReceiptSubType
      * @param string $op операция сравнения
      * @return self
@@ -110,6 +112,22 @@ class ReceiptFilter
         return $this;
     }
 
+    /**
+     * Установить действительность чека
+     *
+     * @param bool $available
+     * @param string $op операция сравнения
+     * @return self
+     */
+    public function setAvailable(bool $available, string $op = self::OP_EQ): self
+    {
+        $this->available = [
+            'value' => intval($available),
+            'op' => $op
+        ];
+        return $this;
+    }
+
     //######################################################################
 
     /**
@@ -154,4 +172,7 @@ class ReceiptFilter
 
     /** @var array<string, int|string> */
     private $siteId = null;
+
+    /** @var array<string, int|string> */
+    private $available = null;
 }
