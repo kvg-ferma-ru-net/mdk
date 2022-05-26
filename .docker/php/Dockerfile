@@ -14,5 +14,3 @@ RUN cd ~ \
 USER $uid
 
 WORKDIR /opt/mdk/
-
-CMD ["composer", "install"]
