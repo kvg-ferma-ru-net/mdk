@@ -12,6 +12,7 @@ use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\ConverterAbstract;
 use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Primitives\Notify;
+use Innokassa\MDK\Entities\Atoms\PaymentMethod;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Exceptions\TransferException;
@@ -23,6 +24,7 @@ use Innokassa\MDK\Collections\ReceiptItemCollection;
 use Innokassa\MDK\Exceptions\Services\AutomaticException;
 use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
+use Innokassa\MDK\Exceptions\Services\AutomaticErrorException;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
@@ -217,6 +219,13 @@ class AutomaticBaseFakeTest extends TestCase
         $receipt->setType(ReceiptType::COMING);
         $receipt->setSubType(ReceiptSubType::PRE);
         $receipt->setStatus(new ReceiptStatus(ReceiptStatus::COMPLETED));
+        $receipt->addItem(
+            (new ReceiptItem())
+                ->setName('test')
+                ->setPrice(100)
+                ->setQuantity(2)
+                ->setPaymentMethod(PaymentMethod::PREPAYMENT_FULL)
+        );
         $receipts[] = $receipt;
 
         $this->storage = $this->createMock(ReceiptStorageInterface::class);
@@ -235,6 +244,47 @@ class AutomaticBaseFakeTest extends TestCase
         $this->assertInstanceOf(Receipt::class, $receipt);
         $this->assertSame(ReceiptSubType::FULL, $receipt->getSubType());
         $this->assertSame(200.0, $receipt->getAmount()->get(Amount::PREPAYMENT));
+    }
+
+    /**
+     * Тест чека полного расчета с чеком предоплаты, при этом их суммы не будут равны
+     * @covers Innokassa\MDK\Services\AutomaticBase::__construct
+     * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
+     */
+    public function testFiscalizeFailFull2()
+    {
+        $this->settings->method('getScheme')
+            ->willReturn(SettingsAbstract::SCHEME_PRE_FULL);
+
+        $receipts = new ReceiptCollection();
+        $receipt = new Receipt();
+        $receipt->setType(ReceiptType::COMING);
+        $receipt->setSubType(ReceiptSubType::PRE);
+        $receipt->setStatus(new ReceiptStatus(ReceiptStatus::COMPLETED));
+        $receipt->addItem(
+            (new ReceiptItem())
+                ->setName('test')
+                ->setPrice(100)
+                ->setQuantity(1)
+                ->setPaymentMethod(PaymentMethod::PREPAYMENT_FULL)
+        );
+        $receipts[] = $receipt;
+
+        $this->storage = $this->createMock(ReceiptStorageInterface::class);
+        $this->storage
+            ->method('getCollection')
+            ->will($this->onConsecutiveCalls($receipts));
+
+        $automatic = new AutomaticBase(
+            $this->settings,
+            $this->storage,
+            $this->transfer,
+            $this->adapter,
+            new ReceiptIdFactoryMeta()
+        );
+
+        $this->expectException(AutomaticErrorException::class);
+        $receipt = $automatic->fiscalize('0');
     }
 
     //**********************************************************************
