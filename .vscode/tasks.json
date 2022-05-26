@@ -8,7 +8,7 @@
             "args": [
                 "exec",
                 "-it",
-                "mdk-php-dev",
+                "mdk-php",
                 "/bin/bash",
                 "-c",
                 "vendor/bin/phpunit --colors=always --coverage-html coverage-report-html --bootstrap tests/Unit/bootstrap.php tests/Unit/"
@@ -26,7 +26,7 @@
             "args": [
                 "exec",
                 "-it",
-                "mdk-php-dev",
+                "mdk-php",
                 "/bin/bash",
                 "-c",
                 "vendor/bin/phpunit --colors=always --coverage-html coverage-report-html --bootstrap tests/Unit/bootstrap.php ${relativeFile}"

@@ -4,9 +4,7 @@ services:
 
   mysql:
     image: mysql:5.7
-    container_name: mdk-mysql-dev
-    volumes:
-      - ./docker-data/mysql/data:/var/lib/mysql
+    container_name: mdk-mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
     command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
@@ -19,13 +17,14 @@ services:
       args:
         uid: 1000
         user: runner
-    container_name: mdk-php-dev
+    container_name: mdk-php
     depends_on: 
       - mysql
     volumes:
       - ./:/opt/mdk/
       - ./.docker/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
-      - ./.docker/php/dev/entrypoint.sh:/usr/bin/entrypoint.sh
+      - ./.docker/php/entrypoint.sh:/usr/bin/entrypoint.sh
+      - ./.docker/php/wait-db.php:/opt/wait-db.php
     command: /bin/bash -c "/usr/bin/entrypoint.sh"
     networks:
       - app-network
@@ -36,4 +35,4 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 192.168.0.1/24
+        - subnet: 172.19.1.1/24
