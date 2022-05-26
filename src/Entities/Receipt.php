@@ -162,6 +162,26 @@ class Receipt
     public function setStatus(ReceiptStatus $receiptStatus): self
     {
         $this->status = $receiptStatus;
+
+        // если чек был принят сервером - помечаем
+        if (
+            $receiptStatus->getCode() == ReceiptStatus::ACCEPTED
+            || $receiptStatus->getCode() == ReceiptStatus::COMPLETED
+        ) {
+            $this->setAccepted(true);
+        }
+
+        // если чек еще не был принят сервером и авторизация не прошла или статусы чека провальные - чек недействителен
+        if (
+            ($this->status->getCode() == ReceiptStatus::UNAUTH && !$this->getAccepted())
+            || $this->status->getCode() == ReceiptStatus::ERROR
+            || $this->status->getCode() == ReceiptStatus::EXPIRED
+        ) {
+            $this->setAvailable(false);
+        } else {
+            $this->setAvailable(true);
+        }
+
         return $this;
     }
 
@@ -173,6 +193,54 @@ class Receipt
     public function getStatus(): ?ReceiptStatus
     {
         return $this->status;
+    }
+
+    //**********************************************************************
+
+    /**
+     * Установить статус принятия сервером
+     *
+     * @param bool $accepted
+     * @return self
+     */
+    public function setAccepted(bool $accepted): self
+    {
+        $this->accepted = $accepted;
+        return $this;
+    }
+
+    /**
+     * Получить статус принятия сервером
+     *
+     * @return bool
+     */
+    public function getAccepted(): bool
+    {
+        return $this->accepted;
+    }
+
+    //**********************************************************************
+
+    /**
+     * Установить действительность чека
+     *
+     * @param bool $available
+     * @return self
+     */
+    public function setAvailable(bool $available): self
+    {
+        $this->available = $available;
+        return $this;
+    }
+
+    /**
+     * Получить действительность чека
+     *
+     * @return bool
+     */
+    public function getAvailable(): bool
+    {
+        return $this->available;
     }
 
     //**********************************************************************
@@ -457,6 +525,8 @@ class Receipt
     // статусные данные
 
     private $status = null;
+    private $accepted = false;
+    private $available = false;
 
     //**********************************************************************
     // прочее

@@ -71,6 +71,8 @@ class ConverterStorageTest extends TestCase
             'site_id' => '',
             'order_id' => '456',
             'status' => ReceiptStatus::COMPLETED,
+            'accepted' => 1,
+            'available' => 1,
             'subtype' => ReceiptSubType::PRE,
             'type' => ReceiptType::COMING,
             'items' => [[
@@ -245,6 +247,8 @@ class ConverterStorageTest extends TestCase
             'site_id' => '0',
             'order_id' => '',
             'status' => ReceiptStatus::COMPLETED,
+            'accepted' => 1,
+            'available' => 1,
             'subtype' => ReceiptSubType::PRE,
             'type' => ReceiptType::COMING,
             'items' => [[
@@ -332,6 +336,8 @@ class ConverterStorageTest extends TestCase
             'site_id' => '0',
             'order_id' => '',
             'status' => ReceiptStatus::COMPLETED,
+            'accepted' => 1,
+            'available' => 1,
             'subtype' => ReceiptSubType::PRE,
             'type' => ReceiptType::COMING,
             'items' => [[

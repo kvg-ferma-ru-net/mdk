@@ -237,6 +237,66 @@ class ReceiptTest extends TestCase
         $receipt = new Receipt();
         $this->assertSame($receipt, $receipt->setStatus(new ReceiptStatus(201)));
         $this->assertSame(ReceiptStatus::COMPLETED, $receipt->getStatus()->getCode());
+        $this->assertTrue($receipt->getAccepted());
+        $this->assertTrue($receipt->getAvailable());
+
+        // чек был принят сервером, а потом началась какая-то херня
+        $receipt = new Receipt();
+        $receipt->setStatus(new ReceiptStatus(202));
+        $this->assertTrue($receipt->getAccepted());
+        $this->assertTrue($receipt->getAvailable());
+
+        $receipt->setStatus(new ReceiptStatus(401));
+        $this->assertTrue($receipt->getAccepted());
+        $this->assertTrue($receipt->getAvailable());
+
+        $receipt->setStatus(new ReceiptStatus(500));
+        $this->assertTrue($receipt->getAccepted());
+        $this->assertTrue($receipt->getAvailable());
+
+        // чек не принят но действителен
+        $receipt = new Receipt();
+        $receipt->setStatus(new ReceiptStatus(500));
+        $this->assertFalse($receipt->getAccepted());
+        $this->assertTrue($receipt->getAvailable());
+
+        // чек неверный - не принят и не действителен
+        $receipt = new Receipt();
+        $receipt->setStatus(new ReceiptStatus(400));
+        $this->assertFalse($receipt->getAccepted());
+        $this->assertFalse($receipt->getAvailable());
+
+        // чек не принят по причинам авторизации, значит и не действителен
+        $receipt = new Receipt();
+        $receipt->setStatus(new ReceiptStatus(401));
+        $this->assertFalse($receipt->getAccepted());
+        $this->assertFalse($receipt->getAvailable());
+    }
+
+    /**
+     * @covers Innokassa\MDK\Entities\Receipt::__construct
+     * @covers Innokassa\MDK\Entities\Receipt::setAccepted
+     * @covers Innokassa\MDK\Entities\Receipt::getAccepted
+     */
+    public function testSetGetAccepted()
+    {
+        $receipt = new Receipt();
+        $this->assertSame(false, $receipt->getAccepted());
+        $this->assertSame($receipt, $receipt->setAccepted(true));
+        $this->assertSame(true, $receipt->getAccepted());
+    }
+
+    /**
+     * @covers Innokassa\MDK\Entities\Receipt::__construct
+     * @covers Innokassa\MDK\Entities\Receipt::setAvailable
+     * @covers Innokassa\MDK\Entities\Receipt::getAvailable
+     */
+    public function testSetGetAvailable()
+    {
+        $receipt = new Receipt();
+        $this->assertSame(false, $receipt->getAvailable());
+        $this->assertSame($receipt, $receipt->setAvailable(true));
+        $this->assertSame(true, $receipt->getAvailable());
     }
 
     /**

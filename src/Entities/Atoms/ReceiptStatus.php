@@ -16,7 +16,7 @@ class ReceiptStatus extends AtomAbstract
     public const COMPLETED  = 1;
 
     /** Нет ошибок, ждем пока чек фискализируется, нужно проверить статус */
-    public const WAIT       = 2;
+    public const ACCEPTED       = 2;
 
     /** Нет ошибок, чек отправлен на сервер, надеемся на фискализацию,
      * но что там с чеком не известно, потому что сервер ответил некорректно,
@@ -24,8 +24,8 @@ class ReceiptStatus extends AtomAbstract
      */
     public const ASSUME     = 3;
 
-    /** Возникли проблемы с доступом к кассе, но надо попробовать еще раз пробить чек */
-    public const REPEAT     = 4;
+    /** Возникли проблемы с доступом к кассе */
+    public const UNAUTH     = 4;
 
     /** Ошибка фискализации */
     public const ERROR      = 5;
@@ -49,17 +49,17 @@ class ReceiptStatus extends AtomAbstract
                 $this->code = self::COMPLETED;
                 $this->name = 'Чек фискализирован';
                 return;
-            case self::WAIT:
-                $this->code = self::WAIT;
+            case self::ACCEPTED:
+                $this->code = self::ACCEPTED;
                 $this->name = 'Чек в очереди';
                 return;
             case self::ASSUME:
                 $this->code = self::ASSUME;
                 $this->name = 'Чек отправлен на сервер';
                 return;
-            case self::REPEAT:
-                $this->code = self::REPEAT;
-                $this->name = 'Ошибка авторизации, помещен в отложенную очередь';
+            case self::UNAUTH:
+                $this->code = self::UNAUTH;
+                $this->name = 'Ошибка авторизации';
                 return;
             case self::ERROR:
                 $this->code = self::ERROR;
@@ -79,16 +79,16 @@ class ReceiptStatus extends AtomAbstract
             $this->name = 'Чек фискализирован';
         } elseif ($code >= 202 && $code < 300) {
             // пробовать еще раз фискализировать с тем же КИ (чек принят сервером)
-            $this->code = self::WAIT;
+            $this->code = self::ACCEPTED;
             $this->name = 'Чек в очереди';
         } elseif ($code >= 500 && $code < 600) {
             // пробовать еще раз фискализировать с тем же КИ (чек отправлен на сервер, но не известно что с там с ним)
             $this->code = self::ASSUME;
             $this->name = 'Чек отправлен на сервер';
         } elseif ($code == 401 || $code == 404) {
-            // проблемы авторизации, надо попробовать фискализировать еще раз, но с большим периодом времени
-            $this->code = self::REPEAT;
-            $this->name = 'Ошибка авторизации, помещен в отложенную очередь';
+            // проблемы авторизации
+            $this->code = self::UNAUTH;
+            $this->name = 'Ошибка авторизации';
         } else {
             // [400, 500) - ошибки, повторять фискализизацию с такими же данными нельзя
             $this->code = self::ERROR;
@@ -105,9 +105,9 @@ class ReceiptStatus extends AtomAbstract
 
         $a[] = new self(self::PREPARED);
         $a[] = new self(self::COMPLETED);
-        $a[] = new self(self::WAIT);
+        $a[] = new self(self::ACCEPTED);
         $a[] = new self(self::ASSUME);
-        $a[] = new self(self::REPEAT);
+        $a[] = new self(self::UNAUTH);
         $a[] = new self(self::ERROR);
         $a[] = new self(self::EXPIRED);
 

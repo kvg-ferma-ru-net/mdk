@@ -141,7 +141,7 @@ class TransferFakeTest extends TestCase
         $transfer = new Transfer($this->client, $this->converter, $this->logger);
         $receipt = new Receipt();
         $this->assertEquals($receipt, $transfer->getReceipt($this->settings->extrudeConn(), $receipt));
-        $this->assertEquals(ReceiptStatus::WAIT, $receipt->getStatus()->getCode());
+        $this->assertEquals(ReceiptStatus::ACCEPTED, $receipt->getStatus()->getCode());
     }
 
     /**
@@ -185,7 +185,7 @@ class TransferFakeTest extends TestCase
             $transfer->getReceipt($this->settings->extrudeConn(), $receipt);
         } catch (TransferException $e) {
             $this->assertEquals(401, $e->getCode());
-            $this->assertEquals(ReceiptStatus::REPEAT, $receipt->getStatus()->getCode());
+            $this->assertEquals(ReceiptStatus::UNAUTH, $receipt->getStatus()->getCode());
         }
     }
 
@@ -212,7 +212,7 @@ class TransferFakeTest extends TestCase
         $receipt = new Receipt();
 
         $this->assertEquals($receipt, $transfer->sendReceipt($this->settings->extrudeConn(), $receipt));
-        $this->assertEquals(ReceiptStatus::WAIT, $receipt->getStatus()->getCode());
+        $this->assertEquals(ReceiptStatus::ACCEPTED, $receipt->getStatus()->getCode());
     }
 
     /**
@@ -264,7 +264,7 @@ class TransferFakeTest extends TestCase
             $transfer->sendReceipt($this->settings->extrudeConn(), $receipt);
         } catch (TransferException $e) {
             $this->assertEquals(401, $e->getCode());
-            $this->assertEquals(ReceiptStatus::REPEAT, $receipt->getStatus()->getCode());
+            $this->assertEquals(ReceiptStatus::UNAUTH, $receipt->getStatus()->getCode());
         }
     }
 

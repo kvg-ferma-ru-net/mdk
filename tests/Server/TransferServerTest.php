@@ -87,7 +87,7 @@ class TransferServerTest extends TestCase
         $transfer->sendReceipt($this->settingsConn, $receipt);
         $this->assertTrue(
             $receipt->getStatus()->getCode() == ReceiptStatus::COMPLETED
-            || $receipt->getStatus()->getCode() == ReceiptStatus::WAIT
+            || $receipt->getStatus()->getCode() == ReceiptStatus::ACCEPTED
         );
 
         return $receipt;
@@ -109,7 +109,7 @@ class TransferServerTest extends TestCase
         $receipt = $transfer->getReceipt($this->settingsConn, $receipt);
         $this->assertTrue(
             $receipt->getStatus()->getCode() == ReceiptStatus::COMPLETED
-            || $receipt->getStatus()->getCode() == ReceiptStatus::WAIT
+            || $receipt->getStatus()->getCode() == ReceiptStatus::ACCEPTED
         );
     }
 

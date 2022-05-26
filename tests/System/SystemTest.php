@@ -245,49 +245,42 @@ class SystemTest extends TestCase
         $automatic = self::$client->serviceAutomatic();
 
         /*
-            создадим чек для заказа 5, пробьем и специально установим статус WAIT,
-            в тестах будем ждать COMPLETED | WAIT
+            создадим чек для заказа 5, пробьем и специально установим статус ACCEPTED,
+            в тестах будем ждать COMPLETED | ACCEPTED
         */
         $orderId = 5;
         $receiptComing = $automatic->fiscalize($orderId);
-        $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::WAIT));
+        $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::ACCEPTED));
         self::$storage->save($receiptComing);
-        $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
+        $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::ACCEPTED];
 
         /*
-            создадим чек для заказа 5, пробьем и специально установим статус REPEAT,
+            создадим чек для заказа 6, пробьем и специально установим статус ACCEPTED,
             в тестах будем ждать EXPIRED
         */
+        $orderId = 6;
         $receiptComing = $automatic->fiscalize($orderId);
-        $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::REPEAT));
+        $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::ASSUME));
+        $receiptComing->setAccepted(false);
         $receiptComing->setStartTime(date('Y-m-d H:i:s', time() - (Receipt::ALLOWED_ATTEMPT_TIME + 1)));
         self::$storage->save($receiptComing);
         $receipts[$receiptComing->getId()] = [ReceiptStatus::EXPIRED];
 
         /*
             создадим чек для заказа 3, присвоим ему статус PREPARED,
-            в тестах будем ждать COMPLETED | WAIT
+            в тестах будем ждать COMPLETED | ACCEPTED
         */
         $orderId = 3;
         $receiptComing = $automatic->fiscalize($orderId);
         $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::PREPARED));
         self::$storage->save($receiptComing);
-        $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
+        $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::ACCEPTED];
 
-
-        /*
-            создадим чек для заказа 4, пробьем и специально установим статус REPEAT,
-            в тестах будем ждать COMPLETED | WAIT
-        */
-        $orderId = 4;
-        $receiptComing = $automatic->fiscalize($orderId);
-        $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::REPEAT));
-        self::$storage->save($receiptComing);
-        $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
 
         /*
             создадим еще один чек для несуществующего заказа 10,
             не будем фискализировать и установим статус ASSUME (сервер ответил ошибками сервера)
+            в тестах будем ждать COMPLETED | ACCEPTED
         */
         $receipt = new Receipt();
         $receipt
@@ -308,7 +301,7 @@ class SystemTest extends TestCase
             ->setLocation('https://example.com/');
         $receipt->setReceiptId((new ReceiptIdFactoryMeta())->build($receipt));
         self::$storage->save($receipt);
-        $receipts[$receipt->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::WAIT];
+        $receipts[$receipt->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::ACCEPTED];
 
 
         $pipeline = self::$client->servicePipeline();
@@ -318,6 +311,17 @@ class SystemTest extends TestCase
             $statusCode = $receipt->getStatus()->getCode();
             $this->assertContains($statusCode, $value);
         }
+    }
+
+    /**
+     * @covers Innokassa\MDK\Services\Monitoring
+     * @depends testPipelineSuccess
+     */
+    public function testMonitoringSuccess()
+    {
+        $file = __DIR__ . '/../../.monitoring';
+        $pipeline = self::$client->servicePipeline();
+        $this->assertTrue($pipeline->monitoring($file, 'start_time'));
     }
 
     //######################################################################

@@ -44,4 +44,30 @@ interface ReceiptStorageInterface
      * @return ReceiptCollection
      */
     public function getCollection(ReceiptFilter $filter, int $limit = 0): ReceiptCollection;
+
+    /**
+     * Получить минимальное значение столбца
+     *
+     * @param ReceiptFilter $filter
+     * @param string $column
+     * @return mixed
+     */
+    public function min(ReceiptFilter $filter, string $column);
+
+    /**
+     * Получить максимальное значение столбца
+     *
+     * @param ReceiptFilter $filter
+     * @param string $column
+     * @return mixed
+     */
+    public function max(ReceiptFilter $filter, string $column);
+
+    /**
+     * Получить количество записей
+     *
+     * @param ReceiptFilter $filter
+     * @return int
+     */
+    public function count(ReceiptFilter $filter): int;
 }

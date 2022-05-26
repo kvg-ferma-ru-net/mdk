@@ -71,6 +71,7 @@ class PipelineBaseFakeTest extends TestCase
      */
     public function testUpdateLock()
     {
+        $this->storage = $this->createMock(ReceiptStorageInterface::class);
         $transfer = new Transfer(
             $this->client,
             $this->converter,
@@ -90,6 +91,7 @@ class PipelineBaseFakeTest extends TestCase
      */
     public function testUpdateSuccess200()
     {
+        $this->storage = $this->createMock(ReceiptStorageInterface::class);
         $receipts = new ReceiptCollection();
         for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
             $receipts[] = (new Receipt())->setId($i + 1);
@@ -141,6 +143,7 @@ class PipelineBaseFakeTest extends TestCase
      */
     public function testUpdateSuccess404()
     {
+        $this->storage = $this->createMock(ReceiptStorageInterface::class);
         $receipts = new ReceiptCollection();
         $receipts[] = (new Receipt())->setId(1);
         $receipts[] = (new Receipt())->setId(2);
@@ -170,8 +173,8 @@ class PipelineBaseFakeTest extends TestCase
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
         $this->assertTrue($pipeline->update());
 
-        $this->assertSame(ReceiptStatus::REPEAT, $receipts[0]->getStatus()->getCode());
-        $this->assertSame(ReceiptStatus::REPEAT, $receipts[1]->getStatus()->getCode());
+        $this->assertSame(ReceiptStatus::UNAUTH, $receipts[0]->getStatus()->getCode());
+        $this->assertSame(ReceiptStatus::UNAUTH, $receipts[1]->getStatus()->getCode());
     }
 
     /**
@@ -181,6 +184,7 @@ class PipelineBaseFakeTest extends TestCase
      */
     public function testUpdateError()
     {
+        $this->storage = $this->createMock(ReceiptStorageInterface::class);
         $receipts1 = new ReceiptCollection();
         for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
             $receipts1[] = new Receipt();
@@ -231,10 +235,11 @@ class PipelineBaseFakeTest extends TestCase
      */
     public function testUpdateExpired()
     {
+        $this->storage = $this->createMock(ReceiptStorageInterface::class);
         $receipts = new ReceiptCollection();
         $receipts[] = (new Receipt())
             ->setStartTime(date("Y-m-d H:i:s", time() - (Receipt::ALLOWED_ATTEMPT_TIME + 1)))
-            ->setStatus(new ReceiptStatus(ReceiptStatus::REPEAT));
+            ->setStatus(new ReceiptStatus(ReceiptStatus::ASSUME));
 
         $this->storage
             ->method('getCollection')
@@ -244,12 +249,12 @@ class PipelineBaseFakeTest extends TestCase
             ->expects($this->exactly(1))
             ->method('save');
 
-        $this->client
+        /*$this->client
             ->method('read')
             ->will($this->returnValueMap([
                 [NetClientInterface::BODY, ''],
                 [NetClientInterface::CODE, 200]
-            ]));
+            ]));*/
 
         $transfer = new Transfer(
             $this->client,
@@ -260,5 +265,51 @@ class PipelineBaseFakeTest extends TestCase
 
         $this->assertTrue($pipeline->update());
         $this->assertSame(ReceiptStatus::EXPIRED, $receipts[0]->getStatus()->getCode());
+    }
+
+    //######################################################################
+
+    /**
+     * @covers Innokassa\MDK\Services\PipelineBase::__construct
+     * @covers Innokassa\MDK\Services\PipelineBase::monitoring
+     */
+    public function testMonitoring()
+    {
+        $this->storage = $this->createMock(ReceiptStorageInterface::class);
+        $transfer = new Transfer(
+            $this->client,
+            $this->converter,
+            $this->logger
+        );
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
+
+        $this->storage
+            ->expects($this->exactly(6))
+            ->method('count')
+            ->will($this->onConsecutiveCalls(1, 2, 3, 4, 5, 6));
+
+        $this->storage
+            ->expects($this->exactly(1))
+            ->method('max')
+            ->will($this->onConsecutiveCalls(date('Y-m-d H:i:s', time() - 60 * 60)));
+
+        $this->storage
+            ->expects($this->exactly(5))
+            ->method('min')
+            ->will($this->onConsecutiveCalls(
+                date('Y-m-d H:i:s', time() - 60 * 60 * 1),
+                date('Y-m-d H:i:s', time() - 60 * 60 * 2),
+                date('Y-m-d H:i:s', time() - 60 * 60 * 3),
+                date('Y-m-d H:i:s', time() - 60 * 60 * 4),
+                date('Y-m-d H:i:s', time() - 60 * 60 * 5),
+                date('Y-m-d H:i:s', time() - 60 * 60 * 6)
+            ));
+
+        $file = __DIR__ . '/../../../.monitoring';
+        if (file_exists($file)) {
+            unlink($file);
+        }
+        $this->assertTrue($pipeline->monitoring($file, 'start_time'));
+        $this->assertTrue(file_exists($file));
     }
 }

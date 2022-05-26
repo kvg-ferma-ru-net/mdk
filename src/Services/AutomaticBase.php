@@ -47,8 +47,12 @@ class AutomaticBase implements AutomaticInterface
      */
     public function fiscalize(string $orderId, string $siteId = '', int $receiptSubType = null): Receipt
     {
+        // получить коллекцию действительных чеков по текущему заказу на сайте
         $receipts = $this->receiptStorage->getCollection(
-            (new ReceiptFilter())->setOrderId($orderId)->setSiteId($siteId)
+            (new ReceiptFilter())
+                ->setOrderId($orderId)
+                ->setSiteId($siteId)
+                ->setAvailable(true)
         );
 
         if ($receiptSubType === null) {
@@ -84,7 +88,7 @@ class AutomaticBase implements AutomaticInterface
         // если пробиваем второй чек и был чек предоплаты
         if (
             $receiptSubType == ReceiptSubType::FULL
-            && $receipts->getByType(ReceiptType::COMING, ReceiptSubType::PRE)
+            && ($receiptPre = $receipts->getByType(ReceiptType::COMING, ReceiptSubType::PRE))
         ) {
             $amount->set(Amount::PREPAYMENT, $total);
         } else {
@@ -108,12 +112,16 @@ class AutomaticBase implements AutomaticInterface
         try {
             $receipt = $this->transfer->sendReceipt($this->settings->extrudeConn($siteId), $receipt);
         } catch (TransferException $e) {
-            if ((new ReceiptStatus($e->getCode()))->getCode() == ReceiptStatus::ERROR) {
+            $receiptStatus = new ReceiptStatus($e->getCode());
+            if (
+                $receiptStatus->getCode() == ReceiptStatus::ERROR
+                || $receiptStatus->getCode() == ReceiptStatus::UNAUTH
+            ) {
                 throw $e;
             }
+        } finally {
+            $this->receiptStorage->save($receipt);
         }
-
-        $this->receiptStorage->save($receipt);
 
         return $receipt;
     }

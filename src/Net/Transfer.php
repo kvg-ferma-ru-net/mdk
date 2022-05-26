@@ -131,6 +131,7 @@ class Transfer implements TransferInterface
             try {
                 $this->client->send();
             } catch (NetConnectException $e) {
+                // проблемы с сетью
                 $receipt->setStatus(new ReceiptStatus(ReceiptStatus::PREPARED));
                 throw new TransferException($e->getMessage(), $e->getCode());
             }

@@ -43,28 +43,7 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
 
     public function getCollection(ReceiptFilter $filter, int $limit = 0): ReceiptCollection
     {
-        $aWhere = $filter->toArray();
-        $aWhere2 = [];
-        foreach ($aWhere as $key => $value) {
-            $val = $value['value'];
-            if ($val === null) {
-                $val = 'null';
-            } elseif (is_array($val)) {
-                $val = '(' . implode(',', $val) . ')';
-
-                if ($value['op'] == '=') {
-                    $value['op'] = ' IN ';
-                } else {
-                    $value['op'] = ' NOT IN ';
-                }
-            } else {
-                $val = "'$val'";
-            }
-            $op = $value['op'];
-            $aWhere2[] = "{$key}{$op}$val";
-        }
-
-        $where = implode(' AND ', $aWhere2);
+        $where = $this->where($filter);
 
         $a = $this->selectArray($where, $limit);
         $receipts = new ReceiptCollection();
@@ -80,6 +59,30 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
         }
 
         return $receipts;
+    }
+
+    public function min(ReceiptFilter $filter, string $column)
+    {
+        $where = $this->where($filter);
+        $sql = "SELECT MIN($column) FROM `receipts` WHERE $where";
+        $result = $this->db->query($sql, true)[0];
+        return current($result);
+    }
+
+    public function max(ReceiptFilter $filter, string $column)
+    {
+        $where = $this->where($filter);
+        $sql = "SELECT MAX($column) FROM `receipts` WHERE $where";
+        $result = $this->db->query($sql, true)[0];
+        return current($result);
+    }
+
+    public function count(ReceiptFilter $filter): int
+    {
+        $where = $this->where($filter);
+        $sql = "SELECT COUNT(*) FROM `receipts` WHERE $where";
+        $result = $this->db->query($sql, true)[0];
+        return current($result);
     }
 
     //######################################################################
@@ -155,5 +158,32 @@ class ReceiptStorageConcrete implements ReceiptStorageInterface
             $sql .= " ORDER BY `id` ASC LIMIT $limit";
         }
         return $this->db->query($sql, true);
+    }
+
+    private function where(ReceiptFilter $filter): string
+    {
+        $aWhere = $filter->toArray();
+        $aWhere2 = [];
+        foreach ($aWhere as $key => $value) {
+            $val = $value['value'];
+            if ($val === null) {
+                $val = 'null';
+            } elseif (is_array($val)) {
+                $val = '(' . implode(',', $val) . ')';
+
+                if ($value['op'] == '=') {
+                    $value['op'] = ' IN ';
+                } else {
+                    $value['op'] = ' NOT IN ';
+                }
+            } else {
+                $val = "'$val'";
+            }
+            $op = $value['op'];
+            $aWhere2[] = "{$key}{$op}$val";
+        }
+
+        $where = implode(' AND ', $aWhere2);
+        return $where;
     }
 }

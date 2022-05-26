@@ -25,7 +25,7 @@ class ReceiptStatusTest extends TestCase
         );
 
         $this->assertSame(
-            ReceiptStatus::WAIT,
+            ReceiptStatus::ACCEPTED,
             (new ReceiptStatus(202))->getCode()
         );
 
@@ -51,11 +51,11 @@ class ReceiptStatusTest extends TestCase
         );
 
         $this->assertSame(
-            ReceiptStatus::REPEAT,
+            ReceiptStatus::UNAUTH,
             (new ReceiptStatus(401))->getCode()
         );
         $this->assertSame(
-            ReceiptStatus::REPEAT,
+            ReceiptStatus::UNAUTH,
             (new ReceiptStatus(404))->getCode()
         );
 
@@ -100,16 +100,16 @@ class ReceiptStatusTest extends TestCase
             (new ReceiptStatus(ReceiptStatus::COMPLETED))->getCode()
         );
         $this->assertSame(
-            ReceiptStatus::WAIT,
-            (new ReceiptStatus(ReceiptStatus::WAIT))->getCode()
+            ReceiptStatus::ACCEPTED,
+            (new ReceiptStatus(ReceiptStatus::ACCEPTED))->getCode()
         );
         $this->assertSame(
             ReceiptStatus::ASSUME,
             (new ReceiptStatus(ReceiptStatus::ASSUME))->getCode()
         );
         $this->assertSame(
-            ReceiptStatus::REPEAT,
-            (new ReceiptStatus(ReceiptStatus::REPEAT))->getCode()
+            ReceiptStatus::UNAUTH,
+            (new ReceiptStatus(ReceiptStatus::UNAUTH))->getCode()
         );
 
         $this->assertSame(
