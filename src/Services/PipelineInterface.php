@@ -10,9 +10,11 @@ interface PipelineInterface
     /**
      * Обновление статуса чеков, которые не пробились сразу
      *
+     * @param string $file путь до файла блокировки
+     *
      * @return bool
      */
-    public function update(): bool;
+    public function update(string $file): bool;
 
     /**
      * Сборка и публикация данных мониторинга

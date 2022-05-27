@@ -37,9 +37,11 @@ class PipelineBaseFakeTest extends TestCase
     private $storage;
     private $logger;
     private $settings;
+    private $fileLock;
 
     protected function setUp(): void
     {
+        $this->fileLock = __DIR__ . '/../../../.pipeline';
         $this->client = $this->createMock(NetClientInterface::class);
         $this->client->method('send')
             ->will($this->returnSelf());
@@ -79,9 +81,9 @@ class PipelineBaseFakeTest extends TestCase
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
 
-        $fp = fopen(PipelineBase::LOCK_FILE, "w+");
+        $fp = fopen($this->fileLock, "w+");
         flock($fp, LOCK_EX);
-        $this->assertFalse($pipeline->update());
+        $this->assertFalse($pipeline->update($this->fileLock));
     }
 
     /**
@@ -129,7 +131,7 @@ class PipelineBaseFakeTest extends TestCase
             $this->logger
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
-        $this->assertTrue($pipeline->update());
+        $this->assertTrue($pipeline->update($this->fileLock));
 
         for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
             $this->assertSame(ReceiptStatus::COMPLETED, $receipts[$i]->getStatus()->getCode());
@@ -171,7 +173,7 @@ class PipelineBaseFakeTest extends TestCase
             $this->logger
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
-        $this->assertTrue($pipeline->update());
+        $this->assertTrue($pipeline->update($this->fileLock));
 
         $this->assertSame(ReceiptStatus::UNAUTH, $receipts[0]->getStatus()->getCode());
         $this->assertSame(ReceiptStatus::UNAUTH, $receipts[1]->getStatus()->getCode());
@@ -219,7 +221,7 @@ class PipelineBaseFakeTest extends TestCase
             $this->logger
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
-        $this->assertTrue($pipeline->update());
+        $this->assertTrue($pipeline->update($this->fileLock));
 
         for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
             $this->assertSame(ReceiptStatus::ASSUME, $receipts1[$i]->getStatus()->getCode());
@@ -263,7 +265,7 @@ class PipelineBaseFakeTest extends TestCase
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
 
-        $this->assertTrue($pipeline->update());
+        $this->assertTrue($pipeline->update($this->fileLock));
         $this->assertSame(ReceiptStatus::EXPIRED, $receipts[0]->getStatus()->getCode());
     }
 
