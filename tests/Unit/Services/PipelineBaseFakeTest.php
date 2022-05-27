@@ -284,9 +284,9 @@ class PipelineBaseFakeTest extends TestCase
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
 
         $this->storage
-            ->expects($this->exactly(6))
+            ->expects($this->exactly(7))
             ->method('count')
-            ->will($this->onConsecutiveCalls(1, 2, 3, 4, 5, 6));
+            ->will($this->onConsecutiveCalls(1, 2, 3, 4, 5, 6, 7));
 
         $this->storage
             ->expects($this->exactly(1))
@@ -294,7 +294,7 @@ class PipelineBaseFakeTest extends TestCase
             ->will($this->onConsecutiveCalls(date('Y-m-d H:i:s', time() - 60 * 60)));
 
         $this->storage
-            ->expects($this->exactly(5))
+            ->expects($this->exactly(6))
             ->method('min')
             ->will($this->onConsecutiveCalls(
                 date('Y-m-d H:i:s', time() - 60 * 60 * 1),
