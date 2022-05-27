@@ -80,6 +80,9 @@ class PipelineBase implements PipelineInterface
         $countAccepted = $this->receiptStorage->count(
             (new ReceiptFilter())->setStatus(ReceiptStatus::ACCEPTED)
         );
+        $countUnauth = $this->receiptStorage->count(
+            (new ReceiptFilter())->setStatus(ReceiptStatus::UNAUTH)
+        );
         $countAssume = $this->receiptStorage->count(
             (new ReceiptFilter())->setStatus(ReceiptStatus::ASSUME)
         );
@@ -118,6 +121,15 @@ class PipelineBase implements PipelineInterface
             $durationAccepted = time() - intval(strtotime($minTimeAccepted));
         }
 
+        $minTimeUnauth = $this->receiptStorage->min(
+            (new ReceiptFilter())->setStatus(ReceiptStatus::UNAUTH),
+            $columnStratTime
+        );
+        $durationUnauth = 0;
+        if ($minTimeUnauth !== null) {
+            $durationUnauth = time() - intval(strtotime($minTimeUnauth));
+        }
+
         $minTimeAssume = $this->receiptStorage->min(
             (new ReceiptFilter())->setStatus(ReceiptStatus::ASSUME),
             $columnStratTime
@@ -153,6 +165,8 @@ class PipelineBase implements PipelineInterface
             '# TYPE prepared_duration gauge',
             '# TYPE accepted_count gauge',
             '# TYPE accepted_duration gauge',
+            '# TYPE unauth_count gauge',
+            '# TYPE unauth_duration gauge',
             '# TYPE assume_count gauge',
             '# TYPE assume_duration gauge',
             '# TYPE error_count gauge',
@@ -168,6 +182,8 @@ class PipelineBase implements PipelineInterface
         $content[] = sprintf('prepared_duration %d', $durationPrepared);
         $content[] = sprintf('accepted_count %d', $countAccepted);
         $content[] = sprintf('accepted_duration %d', $durationAccepted);
+        $content[] = sprintf('unauth_count %d', $countUnauth);
+        $content[] = sprintf('unauth_duration %d', $durationUnauth);
         $content[] = sprintf('assume_count %d', $countAssume);
         $content[] = sprintf('assume_duration %d', $durationAssume);
         $content[] = sprintf('error_count %d', $countError);
