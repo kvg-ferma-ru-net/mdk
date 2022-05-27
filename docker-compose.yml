@@ -14,9 +14,6 @@ services:
   php:
     build:
       context: ./.docker/php
-      args:
-        uid: 1000
-        user: runner
     container_name: mdk-php
     depends_on: 
       - mysql

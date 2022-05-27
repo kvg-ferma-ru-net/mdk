@@ -1,7 +1,7 @@
 
 default:
   tags:
-    - mdk
+    - gitlab-runner-shell
 
 cache:
   paths:
@@ -16,7 +16,9 @@ pre-job:
   script:
     - docker -v
     - docker-compose -v
-    - docker-compose up -d --force-recreate --build
+    - docker-compose build --build-arg user=gitlab-runner --build-arg uid=1001
+    - docker-compose up -d
+    - docker-compose exec -T php composer install
     - docker-compose exec -T php php -f /opt/wait-db.php
 
 analysis-cs-job:
