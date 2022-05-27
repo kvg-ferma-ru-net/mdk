@@ -305,7 +305,7 @@ class SystemTest extends TestCase
 
 
         $pipeline = self::$client->servicePipeline();
-        $pipeline->update();
+        $pipeline->update(__DIR__ . '/../../.pipeline');
         foreach ($receipts as $key => $value) {
             $receipt = self::$storage->getOne($key);
             $statusCode = $receipt->getStatus()->getCode();

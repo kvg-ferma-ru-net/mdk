@@ -16,9 +16,6 @@ use Innokassa\MDK\Storage\ReceiptStorageInterface;
  */
 class PipelineBase implements PipelineInterface
 {
-    /** Лок файл для обработки очереди принятых чеков */
-    public const LOCK_FILE = __DIR__ . '/../../.pipeline';
-
     /** Количество выбираемых элементов из БД */
     public const COUNT_SELECT = 50;
 
@@ -42,9 +39,9 @@ class PipelineBase implements PipelineInterface
     /**
      * @inheritDoc
      */
-    public function update(): bool
+    public function update(string $file): bool
     {
-        $fp = fopen(self::LOCK_FILE, "w+");
+        $fp = fopen($file, "w+");
         if (!flock($fp, LOCK_EX | LOCK_NB)) {
             return false;
         }
@@ -61,7 +58,7 @@ class PipelineBase implements PipelineInterface
             $idLast = $this->processing($receipts);
         } while ($receipts->count() == self::COUNT_SELECT && $idLast > 0);
 
-        unlink(self::LOCK_FILE);
+        unlink($file);
 
         return true;
     }
