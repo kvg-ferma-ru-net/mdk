@@ -142,14 +142,16 @@ class ReceiptItemTest extends TestCase
     public function testSetGetAmount()
     {
         $receiptItem = new ReceiptItem();
-        $receiptItem->setPrice(100.0)
+        $receiptItem->setPrice(20.6)
                     ->setQuantity(3);
-        $this->assertSame(300.0, $receiptItem->getAmount());
-        $this->assertSame($receiptItem, $receiptItem->setAmount(300.0));
-        $this->assertSame(300.0, $receiptItem->getAmount());
+        $this->assertSame(61.8, $receiptItem->getAmount());
+        $this->assertSame($receiptItem, $receiptItem->setAmount($receiptItem->getPrice() * $receiptItem->getQuantity()));
+        $this->assertSame($receiptItem, $receiptItem->setAmount(61.8));
+        $this->assertSame($receiptItem, $receiptItem->setAmount($receiptItem->getAmount()));
+        $this->assertSame(61.8, $receiptItem->getAmount());
 
         $this->expectException(InvalidArgumentException::class);
-        $receiptItem->setAmount(100);
+        $receiptItem->setAmount(20.6);
     }
 
     /**

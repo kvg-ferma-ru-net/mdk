@@ -122,7 +122,7 @@ class ReceiptItem
             throw new InvalidArgumentException("invalid receipt item price '$price'");
         }
 
-        $this->price = $price;
+        $this->price = round($price, 2);
         return $this;
     }
 
@@ -152,7 +152,7 @@ class ReceiptItem
             throw new InvalidArgumentException("invalid receipt item quantity '$quantity'");
         }
 
-        $this->quantity = $quantity;
+        $this->quantity = round($quantity, 3);
         return $this;
     }
 
@@ -182,7 +182,8 @@ class ReceiptItem
      */
     public function setAmount(float $amount): self
     {
-        if ($amount != ($this->price * $this->quantity)) {
+        $amount = round($amount, 2);
+        if ($amount != round(($this->price * $this->quantity), 2)) {
             throw new InvalidArgumentException(
                 "receipt item amount ($amount) deffers from price($this->price) * quantity($this->quantity)"
             );
@@ -199,7 +200,7 @@ class ReceiptItem
      */
     public function getAmount(): float
     {
-        return ($this->amount > 0.0 ? $this->amount : ($this->price * $this->quantity));
+        return ($this->amount > 0.0 ? $this->amount : round(($this->price * $this->quantity), 2));
     }
 
     //**********************************************************************

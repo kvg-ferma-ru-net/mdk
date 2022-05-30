@@ -19,6 +19,6 @@ class ReceiptItemCollection extends BaseCollection
             $amount += $receiptItem->getAmount();
         }
 
-        return $amount;
+        return round($amount, 2);
     }
 }
