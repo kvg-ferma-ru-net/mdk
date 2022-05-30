@@ -52,6 +52,8 @@ class Amount
             throw new InvalidArgumentException("invalid amount sum '$sum'");
         }
 
+        $sum = round($sum, 2);
+
         switch ($type) {
             case Amount::CASH:
                 $this->cash = $sum;
