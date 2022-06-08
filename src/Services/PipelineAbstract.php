@@ -2,19 +2,20 @@
 
 namespace Innokassa\MDK\Services;
 
+use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Net\TransferInterface;
+use Innokassa\MDK\Settings\SettingsConn;
 use Innokassa\MDK\Storage\ReceiptFilter;
-use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
+use Innokassa\MDK\Exceptions\SettingsException;
 use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Collections\ReceiptCollection;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 
 /**
- * Базовая реализация PipelineInterface.
- * Только один инстанс класса будет работать одновременно (используется файловая блокировка)
+ * Абстрактный класс с базовой реализацей PipelineInterface.
  */
-class PipelineBase implements PipelineInterface
+abstract class PipelineAbstract implements PipelineInterface
 {
     /** Количество выбираемых элементов из БД */
     public const COUNT_SELECT = 50;
@@ -22,27 +23,14 @@ class PipelineBase implements PipelineInterface
     //######################################################################
 
     /**
-     * @param SettingsAbstract $settings
-     * @param ReceiptStorageInterface $receiptStorage
-     * @param TransferInterface $transfer
-     */
-    public function __construct(
-        SettingsAbstract $settings,
-        ReceiptStorageInterface $receiptStorage,
-        TransferInterface $transfer
-    ) {
-        $this->receiptStorage = $receiptStorage;
-        $this->transfer = $transfer;
-        $this->settings = $settings;
-    }
-
-    /**
      * @inheritDoc
+     *
+     * Только один инстанс класса будет работать одновременно (используется файловая блокировка)
      */
     public function update(string $file): bool
     {
         $fp = fopen($file, "w+");
-        if (!flock($fp, LOCK_EX | LOCK_NB)) {
+        if (!$fp || !flock($fp, LOCK_EX | LOCK_NB)) {
             return false;
         }
 
@@ -195,17 +183,14 @@ class PipelineBase implements PipelineInterface
     }
 
     //######################################################################
-    // PRIVATE
+    // PROTECTED
     //######################################################################
 
     /** @var ReceiptStorageInterface */
-    private $receiptStorage = null;
+    protected $receiptStorage = null;
 
     /** @var TransferInterface */
-    private $transfer = null;
-
-    /** @var SettingsAbstract */
-    private $settings = null;
+    protected $transfer = null;
 
     //######################################################################
 
@@ -215,7 +200,7 @@ class PipelineBase implements PipelineInterface
      * @param ReceiptCollection $receipts
      * @return integer наибольший идентификатор чека из коллекции
      */
-    private function processing(ReceiptCollection $receipts): int
+    protected function processing(ReceiptCollection $receipts): int
     {
         // ошибочные статусы
         static $errStatuses = [ReceiptStatus::ASSUME];
@@ -234,12 +219,15 @@ class PipelineBase implements PipelineInterface
 
             try {
                 $receipt = $this->transfer->sendReceipt(
-                    $this->settings->extrudeConn($receipt->getSiteId()),
+                    $this->extrudeConn($receipt),
                     $receipt
                 );
             } catch (TransferException $e) {
+            } catch (SettingsException $e) {
+                // TODO
             } finally {
-                if (array_search($receipt->getStatus()->getCode(), $errStatuses) !== false) {
+                $receiptStatus = $receipt->getStatus();
+                if (!$receiptStatus || array_search($receiptStatus->getCode(), $errStatuses) !== false) {
                     $countError++;
                 }
                 // в любом случае сохраняем чек
@@ -249,4 +237,14 @@ class PipelineBase implements PipelineInterface
 
         return ($countError == $receipts->count() ? 0 : $idLast);
     }
+
+    /**
+     * Извлечь настройки соединения на основании данных чека
+     *
+     * @throws SettingsException
+     *
+     * @param Receipt $receipt
+     * @return SettingsConn
+     */
+    abstract protected function extrudeConn(Receipt $receipt): SettingsConn;
 }

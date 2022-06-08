@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Net\ConverterApi;
 use Innokassa\MDK\Logger\LoggerFile;
 use Innokassa\MDK\Net\NetClientCurl;
-use Innokassa\MDK\Services\PipelineBase;
+use Innokassa\MDK\Services\PipelineForModule;
 use Innokassa\MDK\Logger\LoggerInterface;
 use Innokassa\MDK\Services\AutomaticBase;
 use Innokassa\MDK\Services\ConnectorBase;
@@ -22,7 +22,7 @@ use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
  * @uses Innokassa\MDK\Net\Transfer
  * @uses Innokassa\MDK\Services\AutomaticBase
  * @uses Innokassa\MDK\Services\ConnectorBase
- * @uses Innokassa\MDK\Services\PipelineBase
+ * @uses Innokassa\MDK\Services\PipelineForModule
  * @uses Innokassa\MDK\Logger\LoggerFile
  */
 class ClientTest extends TestCase
@@ -48,7 +48,7 @@ class ClientTest extends TestCase
         $transfer = new Transfer(new NetClientCurl(), new ConverterApi(), $logger);
 
         $automatic = new AutomaticBase($settings, $storage, $transfer, $adapter, new ReceiptIdFactoryMeta());
-        $pipeline = new PipelineBase($settings, $storage, $transfer);
+        $pipeline = new PipelineForModule($settings, $storage, $transfer);
         $connector = new ConnectorBase($transfer);
 
         $client = new Client(
