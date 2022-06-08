@@ -8,10 +8,8 @@ use Innokassa\MDK\Net\ConverterApi;
 use Innokassa\MDK\Logger\LoggerFile;
 use Innokassa\MDK\Net\NetClientCurl;
 use Innokassa\MDK\Entities\Atoms\Vat;
-use Innokassa\MDK\Services\ManualBase;
 use Innokassa\MDK\Entities\ReceiptItem;
-use Innokassa\MDK\Services\PrinterBase;
-use Innokassa\MDK\Services\PipelineBase;
+use Innokassa\MDK\Services\PipelineForModule;
 use Innokassa\MDK\Storage\ReceiptFilter;
 use Innokassa\MDK\Services\AutomaticBase;
 use Innokassa\MDK\Services\ConnectorBase;
@@ -29,7 +27,6 @@ use Innokassa\MDK\Collections\ReceiptCollection;
 use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
 use Innokassa\MDK\Entities\Atoms\ReceiptItemType;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
-use Innokassa\MDK\Exceptions\Services\ManualException;
 use Innokassa\MDK\Exceptions\Services\AutomaticException;
 use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
 
@@ -116,7 +113,7 @@ class SystemTest extends TestCase
             self::$adapter,
             new ReceiptIdFactoryMeta()
         );
-        $pipeline = new PipelineBase(self::$settings, self::$storage, $transfer);
+        $pipeline = new PipelineForModule(self::$settings, self::$storage, $transfer);
         $connector = new ConnectorBase($transfer);
 
         self::$client = new Client(
