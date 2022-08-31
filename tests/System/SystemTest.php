@@ -67,7 +67,7 @@ class SystemTest extends TestCase
     /** @var ReceiptStorageConcrete */
     protected static $storage;
 
-    /** @var ReceiptStorageConcrete */
+    /** @var ReceiptAdapterConcrete */
     protected static $adapter;
 
     /** @var Client */
@@ -78,7 +78,7 @@ class SystemTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$db = new db('mysql', 'root', 'root');
+        self::$db = new db('db', 'root', 'root');
         self::$db->query(file_get_contents(__DIR__ . '/db.sql'));
 
         self::$settings = new SettingsConcrete([
@@ -144,7 +144,7 @@ class SystemTest extends TestCase
                     ->setName('name')
             )
             ->setTaxation(Taxation::USN)
-            ->setAmount(new Amount(Amount::CASHLESS, 200.0))
+            ->setAmount((new Amount())->setCashless(200))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
             ->setLocation('https://example.com/');
@@ -167,7 +167,7 @@ class SystemTest extends TestCase
         $this->assertSame($index, $receiptFromDB->getId());
         $this->assertSame(ReceiptType::REFUND_COMING, $receiptFromDB->getType());
         $this->assertSame(Taxation::USN, $receiptFromDB->getTaxation());
-        $this->assertSame(200.0, $receiptFromDB->getAmount()->get(Amount::CASHLESS));
+        $this->assertSame(200.0, $receiptFromDB->getAmount()->getCashless());
         $this->assertSame('box@domain.zone', $receiptFromDB->getNotify()->getEmail());
         $this->assertSame('Test', $receiptFromDB->getCustomer()->getName());
         $this->assertSame('https://example.com/', $receiptFromDB->getLocation());
@@ -252,13 +252,12 @@ class SystemTest extends TestCase
         $receipts[$receiptComing->getId()] = [ReceiptStatus::COMPLETED, ReceiptStatus::ACCEPTED];
 
         /*
-            создадим чек для заказа 6, пробьем и специально установим статус ACCEPTED,
+            создадим чек для заказа 6, пробьем и специально установим статус PREPARED,
             в тестах будем ждать EXPIRED
         */
         $orderId = 6;
         $receiptComing = $automatic->fiscalize($orderId);
-        $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::ASSUME));
-        $receiptComing->setAccepted(false);
+        $receiptComing->setStatus(new ReceiptStatus(ReceiptStatus::PREPARED));
         $receiptComing->setStartTime(date('Y-m-d H:i:s', time() - (Receipt::ALLOWED_ATTEMPT_TIME + 1)));
         self::$storage->save($receiptComing);
         $receipts[$receiptComing->getId()] = [ReceiptStatus::EXPIRED];
@@ -276,13 +275,13 @@ class SystemTest extends TestCase
 
         /*
             создадим еще один чек для несуществующего заказа 10,
-            не будем фискализировать и установим статус ASSUME (сервер ответил ошибками сервера)
+            не будем фискализировать и установим статус PREPARED
             в тестах будем ждать COMPLETED | ACCEPTED
         */
         $receipt = new Receipt();
         $receipt
             ->setId(0)
-            ->setStatus(new ReceiptStatus(ReceiptStatus::ASSUME))
+            ->setStatus(new ReceiptStatus(ReceiptStatus::PREPARED))
             ->setOrderId(10)
             ->setType(ReceiptType::COMING)
             ->addItem(
@@ -292,7 +291,7 @@ class SystemTest extends TestCase
                     ->setName('name')
             )
             ->setTaxation(Taxation::USN)
-            ->setAmount(new Amount(Amount::CASHLESS, 200.0))
+            ->setAmount((new Amount())->setCashless(200))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
             ->setLocation('https://example.com/');

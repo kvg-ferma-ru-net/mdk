@@ -30,32 +30,32 @@ class ReceiptStatusTest extends TestCase
         );
 
         $this->assertSame(
-            ReceiptStatus::ASSUME,
+            ReceiptStatus::PREPARED,
             (new ReceiptStatus(500))->getCode()
         );
         $this->assertSame(
-            ReceiptStatus::ASSUME,
+            ReceiptStatus::PREPARED,
             (new ReceiptStatus(501))->getCode()
         );
         $this->assertSame(
-            ReceiptStatus::ASSUME,
+            ReceiptStatus::PREPARED,
             (new ReceiptStatus(502))->getCode()
         );
         $this->assertSame(
-            ReceiptStatus::ASSUME,
+            ReceiptStatus::PREPARED,
             (new ReceiptStatus(503))->getCode()
         );
         $this->assertSame(
-            ReceiptStatus::ASSUME,
+            ReceiptStatus::PREPARED,
             (new ReceiptStatus(504))->getCode()
         );
 
         $this->assertSame(
-            ReceiptStatus::UNAUTH,
+            ReceiptStatus::ERROR,
             (new ReceiptStatus(401))->getCode()
         );
         $this->assertSame(
-            ReceiptStatus::UNAUTH,
+            ReceiptStatus::ERROR,
             (new ReceiptStatus(404))->getCode()
         );
 
@@ -104,15 +104,6 @@ class ReceiptStatusTest extends TestCase
             (new ReceiptStatus(ReceiptStatus::ACCEPTED))->getCode()
         );
         $this->assertSame(
-            ReceiptStatus::ASSUME,
-            (new ReceiptStatus(ReceiptStatus::ASSUME))->getCode()
-        );
-        $this->assertSame(
-            ReceiptStatus::UNAUTH,
-            (new ReceiptStatus(ReceiptStatus::UNAUTH))->getCode()
-        );
-
-        $this->assertSame(
             ReceiptStatus::ERROR,
             (new ReceiptStatus(ReceiptStatus::ERROR))->getCode()
         );
@@ -131,6 +122,6 @@ class ReceiptStatusTest extends TestCase
         $a = ReceiptStatus::all();
         $this->assertIsArray($a);
         $this->assertContainsOnlyInstancesOf(ReceiptStatus::class, $a);
-        $this->assertCount(7, $a);
+        $this->assertCount(5, $a);
     }
 }

@@ -225,8 +225,8 @@ class PipelineForModuleFakeTest extends TestCase
         $pipeline = new PipelineForModule($this->settings, $this->storage, $transfer);
         $this->assertTrue($pipeline->update($this->fileLock));
 
-        $this->assertSame(ReceiptStatus::UNAUTH, $receipts[0]->getStatus()->getCode());
-        $this->assertSame(ReceiptStatus::UNAUTH, $receipts[1]->getStatus()->getCode());
+        $this->assertSame(ReceiptStatus::ERROR, $receipts[0]->getStatus()->getCode());
+        $this->assertSame(ReceiptStatus::ERROR, $receipts[1]->getStatus()->getCode());
     }
 
     /**
@@ -274,7 +274,7 @@ class PipelineForModuleFakeTest extends TestCase
         $this->assertTrue($pipeline->update($this->fileLock));
 
         for ($i = 0; $i < PipelineAbstract::COUNT_SELECT; ++$i) {
-            $this->assertSame(ReceiptStatus::ASSUME, $receipts1[$i]->getStatus()->getCode());
+            $this->assertSame(ReceiptStatus::PREPARED, $receipts1[$i]->getStatus()->getCode());
         }
 
         $this->assertSame(ReceiptStatus::PREPARED, $receipts2[0]->getStatus()->getCode());
@@ -291,7 +291,7 @@ class PipelineForModuleFakeTest extends TestCase
         $receipts = new ReceiptCollection();
         $receipts[] = (new Receipt())
             ->setStartTime(date("Y-m-d H:i:s", time() - (Receipt::ALLOWED_ATTEMPT_TIME + 1)))
-            ->setStatus(new ReceiptStatus(ReceiptStatus::ASSUME));
+            ->setStatus(new ReceiptStatus(ReceiptStatus::PREPARED));
 
         $this->storage
             ->method('getCollection')
@@ -336,9 +336,9 @@ class PipelineForModuleFakeTest extends TestCase
         $pipeline = new PipelineForModule($this->settings, $this->storage, $transfer);
 
         $this->storage
-            ->expects($this->exactly(7))
+            ->expects($this->exactly(5))
             ->method('count')
-            ->will($this->onConsecutiveCalls(1, 2, 3, 4, 5, 6, 7));
+            ->will($this->onConsecutiveCalls(1, 2, 3, 4, 5));
 
         $this->storage
             ->expects($this->exactly(1))
@@ -346,15 +346,13 @@ class PipelineForModuleFakeTest extends TestCase
             ->will($this->onConsecutiveCalls(date('Y-m-d H:i:s', time() - 60 * 60)));
 
         $this->storage
-            ->expects($this->exactly(6))
+            ->expects($this->exactly(4))
             ->method('min')
             ->will($this->onConsecutiveCalls(
                 date('Y-m-d H:i:s', time() - 60 * 60 * 1),
                 date('Y-m-d H:i:s', time() - 60 * 60 * 2),
                 date('Y-m-d H:i:s', time() - 60 * 60 * 3),
                 date('Y-m-d H:i:s', time() - 60 * 60 * 4),
-                date('Y-m-d H:i:s', time() - 60 * 60 * 5),
-                date('Y-m-d H:i:s', time() - 60 * 60 * 6)
             ));
 
         $file = __DIR__ . '/../../../.monitoring';

@@ -2,34 +2,38 @@ version: '3.0'
 
 services:
 
-  mysql:
+  db:
     image: mysql:5.7
-    container_name: mdk-mysql
+    container_name: mdk-db
     environment:
       MYSQL_ROOT_PASSWORD: root
     command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
     networks:
-      - app-network
+      - mdk-network
 
-  php:
-    build:
-      context: ./.docker/php
-    container_name: mdk-php
+  backend:
+    image: registry.git.innokassa.ru/byurrer/docker-images/php7.4-cli:dev
+    container_name: mdk-backend
+    extra_hosts:
+      - "host.docker.internal:172.16.1.1"
     depends_on: 
-      - mysql
+      - db
     volumes:
-      - ./:/opt/mdk/
-      - ./.docker/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+      - ./src/:/var/www/html/src/
+      - ./tests/:/var/www/html/tests/
+      - ./composer.json:/var/www/html/composer.json
+      - ./phpstan.neon:/var/www/html/phpstan.neon
+      - ./phpunit.xml:/var/www/html/phpunit.xml
       - ./.docker/php/entrypoint.sh:/usr/bin/entrypoint.sh
-      - ./.docker/php/wait-db.php:/opt/wait-db.php
+      - ./.docker/php/wait-db.php:/var/www/html/wait-db.php
     command: /bin/bash -c "/usr/bin/entrypoint.sh"
     networks:
-      - app-network
+      - mdk-network
 
 networks:
-  app-network:
+  mdk-network:
     driver: bridge
     ipam:
       driver: default
       config:
-        - subnet: 172.19.1.1/24
+        - subnet: 172.16.1.1/24

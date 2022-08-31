@@ -19,7 +19,6 @@ class ReceiptFilterTest extends TestCase
      * @covers Innokassa\MDK\Storage\ReceiptFilter::setStatus
      * @covers Innokassa\MDK\Storage\ReceiptFilter::setOrderId
      * @covers Innokassa\MDK\Storage\ReceiptFilter::setSiteId
-     * @covers Innokassa\MDK\Storage\ReceiptFilter::setAvailable
      * @covers Innokassa\MDK\Storage\ReceiptFilter::toArray
      */
     public function test()
@@ -43,7 +42,6 @@ class ReceiptFilterTest extends TestCase
         $filter->setOrderId('0');
         $filter->setId('0', ReceiptFilter::OP_GT);
         $filter->setSiteId('0', ReceiptFilter::OP_GT);
-        $filter->setAvailable(true, ReceiptFilter::OP_GT);
         $this->assertEquals(
             [
                 'type' => [
@@ -68,10 +66,6 @@ class ReceiptFilterTest extends TestCase
                 ],
                 'site_id' => [
                     'value' => '0',
-                    'op' => ReceiptFilter::OP_GT
-                ],
-                'available' => [
-                    'value' => '1',
                     'op' => ReceiptFilter::OP_GT
                 ]
             ],

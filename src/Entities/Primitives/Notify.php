@@ -119,6 +119,9 @@ class Notify
     // PRIVATE
     //######################################################################
 
+    /** @var string */
     private $email = '';
+
+    /** @var string */
     private $phone = '';
 }

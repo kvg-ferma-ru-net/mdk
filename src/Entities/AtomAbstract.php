@@ -30,7 +30,7 @@ abstract class AtomAbstract
     /**
      * Получить все возможные объекты текущего атома
      *
-     * @return array
+     * @return array<mixed>
      */
     abstract public static function all(): array;
 

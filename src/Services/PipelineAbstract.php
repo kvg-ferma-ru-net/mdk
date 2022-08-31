@@ -39,8 +39,7 @@ abstract class PipelineAbstract implements PipelineInterface
             $receipts = $this->receiptStorage->getCollection(
                 (new ReceiptFilter())
                     ->setId($idLast, ReceiptFilter::OP_GT)
-                    ->setStatus(ReceiptStatus::COMPLETED, ReceiptFilter::OP_NOTEQ)
-                    ->setAvailable(true),
+                    ->setStatus([ReceiptStatus::ACCEPTED, ReceiptStatus::PREPARED]),
                 self::COUNT_SELECT
             );
             $idLast = $this->processing($receipts);
@@ -64,12 +63,6 @@ abstract class PipelineAbstract implements PipelineInterface
         );
         $countAccepted = $this->receiptStorage->count(
             (new ReceiptFilter())->setStatus(ReceiptStatus::ACCEPTED)
-        );
-        $countUnauth = $this->receiptStorage->count(
-            (new ReceiptFilter())->setStatus(ReceiptStatus::UNAUTH)
-        );
-        $countAssume = $this->receiptStorage->count(
-            (new ReceiptFilter())->setStatus(ReceiptStatus::ASSUME)
         );
         $countError = $this->receiptStorage->count(
             (new ReceiptFilter())->setStatus(ReceiptStatus::ERROR)
@@ -106,24 +99,6 @@ abstract class PipelineAbstract implements PipelineInterface
             $durationAccepted = time() - intval(strtotime($minTimeAccepted));
         }
 
-        $minTimeUnauth = $this->receiptStorage->min(
-            (new ReceiptFilter())->setStatus(ReceiptStatus::UNAUTH),
-            $columnStratTime
-        );
-        $durationUnauth = 0;
-        if ($minTimeUnauth !== null) {
-            $durationUnauth = time() - intval(strtotime($minTimeUnauth));
-        }
-
-        $minTimeAssume = $this->receiptStorage->min(
-            (new ReceiptFilter())->setStatus(ReceiptStatus::ASSUME),
-            $columnStratTime
-        );
-        $durationAssume = 0;
-        if ($minTimeAssume !== null) {
-            $durationAssume = time() - intval(strtotime($minTimeAssume));
-        }
-
         $minTimeError = $this->receiptStorage->min(
             (new ReceiptFilter())->setStatus(ReceiptStatus::ERROR),
             $columnStratTime
@@ -150,10 +125,6 @@ abstract class PipelineAbstract implements PipelineInterface
             '# TYPE prepared_duration gauge',
             '# TYPE accepted_count gauge',
             '# TYPE accepted_duration gauge',
-            '# TYPE unauth_count gauge',
-            '# TYPE unauth_duration gauge',
-            '# TYPE assume_count gauge',
-            '# TYPE assume_duration gauge',
             '# TYPE error_count gauge',
             '# TYPE error_duration gauge',
             '# TYPE expired_count gauge',
@@ -167,10 +138,6 @@ abstract class PipelineAbstract implements PipelineInterface
         $content[] = sprintf('prepared_duration %d', $durationPrepared);
         $content[] = sprintf('accepted_count %d', $countAccepted);
         $content[] = sprintf('accepted_duration %d', $durationAccepted);
-        $content[] = sprintf('unauth_count %d', $countUnauth);
-        $content[] = sprintf('unauth_duration %d', $durationUnauth);
-        $content[] = sprintf('assume_count %d', $countAssume);
-        $content[] = sprintf('assume_duration %d', $durationAssume);
         $content[] = sprintf('error_count %d', $countError);
         $content[] = sprintf('error_duration %d', $durationError);
         $content[] = sprintf('expired_count %d', $countExpired);
@@ -202,8 +169,6 @@ abstract class PipelineAbstract implements PipelineInterface
      */
     protected function processing(ReceiptCollection $receipts): int
     {
-        // ошибочные статусы
-        static $errStatuses = [ReceiptStatus::ASSUME];
         $countError = 0;
 
         $idLast = 0;
@@ -211,27 +176,37 @@ abstract class PipelineAbstract implements PipelineInterface
             $idLast = ($receipt->getId() > $idLast ? $receipt->getId() : $idLast);
 
             // если чек не был принят сервером и время фискализации истекло
-            if (!$receipt->getAccepted() && $receipt->isExpired()) {
+            if ($receipt->getStatus()->getCode() == ReceiptStatus::PREPARED && $receipt->isExpired()) {
                 $receipt->setStatus(new ReceiptStatus(ReceiptStatus::EXPIRED));
                 $this->receiptStorage->save($receipt);
                 continue;
             }
 
+            $receiptStatus = new ReceiptStatus(ReceiptStatus::PREPARED);
             try {
-                $receipt = $this->transfer->sendReceipt(
+                $receiptStatus = $this->transfer->sendReceipt(
                     $this->extrudeConn($receipt),
                     $receipt
                 );
             } catch (TransferException $e) {
+                $receiptStatus = new ReceiptStatus($e->getCode());
             } catch (SettingsException $e) {
                 // TODO
             } finally {
-                $receiptStatus = $receipt->getStatus();
-                if (!$receiptStatus || array_search($receiptStatus->getCode(), $errStatuses) !== false) {
+                if ($receiptStatus->getCode() == ReceiptStatus::PREPARED) {
                     $countError++;
                 }
-                // в любом случае сохраняем чек
-                $this->receiptStorage->save($receipt);
+
+                // если новый статус дает окончательное состояние чека - обновляем
+                if (
+                    !(
+                        $receipt->getStatus()->getCode() == ReceiptStatus::ACCEPTED
+                        && $receiptStatus->getCode() == ReceiptStatus::PREPARED
+                    )
+                ) {
+                    $receipt->setStatus($receiptStatus);
+                    $this->receiptStorage->save($receipt);
+                }
             }
         }
 

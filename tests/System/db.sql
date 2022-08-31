@@ -30,13 +30,10 @@ INSERT INTO `test_db_mdk`.`orders` (`id`, `items`, `customer`, `notify`)
 CREATE TABLE `test_db_mdk`.`receipts` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `subtype` TINYINT,
-    `cashbox` VARCHAR(255) NOT NULL,
     `order_id` VARCHAR(255) NOT NULL,
     `site_id` VARCHAR(255) NOT NULL,
     `receipt_id` VARCHAR(64) NOT NULL,
     `status` TINYINT NOT NULL,
-    `accepted` TINYINT NOT NULL,
-    `available` TINYINT NOT NULL,
     `type` TINYINT NOT NULL,
     `items` TEXT NOT NULL,
     `taxation` TINYINT NOT NULL,

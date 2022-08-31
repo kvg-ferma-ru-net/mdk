@@ -92,6 +92,9 @@ class Customer
     // PROTECTED
     //######################################################################
 
+    /** @var string */
     protected $name = '';
+
+    /** @var string */
     protected $tin = '';
 }

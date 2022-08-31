@@ -53,7 +53,7 @@ class AutomaticBase implements AutomaticInterface
             (new ReceiptFilter())
                 ->setOrderId($orderId)
                 ->setSiteId($siteId)
-                ->setAvailable(true)
+                ->setStatus([ReceiptStatus::ACCEPTED, ReceiptStatus::COMPLETED, ReceiptStatus::PREPARED])
         );
 
         if ($receiptSubType === null) {
@@ -98,9 +98,9 @@ class AutomaticBase implements AutomaticInterface
                     $totalPre
                 ));
             }
-            $amount->set(Amount::PREPAYMENT, $total);
+            $amount->setPrepayment($total);
         } else {
-            $amount->set(Amount::CASHLESS, $total);
+            $amount->setCashless($total);
         }
 
         $receipt = new Receipt();
@@ -114,20 +114,25 @@ class AutomaticBase implements AutomaticInterface
         $receipt->setAmount($amount);
         $receipt->setTaxation($this->settings->getTaxation($siteId));
         $receipt->setLocation($this->settings->getLocation($siteId));
-        $receipt->setCashbox($this->settings->getCashbox($siteId));
         $receipt->setReceiptId($this->receiptIdFactory->build($receipt));
 
+        $receiptStatus = new ReceiptStatus(ReceiptStatus::PREPARED);
         try {
-            $receipt = $this->transfer->sendReceipt($this->settings->extrudeConn($siteId), $receipt);
+            $receiptStatus = $this->transfer->sendReceipt($this->settings->extrudeConn($siteId), $receipt);
         } catch (TransferException $e) {
             $receiptStatus = new ReceiptStatus($e->getCode());
-            if (
-                $receiptStatus->getCode() == ReceiptStatus::ERROR
-                || $receiptStatus->getCode() == ReceiptStatus::UNAUTH
-            ) {
+            if ($receiptStatus->getCode() == ReceiptStatus::ERROR) {
                 throw $e;
             }
         } finally {
+            if (
+                !(
+                    $receipt->getStatus()->getCode() == ReceiptStatus::ACCEPTED
+                    && $receiptStatus->getCode() == ReceiptStatus::PREPARED
+                )
+            ) {
+                $receipt->setStatus($receiptStatus);
+            }
             $this->receiptStorage->save($receipt);
         }
 

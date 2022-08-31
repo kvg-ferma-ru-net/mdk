@@ -101,8 +101,8 @@ class ReceiptTest extends TestCase
     public function testSetGetAmount()
     {
         $receipt = new Receipt();
-        $this->assertSame($receipt, $receipt->setAmount(new Amount(Amount::CASHLESS, 100)));
-        $this->assertSame(100.0, $receipt->getAmount()->get(Amount::CASHLESS));
+        $this->assertSame($receipt, $receipt->setAmount((new Amount())->setCashless(100)));
+        $this->assertSame(100.0, $receipt->getAmount()->getCashless());
     }
 
     /**
@@ -237,78 +237,6 @@ class ReceiptTest extends TestCase
         $receipt = new Receipt();
         $this->assertSame($receipt, $receipt->setStatus(new ReceiptStatus(201)));
         $this->assertSame(ReceiptStatus::COMPLETED, $receipt->getStatus()->getCode());
-        $this->assertTrue($receipt->getAccepted());
-        $this->assertTrue($receipt->getAvailable());
-
-        // чек был принят сервером, а потом началась какая-то херня
-        $receipt = new Receipt();
-        $receipt->setStatus(new ReceiptStatus(202));
-        $this->assertTrue($receipt->getAccepted());
-        $this->assertTrue($receipt->getAvailable());
-
-        $receipt->setStatus(new ReceiptStatus(401));
-        $this->assertTrue($receipt->getAccepted());
-        $this->assertTrue($receipt->getAvailable());
-
-        $receipt->setStatus(new ReceiptStatus(500));
-        $this->assertTrue($receipt->getAccepted());
-        $this->assertTrue($receipt->getAvailable());
-
-        // чек не принят но действителен
-        $receipt = new Receipt();
-        $receipt->setStatus(new ReceiptStatus(500));
-        $this->assertFalse($receipt->getAccepted());
-        $this->assertTrue($receipt->getAvailable());
-
-        // чек неверный - не принят и не действителен
-        $receipt = new Receipt();
-        $receipt->setStatus(new ReceiptStatus(400));
-        $this->assertFalse($receipt->getAccepted());
-        $this->assertFalse($receipt->getAvailable());
-
-        // чек не принят по причинам авторизации, значит и не действителен
-        $receipt = new Receipt();
-        $receipt->setStatus(new ReceiptStatus(401));
-        $this->assertFalse($receipt->getAccepted());
-        $this->assertFalse($receipt->getAvailable());
-    }
-
-    /**
-     * @covers Innokassa\MDK\Entities\Receipt::__construct
-     * @covers Innokassa\MDK\Entities\Receipt::setAccepted
-     * @covers Innokassa\MDK\Entities\Receipt::getAccepted
-     */
-    public function testSetGetAccepted()
-    {
-        $receipt = new Receipt();
-        $this->assertSame(false, $receipt->getAccepted());
-        $this->assertSame($receipt, $receipt->setAccepted(true));
-        $this->assertSame(true, $receipt->getAccepted());
-    }
-
-    /**
-     * @covers Innokassa\MDK\Entities\Receipt::__construct
-     * @covers Innokassa\MDK\Entities\Receipt::setAvailable
-     * @covers Innokassa\MDK\Entities\Receipt::getAvailable
-     */
-    public function testSetGetAvailable()
-    {
-        $receipt = new Receipt();
-        $this->assertSame(false, $receipt->getAvailable());
-        $this->assertSame($receipt, $receipt->setAvailable(true));
-        $this->assertSame(true, $receipt->getAvailable());
-    }
-
-    /**
-     * @covers Innokassa\MDK\Entities\Receipt::__construct
-     * @covers Innokassa\MDK\Entities\Receipt::setCashbox
-     * @covers Innokassa\MDK\Entities\Receipt::getCashbox
-     */
-    public function testSetGetCashbox()
-    {
-        $receipt = new Receipt();
-        $this->assertSame($receipt, $receipt->setCashbox('123456'));
-        $this->assertSame('123456', $receipt->getCashbox());
     }
 
     /**

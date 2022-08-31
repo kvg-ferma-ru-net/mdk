@@ -59,7 +59,7 @@ class ConverterStorageTest extends TestCase
                     ->setUnit(Unit::DEFAULT)
             )
             ->setTaxation(Taxation::ORN)
-            ->setAmount(new Amount(Amount::CASHLESS, 200.0))
+            ->setAmount((new Amount())->setCashless(200.0))
             ->setNotify(new Notify('box@domain.zone'))
             ->setLocation('http://example.com/')
             ->setOrderId('456');
@@ -67,12 +67,9 @@ class ConverterStorageTest extends TestCase
         $a = [
             'id' => 0,
             'receipt_id' => $receipt->getReceiptId(),
-            'cashbox' => '',
             'site_id' => '',
             'order_id' => '456',
             'status' => ReceiptStatus::COMPLETED,
-            'accepted' => 1,
-            'available' => 1,
             'subtype' => ReceiptSubType::PRE,
             'type' => ReceiptType::COMING,
             'items' => [[
@@ -88,7 +85,7 @@ class ConverterStorageTest extends TestCase
             ]],
             'taxation' => Taxation::ORN,
             'amount' => [
-                'cashless' => 200.0
+                'cashless' => 200.0,
             ],
             'notify' => [
                 'email' => 'box@domain.zone'
@@ -125,7 +122,7 @@ class ConverterStorageTest extends TestCase
         $receipt
             ->setType(ReceiptType::COMING)
             ->setTaxation(Taxation::ORN)
-            ->setAmount(new Amount(Amount::CASHLESS, 200.0))
+            ->setAmount((new Amount())->setCashless(200.0))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
             ->setLocation('http://example.com/');
@@ -149,7 +146,7 @@ class ConverterStorageTest extends TestCase
                     ->setQuantity(2)
                     ->setName('name')
             )
-            ->setAmount(new Amount(Amount::CASHLESS, 200.0))
+            ->setAmount((new Amount())->setCashless(200.0))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
             ->setLocation('http://example.com/');
@@ -198,7 +195,7 @@ class ConverterStorageTest extends TestCase
                     ->setName('name')
             )
             ->setTaxation(Taxation::ORN)
-            ->setAmount(new Amount(Amount::CASHLESS, 200.0))
+            ->setAmount((new Amount())->setCashless(200.0))
             ->setCustomer(new Customer('Test'))
             ->setLocation('http://example.com/');
 
@@ -222,7 +219,7 @@ class ConverterStorageTest extends TestCase
                     ->setName('name')
             )
             ->setTaxation(Taxation::ORN)
-            ->setAmount(new Amount(Amount::CASHLESS, 200.0))
+            ->setAmount((new Amount())->setCashless(200.0))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'));
 
@@ -243,12 +240,9 @@ class ConverterStorageTest extends TestCase
         $a = [
             'id' => 0,
             'receipt_id' => $receiptId,
-            'cashbox' => '',
             'site_id' => '0',
             'order_id' => '',
             'status' => ReceiptStatus::COMPLETED,
-            'accepted' => 1,
-            'available' => 1,
             'subtype' => ReceiptSubType::PRE,
             'type' => ReceiptType::COMING,
             'items' => [[
@@ -278,7 +272,6 @@ class ConverterStorageTest extends TestCase
 
         $this->assertSame(0, $receipt->getId());
         $this->assertSame($receiptId, $receipt->getReceiptId());
-        $this->assertSame('', $receipt->getCashbox());
         $this->assertSame('0', $receipt->getSiteId());
         $this->assertSame('', $receipt->getOrderId());
         $this->assertSame(ReceiptType::COMING, $receipt->getType());
@@ -288,7 +281,7 @@ class ConverterStorageTest extends TestCase
         $this->assertSame(Taxation::ORN, $receipt->getTaxation());
         $this->assertSame(null, $receipt->getCustomer());
         $this->assertSame('box@domain.zone', $receipt->getNotify()->getEmail());
-        $this->assertSame(200.0, $receipt->getAmount()->get(Amount::CASHLESS));
+        $this->assertSame(200.0, $receipt->getAmount()->getCashless());
         $this->assertSame('http://example.com/', $receipt->getLocation());
     }
 

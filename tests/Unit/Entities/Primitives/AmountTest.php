@@ -12,104 +12,88 @@ class AmountTest extends TestCase
 {
     /**
      * @covers Innokassa\MDK\Entities\Primitives\Amount::__construct
-     * @covers Innokassa\MDK\Entities\Primitives\Amount::get
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::setCash
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::getCash
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::setCashless
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::getCashless
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::setPrepayment
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::getPrepayment
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::setPostpayment
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::getPostpayment
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::setBarter
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::getBarter
      */
-    public function testConstructSuccess()
+    public function testSetGetCash()
     {
-        $amount = new Amount(Amount::CASHLESS, 100);
-        $this->assertSame(100.0, $amount->get(Amount::CASHLESS));
+        $amount = new Amount();
+        $this->assertSame($amount, $amount->setCash(100));
+        $this->assertSame(100.0, $amount->getCash());
 
-        $amount = new Amount(Amount::CASH, 0);
-        $this->assertSame(0.0, $amount->get(Amount::CASH));
+        $this->assertSame($amount, $amount->setCashless(101));
+        $this->assertSame(101.0, $amount->getCashless());
 
-        $amount = new Amount(Amount::PREPAYMENT, 100);
-        $this->assertSame(100.0, $amount->get(Amount::PREPAYMENT));
+        $this->assertSame($amount, $amount->setPrepayment(102));
+        $this->assertSame(102.0, $amount->getPrepayment());
 
-        $amount = new Amount(Amount::POSTPAYMENT, 100);
-        $this->assertSame(100.0, $amount->get(Amount::POSTPAYMENT));
+        $this->assertSame($amount, $amount->setPostpayment(103));
+        $this->assertSame(103.0, $amount->getPostpayment());
 
-        $amount = new Amount(Amount::BARTER, 100);
-        $this->assertSame(100.0, $amount->get(Amount::BARTER));
+        $this->assertSame($amount, $amount->setBarter(104));
+        $this->assertSame(104.0, $amount->getBarter());
     }
 
     /**
      * @covers Innokassa\MDK\Entities\Primitives\Amount::__construct
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::setCash
      */
-    public function testConstructFail1()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $amount = new Amount(0, 100);
-    }
-
-    /**
-     * @covers Innokassa\MDK\Entities\Primitives\Amount::__construct
-     */
-    public function testConstructFail2()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $amount = new Amount(Amount::PREPAYMENT, -1);
-    }
-
-    //######################################################################
-
-    /**
-     * @covers Innokassa\MDK\Entities\Primitives\Amount::__construct
-     * @covers Innokassa\MDK\Entities\Primitives\Amount::set
-     * @covers Innokassa\MDK\Entities\Primitives\Amount::get
-     */
-    public function testSetSuccess()
-    {
-        $amount = new Amount();
-        $amount->set(Amount::CASHLESS, 100);
-        $this->assertSame(100.0, $amount->get(Amount::CASHLESS));
-
-        $amount = new Amount();
-        $amount->set(Amount::CASH, 0);
-        $this->assertSame(0.0, $amount->get(Amount::CASH));
-
-        $amount = new Amount();
-        $amount->set(Amount::PREPAYMENT, 100);
-        $this->assertSame(100.0, $amount->get(Amount::PREPAYMENT));
-
-        $amount = new Amount();
-        $amount->set(Amount::POSTPAYMENT, 100);
-        $this->assertSame(100.0, $amount->get(Amount::POSTPAYMENT));
-
-        $amount = new Amount();
-        $amount->set(Amount::BARTER, 100);
-        $this->assertSame(100.0, $amount->get(Amount::BARTER));
-    }
-
-    /**
-     * @covers Innokassa\MDK\Entities\Primitives\Amount::__construct
-     * @covers Innokassa\MDK\Entities\Primitives\Amount::set
-     */
-    public function testSetFail1()
+    public function testSetCashFail()
     {
         $amount = new Amount();
         $this->expectException(InvalidArgumentException::class);
-        $amount->set(0, 100);
+        $amount->setCash(-100);
     }
 
     /**
      * @covers Innokassa\MDK\Entities\Primitives\Amount::__construct
-     * @covers Innokassa\MDK\Entities\Primitives\Amount::set
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::setCashless
      */
-    public function testSetFail2()
+    public function testSetCashlessFail()
     {
         $amount = new Amount();
         $this->expectException(InvalidArgumentException::class);
-        $amount->set(Amount::PREPAYMENT, -1);
+        $amount->setCashless(-100);
     }
 
     /**
      * @covers Innokassa\MDK\Entities\Primitives\Amount::__construct
-     * @covers Innokassa\MDK\Entities\Primitives\Amount::get
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::setPrepayment
      */
-    public function testGetFail()
+    public function testSetPrepaymentFail()
     {
         $amount = new Amount();
         $this->expectException(InvalidArgumentException::class);
-        $amount->get(0);
+        $amount->setPrepayment(-100);
+    }
+
+    /**
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::__construct
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::setPostpayment
+     */
+    public function testSetPostpaymentFail()
+    {
+        $amount = new Amount();
+        $this->expectException(InvalidArgumentException::class);
+        $amount->setPostpayment(-100);
+    }
+
+    /**
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::__construct
+     * @covers Innokassa\MDK\Entities\Primitives\Amount::setBarter
+     */
+    public function testSetBarterFail()
+    {
+        $amount = new Amount();
+        $this->expectException(InvalidArgumentException::class);
+        $amount->setBarter(-100);
     }
 }
