@@ -6,10 +6,9 @@ use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Settings\SettingsConn;
 use Innokassa\MDK\Logger\LoggerInterface;
 use Innokassa\MDK\Net\NetClientInterface;
-use Innokassa\MDK\Services\PipelineAbstract;
 use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Entities\ConverterAbstract;
-use Innokassa\MDK\Services\PipelineForModule;
+use Innokassa\MDK\Services\PipelineBase;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Exceptions\SettingsException;
 use Innokassa\MDK\Collections\ReceiptCollection;
@@ -17,8 +16,7 @@ use Innokassa\MDK\Storage\ReceiptStorageInterface;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
- * @uses Innokassa\MDK\Services\PipelineAbstract
- * @uses Innokassa\MDK\Services\PipelineForModule
+ * @uses Innokassa\MDK\Services\PipelineBase
  * @uses Innokassa\MDK\Net\Transfer
  * @uses Innokassa\MDK\Exceptions\TransferException
  * @uses Innokassa\MDK\Entities\AtomAbstract
@@ -33,7 +31,7 @@ use Innokassa\MDK\Storage\ReceiptStorageInterface;
  * @uses Innokassa\MDK\Exceptions\BaseException
  * @uses Innokassa\MDK\Settings\SettingsConn
  */
-class PipelineForModuleFakeTest extends TestCase
+class PipelineBaseFakeTest extends TestCase
 {
     private $client;
     private $converter;
@@ -71,8 +69,8 @@ class PipelineForModuleFakeTest extends TestCase
     //######################################################################
 
     /**
-     * @covers Innokassa\MDK\Services\PipelineForModule::__construct
-     * @covers Innokassa\MDK\Services\PipelineForModule::update
+     * @covers Innokassa\MDK\Services\PipelineBase::__construct
+     * @covers Innokassa\MDK\Services\PipelineBase::update
      */
     public function testUpdateLock()
     {
@@ -82,7 +80,7 @@ class PipelineForModuleFakeTest extends TestCase
             $this->converter,
             $this->logger
         );
-        $pipeline = new PipelineForModule($this->settings, $this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
 
         $fp = fopen($this->fileLock, "w+");
         flock($fp, LOCK_EX);
@@ -90,21 +88,21 @@ class PipelineForModuleFakeTest extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Services\PipelineForModule::__construct
-     * @covers Innokassa\MDK\Services\PipelineForModule::update
-     * @covers Innokassa\MDK\Services\PipelineForModule::processing
-     * @covers Innokassa\MDK\Services\PipelineForModule::extrudeConn
+     * @covers Innokassa\MDK\Services\PipelineBase::__construct
+     * @covers Innokassa\MDK\Services\PipelineBase::update
+     * @covers Innokassa\MDK\Services\PipelineBase::processing
+     * @covers Innokassa\MDK\Services\PipelineBase::extrudeConn
      */
     public function testUpdateSuccess200()
     {
         $this->storage = $this->createMock(ReceiptStorageInterface::class);
         $receipts = new ReceiptCollection();
-        for ($i = 0; $i < PipelineForModule::COUNT_SELECT; ++$i) {
+        for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
             $receipts[] = (new Receipt())->setId($i + 1);
         }
 
         /*
-            ожидание 2 вызова т.к. в БД PipelineAbstract::COUNT_SELECT чеков, для одной итерации одного статуса хватит,
+            ожидание 2 вызова т.к. в БД PipelineBase::COUNT_SELECT чеков, для одной итерации одного статуса хватит,
             но будет взведена вторая, в которой будет пустая коллекция
         */
         $this->storage
@@ -119,7 +117,7 @@ class PipelineForModuleFakeTest extends TestCase
             );
 
         $this->storage
-            ->expects($this->exactly(PipelineAbstract::COUNT_SELECT))
+            ->expects($this->exactly(PipelineBase::COUNT_SELECT))
             ->method('save');
 
         $this->client
@@ -134,19 +132,19 @@ class PipelineForModuleFakeTest extends TestCase
             $this->converter,
             $this->logger
         );
-        $pipeline = new PipelineForModule($this->settings, $this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
         $this->assertTrue($pipeline->update($this->fileLock));
 
-        for ($i = 0; $i < PipelineAbstract::COUNT_SELECT; ++$i) {
+        for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
             $this->assertSame(ReceiptStatus::COMPLETED, $receipts[$i]->getStatus()->getCode());
         }
     }
 
     /**
-     * @covers Innokassa\MDK\Services\PipelineForModule::__construct
-     * @covers Innokassa\MDK\Services\PipelineForModule::update
-     * @covers Innokassa\MDK\Services\PipelineForModule::processing
-     * @covers Innokassa\MDK\Services\PipelineForModule::extrudeConn
+     * @covers Innokassa\MDK\Services\PipelineBase::__construct
+     * @covers Innokassa\MDK\Services\PipelineBase::update
+     * @covers Innokassa\MDK\Services\PipelineBase::processing
+     * @covers Innokassa\MDK\Services\PipelineBase::extrudeConn
      */
     public function testUpdateFailExtrudeConn()
     {
@@ -181,7 +179,7 @@ class PipelineForModuleFakeTest extends TestCase
             $this->converter,
             $this->logger
         );
-        $pipeline = new PipelineForModule($settings, $this->storage, $transfer);
+        $pipeline = new PipelineBase($settings, $this->storage, $transfer);
         $this->assertTrue($pipeline->update($this->fileLock));
 
         $this->assertSame(ReceiptStatus::PREPARED, $receipts[0]->getStatus()->getCode());
@@ -189,9 +187,9 @@ class PipelineForModuleFakeTest extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Services\PipelineForModule::__construct
-     * @covers Innokassa\MDK\Services\PipelineForModule::update
-     * @covers Innokassa\MDK\Services\PipelineForModule::processing
+     * @covers Innokassa\MDK\Services\PipelineBase::__construct
+     * @covers Innokassa\MDK\Services\PipelineBase::update
+     * @covers Innokassa\MDK\Services\PipelineBase::processing
      */
     public function testUpdateSuccess404()
     {
@@ -222,7 +220,7 @@ class PipelineForModuleFakeTest extends TestCase
             $this->converter,
             $this->logger
         );
-        $pipeline = new PipelineForModule($this->settings, $this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
         $this->assertTrue($pipeline->update($this->fileLock));
 
         $this->assertSame(ReceiptStatus::ERROR, $receipts[0]->getStatus()->getCode());
@@ -230,15 +228,15 @@ class PipelineForModuleFakeTest extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Services\PipelineForModule::__construct
-     * @covers Innokassa\MDK\Services\PipelineForModule::update
-     * @covers Innokassa\MDK\Services\PipelineForModule::processing
+     * @covers Innokassa\MDK\Services\PipelineBase::__construct
+     * @covers Innokassa\MDK\Services\PipelineBase::update
+     * @covers Innokassa\MDK\Services\PipelineBase::processing
      */
     public function testUpdateError()
     {
         $this->storage = $this->createMock(ReceiptStorageInterface::class);
         $receipts1 = new ReceiptCollection();
-        for ($i = 0; $i < PipelineAbstract::COUNT_SELECT; ++$i) {
+        for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
             $receipts1[] = new Receipt();
         }
 
@@ -246,7 +244,7 @@ class PipelineForModuleFakeTest extends TestCase
         $receipts2[] = new Receipt();
 
         /*
-            ожидание одного вызова потому что в БД только PipelineAbstract::COUNT_SELECT+1 чеков
+            ожидание одного вызова потому что в БД только PipelineBase::COUNT_SELECT+1 чеков
             и все получат ошибочный статус
         */
         $this->storage
@@ -255,7 +253,7 @@ class PipelineForModuleFakeTest extends TestCase
             ->will($this->onConsecutiveCalls($receipts1, $receipts2));
 
         $this->storage
-            ->expects($this->exactly(PipelineAbstract::COUNT_SELECT))
+            ->expects($this->exactly(PipelineBase::COUNT_SELECT))
             ->method('save');
 
         $this->client
@@ -270,10 +268,10 @@ class PipelineForModuleFakeTest extends TestCase
             $this->converter,
             $this->logger
         );
-        $pipeline = new PipelineForModule($this->settings, $this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
         $this->assertTrue($pipeline->update($this->fileLock));
 
-        for ($i = 0; $i < PipelineAbstract::COUNT_SELECT; ++$i) {
+        for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
             $this->assertSame(ReceiptStatus::PREPARED, $receipts1[$i]->getStatus()->getCode());
         }
 
@@ -281,9 +279,9 @@ class PipelineForModuleFakeTest extends TestCase
     }
 
     /**
-     * @covers Innokassa\MDK\Services\PipelineForModule::__construct
-     * @covers Innokassa\MDK\Services\PipelineForModule::update
-     * @covers Innokassa\MDK\Services\PipelineForModule::processing
+     * @covers Innokassa\MDK\Services\PipelineBase::__construct
+     * @covers Innokassa\MDK\Services\PipelineBase::update
+     * @covers Innokassa\MDK\Services\PipelineBase::processing
      */
     public function testUpdateExpired()
     {
@@ -313,7 +311,7 @@ class PipelineForModuleFakeTest extends TestCase
             $this->converter,
             $this->logger
         );
-        $pipeline = new PipelineForModule($this->settings, $this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
 
         $this->assertTrue($pipeline->update($this->fileLock));
         $this->assertSame(ReceiptStatus::EXPIRED, $receipts[0]->getStatus()->getCode());
@@ -322,8 +320,8 @@ class PipelineForModuleFakeTest extends TestCase
     //######################################################################
 
     /**
-     * @covers Innokassa\MDK\Services\PipelineForModule::__construct
-     * @covers Innokassa\MDK\Services\PipelineForModule::monitoring
+     * @covers Innokassa\MDK\Services\PipelineBase::__construct
+     * @covers Innokassa\MDK\Services\PipelineBase::monitoring
      */
     public function testMonitoring()
     {
@@ -333,7 +331,7 @@ class PipelineForModuleFakeTest extends TestCase
             $this->converter,
             $this->logger
         );
-        $pipeline = new PipelineForModule($this->settings, $this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
 
         $this->storage
             ->expects($this->exactly(5))

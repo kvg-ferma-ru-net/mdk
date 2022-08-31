@@ -6,6 +6,7 @@ use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Settings\SettingsConn;
 use Innokassa\MDK\Storage\ReceiptFilter;
+use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Exceptions\SettingsException;
 use Innokassa\MDK\Exceptions\TransferException;
@@ -13,14 +14,29 @@ use Innokassa\MDK\Collections\ReceiptCollection;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 
 /**
- * Абстрактный класс с базовой реализацей PipelineInterface.
+ * Класс с базовой реализацей PipelineInterface.
  */
-abstract class PipelineAbstract implements PipelineInterface
+class PipelineBase implements PipelineInterface
 {
     /** Количество выбираемых элементов из БД */
     public const COUNT_SELECT = 50;
 
     //######################################################################
+
+    /**
+     * @param SettingsAbstract $settings
+     * @param ReceiptStorageInterface $receiptStorage
+     * @param TransferInterface $transfer
+     */
+    public function __construct(
+        SettingsAbstract $settings,
+        ReceiptStorageInterface $receiptStorage,
+        TransferInterface $transfer
+    ) {
+        $this->receiptStorage = $receiptStorage;
+        $this->transfer = $transfer;
+        $this->settings = $settings;
+    }
 
     /**
      * @inheritDoc
@@ -159,10 +175,13 @@ abstract class PipelineAbstract implements PipelineInterface
     /** @var TransferInterface */
     protected $transfer = null;
 
+    /** @var SettingsAbstract */
+    protected $settings = null;
+
     //######################################################################
 
     /**
-     * Обработка коллекции принятых чеков
+     * Обработка коллекции чеков
      *
      * @param ReceiptCollection $receipts
      * @return integer наибольший идентификатор чека из коллекции
@@ -213,6 +232,8 @@ abstract class PipelineAbstract implements PipelineInterface
         return ($countError == $receipts->count() ? 0 : $idLast);
     }
 
+    //######################################################################
+
     /**
      * Извлечь настройки соединения на основании данных чека
      *
@@ -221,5 +242,8 @@ abstract class PipelineAbstract implements PipelineInterface
      * @param Receipt $receipt
      * @return SettingsConn
      */
-    abstract protected function extrudeConn(Receipt $receipt): SettingsConn;
+    protected function extrudeConn(Receipt $receipt): SettingsConn
+    {
+        return $this->settings->extrudeConn($receipt->getSiteId());
+    }
 }
