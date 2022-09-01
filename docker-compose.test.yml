@@ -13,7 +13,6 @@ services:
 
   backend:
     image: registry.git.innokassa.ru/byurrer/docker-images/php7.1-cli:dev
-    user: www-data
     container_name: mdk-backend
     extra_hosts:
       - "host.docker.internal:172.16.1.1"
