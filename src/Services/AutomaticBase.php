@@ -11,6 +11,7 @@ use Innokassa\MDK\Entities\Primitives\Amount;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
+use Innokassa\MDK\Exceptions\NetConnectException;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Entities\ReceiptAdapterInterface;
 use Innokassa\MDK\Exceptions\Services\AutomaticException;
@@ -123,16 +124,12 @@ class AutomaticBase implements AutomaticInterface
             $receiptStatus = new ReceiptStatus($e->getCode());
             if ($receiptStatus->getCode() == ReceiptStatus::ERROR) {
                 throw $e;
+            } elseif ($receiptStatus->getCode() == ReceiptStatus::PREPARED) {
+                $receipt->setReceiptId($this->receiptIdFactory->build($receipt));
             }
+            $receipt->setStatus($receiptStatus);
+        } catch (NetConnectException $e) {
         } finally {
-            if (
-                !(
-                    $receipt->getStatus()->getCode() == ReceiptStatus::ACCEPTED
-                    && $receiptStatus->getCode() == ReceiptStatus::PREPARED
-                )
-            ) {
-                $receipt->setStatus($receiptStatus);
-            }
             $this->receiptStorage->save($receipt);
         }
 

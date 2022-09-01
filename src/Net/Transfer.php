@@ -57,7 +57,7 @@ class Transfer implements TransferInterface
             try {
                 $this->client->send();
             } catch (NetConnectException $e) {
-                throw new TransferException($e->getMessage(), $e->getCode());
+                throw $e;
             }
 
             $responseCode = $this->client->read(NetClientInterface::CODE);
@@ -68,12 +68,12 @@ class Transfer implements TransferInterface
             }
 
             $responseBody = json_decode($responseBody);
-        } catch (TransferException $e) {
+        } catch (TransferException | NetConnectException $e) {
             $this->logger->log(
                 LogLevel::ERROR,
                 'error ' . __METHOD__,
                 [
-                    'exception' => $e->toArray(),
+                    'exception' => $e->__toString(),
                     'url' => $url,
                     'response' => [
                         'code' => $responseCode ?? '',
@@ -131,11 +131,7 @@ class Transfer implements TransferInterface
             try {
                 $this->client->send();
             } catch (NetConnectException $e) {
-                // проблемы с сетью
-                throw new TransferException(
-                    sprintf('%s (%d)', $e->getMessage(), $e->getCode()),
-                    ReceiptStatus::PREPARED
-                );
+                throw $e;
             }
 
             $responseCode = $this->client->read(NetClientInterface::CODE);
@@ -145,12 +141,12 @@ class Transfer implements TransferInterface
             if (!($responseCode == 201 || $responseCode == 202)) {
                 throw new TransferException($responseBody, $responseCode);
             }
-        } catch (TransferException $e) {
+        } catch (TransferException | NetConnectException $e) {
             $this->logger->log(
                 LogLevel::ERROR,
                 'error ' . __METHOD__,
                 [
-                    'exception' => $e->toArray(),
+                    'exception' => $e->__toString(),
                     'receipt' => [
                         'id' => $receipt->getId(),
                         'order' => $receipt->getOrderId(),

@@ -12,6 +12,7 @@ use Innokassa\MDK\Services\PipelineBase;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Exceptions\SettingsException;
 use Innokassa\MDK\Collections\ReceiptCollection;
+use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryInterface;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
@@ -54,15 +55,23 @@ class PipelineBaseFakeTest extends TestCase
         $this->converter = $this->createMock(ConverterAbstract::class);
         $this->storage = $this->createMock(ReceiptStorageInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $this->receiptIdFactory = $this->createMock(ReceiptIdFactoryInterface::class);
+        $this->receiptIdFactory
+            ->method('build')
+            ->willReturn('asdf');
 
         $this->settings = $this->createMock(SettingsAbstract::class);
-        $this->settings->method('getActorId')
+        $this->settings
+            ->method('getActorId')
             ->willReturn(TEST_ACTOR_ID);
-        $this->settings->method('getActorToken')
+        $this->settings
+            ->method('getActorToken')
             ->willReturn(TEST_ACTOR_TOKEN);
-        $this->settings->method('getCashbox')
+        $this->settings
+            ->method('getCashbox')
             ->willReturn(TEST_CASHBOX_WITHOUT_AGENT);
-        $this->settings->method('extrudeConn')
+        $this->settings
+            ->method('extrudeConn')
             ->willReturn(new SettingsConn(TEST_ACTOR_ID, TEST_ACTOR_TOKEN, TEST_CASHBOX_WITHOUT_AGENT));
     }
 
@@ -80,7 +89,7 @@ class PipelineBaseFakeTest extends TestCase
             $this->converter,
             $this->logger
         );
-        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer, $this->receiptIdFactory);
 
         $fp = fopen($this->fileLock, "w+");
         flock($fp, LOCK_EX);
@@ -132,7 +141,7 @@ class PipelineBaseFakeTest extends TestCase
             $this->converter,
             $this->logger
         );
-        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer, $this->receiptIdFactory);
         $this->assertTrue($pipeline->update($this->fileLock));
 
         for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
@@ -146,10 +155,60 @@ class PipelineBaseFakeTest extends TestCase
      * @covers Innokassa\MDK\Services\PipelineBase::processing
      * @covers Innokassa\MDK\Services\PipelineBase::extrudeConn
      */
+    public function testUpdateChangeReceiptId()
+    {
+        $this->storage = $this->createMock(ReceiptStorageInterface::class);
+        $receipts = new ReceiptCollection();
+        $receipts[] = (new Receipt())->setId(1);
+
+        $this->storage
+            ->expects($this->exactly(1))
+            ->method('getCollection')
+            ->will(
+                $this->onConsecutiveCalls(
+                    $receipts
+                )
+            );
+
+        $this->storage
+            ->expects($this->exactly(1))
+            ->method('save');
+
+        $this->client
+            ->method('read')
+            ->will($this->returnValueMap([
+                [NetClientInterface::BODY, ''],
+                [NetClientInterface::CODE, 500]
+            ]));
+
+        $transfer = new Transfer(
+            $this->client,
+            $this->converter,
+            $this->logger
+        );
+
+        $receiptIdFactory = $this->createMock(ReceiptIdFactoryInterface::class);
+        $receiptIdFactory
+            ->expects($this->exactly(1))
+            ->method('build')
+            ->willReturn('asdf');
+
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer, $receiptIdFactory);
+        $this->assertTrue($pipeline->update($this->fileLock));
+        $this->assertSame(ReceiptStatus::PREPARED, $receipts[0]->getStatus()->getCode());
+    }
+
+    /**
+     * @covers Innokassa\MDK\Services\PipelineBase::__construct
+     * @covers Innokassa\MDK\Services\PipelineBase::update
+     * @covers Innokassa\MDK\Services\PipelineBase::processing
+     * @covers Innokassa\MDK\Services\PipelineBase::extrudeConn
+     */
     public function testUpdateFailExtrudeConn()
     {
         $settings = $this->createMock(SettingsAbstract::class);
-        $settings->method('extrudeConn')
+        $settings
+            ->method('extrudeConn')
             ->will($this->throwException(new SettingsException('')));
 
         $this->storage = $this->createMock(ReceiptStorageInterface::class);
@@ -179,7 +238,7 @@ class PipelineBaseFakeTest extends TestCase
             $this->converter,
             $this->logger
         );
-        $pipeline = new PipelineBase($settings, $this->storage, $transfer);
+        $pipeline = new PipelineBase($settings, $this->storage, $transfer, $this->receiptIdFactory);
         $this->assertTrue($pipeline->update($this->fileLock));
 
         $this->assertSame(ReceiptStatus::PREPARED, $receipts[0]->getStatus()->getCode());
@@ -220,7 +279,7 @@ class PipelineBaseFakeTest extends TestCase
             $this->converter,
             $this->logger
         );
-        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer, $this->receiptIdFactory);
         $this->assertTrue($pipeline->update($this->fileLock));
 
         $this->assertSame(ReceiptStatus::ERROR, $receipts[0]->getStatus()->getCode());
@@ -268,7 +327,7 @@ class PipelineBaseFakeTest extends TestCase
             $this->converter,
             $this->logger
         );
-        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer, $this->receiptIdFactory);
         $this->assertTrue($pipeline->update($this->fileLock));
 
         for ($i = 0; $i < PipelineBase::COUNT_SELECT; ++$i) {
@@ -311,7 +370,7 @@ class PipelineBaseFakeTest extends TestCase
             $this->converter,
             $this->logger
         );
-        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer, $this->receiptIdFactory);
 
         $this->assertTrue($pipeline->update($this->fileLock));
         $this->assertSame(ReceiptStatus::EXPIRED, $receipts[0]->getStatus()->getCode());
@@ -331,7 +390,7 @@ class PipelineBaseFakeTest extends TestCase
             $this->converter,
             $this->logger
         );
-        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer);
+        $pipeline = new PipelineBase($this->settings, $this->storage, $transfer, $this->receiptIdFactory);
 
         $this->storage
             ->expects($this->exactly(5))

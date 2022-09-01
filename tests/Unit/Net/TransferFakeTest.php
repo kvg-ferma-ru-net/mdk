@@ -99,7 +99,7 @@ class TransferFakeTest extends TestCase
 
         $transfer = new Transfer($this->client, $this->converter, $this->logger);
 
-        $this->expectException(TransferException::class);
+        $this->expectException(NetConnectException::class);
         $transfer->getCashbox($this->settings->extrudeConn());
     }
 
@@ -167,11 +167,8 @@ class TransferFakeTest extends TestCase
         $transfer = new Transfer($this->client, $this->converter, $this->logger);
         $receipt = new Receipt();
 
-        try {
-            $transfer->sendReceipt($this->settings->extrudeConn(), $receipt);
-        } catch (TransferException $e) {
-            $this->assertEquals(ReceiptStatus::PREPARED, $e->getCode());
-        }
+        $this->expectException(NetConnectException::class);
+        $transfer->sendReceipt($this->settings->extrudeConn(), $receipt);
     }
 
     /**

@@ -115,11 +115,9 @@ class ConnectorBaseFakeTest extends TestCase
      */
     public function testSettingsFailServer28()
     {
-        $this->client->method('read')
-            ->will($this->returnValueMap([
-                [NetClientInterface::CODE, 28],
-                [NetClientInterface::BODY, ''],
-            ]));
+        $this->client
+            ->method('send')
+            ->will($this->throwException(new NetConnectException('', 28)));
 
         $transfer = new Transfer(
             $this->client,

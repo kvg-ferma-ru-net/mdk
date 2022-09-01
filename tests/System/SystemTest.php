@@ -113,7 +113,7 @@ class SystemTest extends TestCase
             self::$adapter,
             new ReceiptIdFactoryMeta()
         );
-        $pipeline = new PipelineBase(self::$settings, self::$storage, $transfer);
+        $pipeline = new PipelineBase(self::$settings, self::$storage, $transfer, new ReceiptIdFactoryMeta());
         $connector = new ConnectorBase($transfer);
 
         self::$client = new Client(

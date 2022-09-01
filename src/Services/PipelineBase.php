@@ -11,7 +11,9 @@ use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Exceptions\SettingsException;
 use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Collections\ReceiptCollection;
+use Innokassa\MDK\Exceptions\NetConnectException;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
+use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryInterface;
 
 /**
  * Класс с базовой реализацей PipelineInterface.
@@ -27,15 +29,18 @@ class PipelineBase implements PipelineInterface
      * @param SettingsAbstract $settings
      * @param ReceiptStorageInterface $receiptStorage
      * @param TransferInterface $transfer
+     * @param ReceiptIdFactoryInterface $receiptIdFactory
      */
     public function __construct(
         SettingsAbstract $settings,
         ReceiptStorageInterface $receiptStorage,
-        TransferInterface $transfer
+        TransferInterface $transfer,
+        ReceiptIdFactoryInterface $receiptIdFactory
     ) {
         $this->receiptStorage = $receiptStorage;
         $this->transfer = $transfer;
         $this->settings = $settings;
+        $this->receiptIdFactory = $receiptIdFactory;
     }
 
     /**
@@ -178,6 +183,9 @@ class PipelineBase implements PipelineInterface
     /** @var SettingsAbstract */
     protected $settings = null;
 
+    /** @var ReceiptIdFactoryInterface */
+    protected $receiptIdFactory = null;
+
     //######################################################################
 
     /**
@@ -209,23 +217,16 @@ class PipelineBase implements PipelineInterface
                 );
             } catch (TransferException $e) {
                 $receiptStatus = new ReceiptStatus($e->getCode());
-            } catch (SettingsException $e) {
-                // TODO
-            } finally {
                 if ($receiptStatus->getCode() == ReceiptStatus::PREPARED) {
+                    $receipt->setReceiptId($this->receiptIdFactory->build($receipt));
                     $countError++;
                 }
-
-                // если новый статус дает окончательное состояние чека - обновляем
-                if (
-                    !(
-                        $receipt->getStatus()->getCode() == ReceiptStatus::ACCEPTED
-                        && $receiptStatus->getCode() == ReceiptStatus::PREPARED
-                    )
-                ) {
-                    $receipt->setStatus($receiptStatus);
-                    $this->receiptStorage->save($receipt);
-                }
+            } catch (NetConnectException | SettingsException $e) {
+                $receiptStatus = $receipt->getStatus();
+                $countError++;
+            } finally {
+                $receipt->setStatus($receiptStatus);
+                $this->receiptStorage->save($receipt);
             }
         }
 
