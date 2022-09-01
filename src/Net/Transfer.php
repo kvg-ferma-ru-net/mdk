@@ -40,7 +40,7 @@ class Transfer implements TransferInterface
     /**
      * @inheritDoc
      */
-    public function getCashbox(SettingsConn $settingsConn): object
+    public function getCashbox(SettingsConn $settingsConn): \stdClass
     {
         $headers = [
             "Authorization: Basic " . base64_encode($settingsConn->getActorId() . ":" . $settingsConn->getActorToken()),

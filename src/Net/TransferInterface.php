@@ -21,9 +21,9 @@ interface TransferInterface
      * @throws TransferException
      *
      * @param SettingsConn $settingsConn
-     * @return object
+     * @return \stdClass
      */
-    public function getCashbox(SettingsConn $settingsConn): object;
+    public function getCashbox(SettingsConn $settingsConn): \stdClass;
 
     /**
      * Отправка чека на фискализацию

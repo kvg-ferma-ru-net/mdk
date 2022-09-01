@@ -2,14 +2,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Listen local",
-            "type": "php",
-            "request": "launch",
-            "hostname": "localhost",
-            "port": 9005,
-            "log": true,
-        },
-        {
             "name": "Listen container",
             "type": "php",
             "request": "launch",
@@ -17,7 +9,7 @@
             "port": 9003,
             "log": true,
             "pathMappings": {
-                "/vat/www/html/": "${workspaceFolder}"
+                "/var/www/html/": "${workspaceFolder}"
             }
         }
     ]

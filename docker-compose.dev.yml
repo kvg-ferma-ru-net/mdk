@@ -12,21 +12,23 @@ services:
       - mdk-network
 
   backend:
-    image: registry.git.innokassa.ru/byurrer/docker-images/php7.4-cli:dev
+    image: registry.git.innokassa.ru/byurrer/docker-images/php7.1-cli:dev
     container_name: mdk-backend
     extra_hosts:
       - "host.docker.internal:172.16.1.1"
     depends_on: 
       - db
     volumes:
+      - ./coverage-report-html/:/var/www/html/coverage-report-html/
+      - ./logs/:/var/www/html/logs/
       - ./src/:/var/www/html/src/
       - ./tests/:/var/www/html/tests/
       - ./composer.json:/var/www/html/composer.json
       - ./phpstan.neon:/var/www/html/phpstan.neon
       - ./phpunit.xml:/var/www/html/phpunit.xml
-      - ./.docker/php/entrypoint.sh:/usr/bin/entrypoint.sh
-      - ./.docker/php/wait-db.php:/var/www/html/wait-db.php
-    command: /bin/bash -c "/usr/bin/entrypoint.sh"
+      - ./.env/php/dev.sh:/usr/bin/dev.sh
+      - ./.env/php/wait-db.php:/var/www/html/wait-db.php
+    command: /bin/bash -c "/usr/bin/dev.sh"
     networks:
       - mdk-network
 

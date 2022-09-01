@@ -350,7 +350,7 @@ class PipelineBaseFakeTest extends TestCase
                 date('Y-m-d H:i:s', time() - 60 * 60 * 1),
                 date('Y-m-d H:i:s', time() - 60 * 60 * 2),
                 date('Y-m-d H:i:s', time() - 60 * 60 * 3),
-                date('Y-m-d H:i:s', time() - 60 * 60 * 4),
+                date('Y-m-d H:i:s', time() - 60 * 60 * 4)
             ));
 
         $file = __DIR__ . '/../../../.monitoring';
