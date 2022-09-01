@@ -25,7 +25,7 @@ abstract class ConverterAbstract
      * @throws ConverterException
      *
      * @param Receipt $receipt
-     * @return array
+     * @return array<string, mixed>
      */
     abstract public function receiptToArray(Receipt $receipt): array;
 
@@ -34,7 +34,7 @@ abstract class ConverterAbstract
      *
      * @throws ConverterException
      *
-     * @param array $a
+     * @param array<string, mixed> $a
      * @return Receipt
      */
     abstract public function receiptFromArray(array $a): Receipt;
@@ -48,7 +48,7 @@ abstract class ConverterAbstract
      * @throws ConverterException
      *
      * @param ReceiptItemCollection $items
-     * @return array
+     * @return array<mixed>
      */
     public function itemsToArray(ReceiptItemCollection $items): array
     {
@@ -66,7 +66,7 @@ abstract class ConverterAbstract
      *
      * @throws ConverterException
      *
-     * @param array $a
+     * @param array<mixed> $a
      * @return ReceiptItemCollection
      */
     public function itemsFromArray(array $a): ReceiptItemCollection
@@ -89,7 +89,7 @@ abstract class ConverterAbstract
      * @throws ConverterException
      *
      * @param ReceiptItem $item
-     * @return array
+     * @return array<string, mixed>
      */
     public function itemToArray(ReceiptItem $item): array
     {
@@ -121,7 +121,7 @@ abstract class ConverterAbstract
      *
      * @throws ConverterException
      *
-     * @param array $a
+     * @param array<string, mixed> $a
      * @return ReceiptItem
      */
     public function itemFromArray(array $a): ReceiptItem
@@ -181,23 +181,25 @@ abstract class ConverterAbstract
      * @throws ConverterException
      *
      * @param Amount $amount
-     * @return array
+     * @return array<string, mixed>
      */
     public function amountToArray(Amount $amount): array
     {
         $a = [];
-        $amounts = [
-            'cash' => Amount::CASH,
-            'cashless' => Amount::CASHLESS,
-            'prepayment' => Amount::PREPAYMENT,
-            'postpayment' => Amount::POSTPAYMENT,
-            'barter' => Amount::BARTER,
-        ];
-
-        foreach ($amounts as $key => $const) {
-            if ($amount->get($const) !== null) {
-                $a[$key] = $amount->get($const);
-            }
+        if ($amount->getCash() > 0.0) {
+            $a['cash'] = $amount->getCash();
+        }
+        if ($amount->getCashless() > 0.0) {
+            $a['cashless'] = $amount->getCashless();
+        }
+        if ($amount->getPrepayment() > 0.0) {
+            $a['prepayment'] = $amount->getPrepayment();
+        }
+        if ($amount->getPostpayment() > 0.0) {
+            $a['postpayment'] = $amount->getPostpayment();
+        }
+        if ($amount->getBarter() > 0.0) {
+            $a['barter'] = $amount->getBarter();
         }
 
         if (!$a) {
@@ -212,7 +214,7 @@ abstract class ConverterAbstract
      *
      * @throws ConverterException
      *
-     * @param array $a
+     * @param array<string, mixed> $a
      * @return Amount
      */
     public function amountFromArray(array $a): Amount
@@ -223,19 +225,25 @@ abstract class ConverterAbstract
 
         $amount = new Amount();
 
-        $fields = [
-            'cash' => Amount::CASH,
-            'cashless' => Amount::CASHLESS,
-            'prepayment' => Amount::PREPAYMENT,
-            'postpayment' => Amount::POSTPAYMENT,
-            'barter' => Amount::BARTER
-        ];
-
         try {
-            foreach ($fields as $field => $const) {
-                if (isset($a[$field])) {
-                    $amount->set($const, $a[$field]);
-                }
+            if (isset($a['cash'])) {
+                $amount->setCash($a['cash']);
+            }
+
+            if (isset($a['cashless'])) {
+                $amount->setCashless($a['cashless']);
+            }
+
+            if (isset($a['prepayment'])) {
+                $amount->setPrepayment($a['prepayment']);
+            }
+
+            if (isset($a['postpayment'])) {
+                $amount->setPostpayment($a['postpayment']);
+            }
+
+            if (isset($a['barter'])) {
+                $amount->setBarter($a['barter']);
             }
         } catch (InvalidArgumentException $e) {
             throw new ConverterException('invalid array => amount: ' . $e->getMessage());
@@ -253,7 +261,7 @@ abstract class ConverterAbstract
      * @throws ConverterException
      *
      * @param Notify $notify
-     * @return array
+     * @return array<string, mixed>
      */
     public function notifyToArray(Notify $notify): array
     {
@@ -279,7 +287,7 @@ abstract class ConverterAbstract
      *
      * @throws ConverterException
      *
-     * @param array $a
+     * @param array<string, mixed> $a
      * @return Notify
      */
     public function notifyFromArray(array $a): Notify
@@ -314,7 +322,7 @@ abstract class ConverterAbstract
      * @throws ConverterException
      *
      * @param Customer $customer
-     * @return array
+     * @return array<string, mixed>
      */
     public function customerToArray(Customer $customer): array
     {
@@ -340,7 +348,7 @@ abstract class ConverterAbstract
      *
      * @throws ConverterException
      *
-     * @param array $a
+     * @param array<string, mixed> $a
      * @return Customer
      */
     public function customerFromArray(array $a): Customer

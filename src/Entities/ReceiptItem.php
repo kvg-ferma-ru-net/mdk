@@ -68,7 +68,7 @@ class ReceiptItem
      */
     public function getType(): ?int
     {
-        return ($this->type ? $this->type->getCode() : null);
+        return ($this->type !== null ? $this->type->getCode() : null);
     }
 
     //**********************************************************************
@@ -249,7 +249,7 @@ class ReceiptItem
      */
     public function getPaymentMethod(): ?int
     {
-        return ($this->paymentMethod ? $this->paymentMethod->getCode() : null);
+        return ($this->paymentMethod !== null ? $this->paymentMethod->getCode() : null);
     }
 
     /**
@@ -271,20 +271,35 @@ class ReceiptItem
      */
     public function getUnit(): int
     {
-        return ($this->unit ? $this->unit->getCode() : null);
+        return ($this->unit !== null ? $this->unit->getCode() : null);
     }
 
     //######################################################################
     // PRIVATE
     //######################################################################
 
+    /** @var ReceiptItemType */
     private $type = null;
+
+    /** @var string */
     private $name = '';
+
+    /** @var float */
     private $price = 0.0;
+
+    /** @var float */
     private $quantity = 1.0;
+
+    /** @var float */
     private $amount = 0.0;
+
+    /** @var Vat */
     private $vat = null;
+
+    /** @var PaymentMethod */
     private $paymentMethod = null;
+
+    /** @var Unit */
     private $unit = null;
 
     /** @var string */

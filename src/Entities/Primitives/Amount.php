@@ -9,106 +9,176 @@ use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
  */
 class Amount
 {
-    /** Оплата наличными */
-    public const CASH = 1;
-
-    /** Оплата безналичными */
-    public const CASHLESS = 2;
-
-    /** Оплата предоплатой */
-    public const PREPAYMENT = 3;
-
-    /** Оплата постоплатой */
-    public const POSTPAYMENT = 4;
-
-    /** Оплата встречным представлением */
-    public const BARTER = 5;
-
-    //######################################################################
-
-    /**
-     * @throws InvalidArgumentException
-     * @param integer|null $type из констант класса
-     * @param float|null $sum сумма
-     */
-    public function __construct(int $type = null, float $sum = null)
+    public function __construct()
     {
-        if (is_numeric($type) && is_numeric($sum)) {
-            $this->set($type, $sum);
-        }
     }
 
+    //**********************************************************************
+
     /**
-     * Установить тип и сумму оплаты
+     * Установить расчет наличными
      *
      * @throws InvalidArgumentException
-     * @param integer $type из констант класса
-     * @param float $sum сумма
+     *
+     * @param float $cash
      * @return self
      */
-    public function set(int $type, float $sum): self
+    public function setCash(float $cash): self
     {
-        if ($sum < 0) {
-            throw new InvalidArgumentException("invalid amount sum '$sum'");
+        if ($cash < 0) {
+            throw new InvalidArgumentException("invalid amount cash '$cash'");
         }
 
-        $sum = round($sum, 2);
-
-        switch ($type) {
-            case Amount::CASH:
-                $this->cash = $sum;
-                break;
-            case Amount::CASHLESS:
-                $this->cashless = $sum;
-                break;
-            case Amount::PREPAYMENT:
-                $this->prepayment = $sum;
-                break;
-            case Amount::POSTPAYMENT:
-                $this->postpayment = $sum;
-                break;
-            case Amount::BARTER:
-                $this->barter = $sum;
-                break;
-            default:
-                throw new InvalidArgumentException("invalid amount type '$type'");
-        }
-
+        $this->cash = $cash;
         return $this;
     }
 
     /**
-     * Получить сумму по типу расчета
+     * Получить расчет наличными
      *
-     * @throws InvalidArgumentException
-     * @param integer $type из констант класса
      * @return float
      */
-    public function get(int $type): ?float
+    public function getCash(): float
     {
-        switch ($type) {
-            case Amount::CASH:
-                return $this->cash;
-            case Amount::CASHLESS:
-                return $this->cashless;
-            case Amount::PREPAYMENT:
-                return $this->prepayment;
-            case Amount::POSTPAYMENT:
-                return $this->postpayment;
-            case Amount::BARTER:
-                return $this->barter;
-            default:
-                throw new InvalidArgumentException("invalid amount type '$type'");
+        return $this->cash;
+    }
+
+    //**********************************************************************
+
+    /**
+     * Установить расчет безналичными
+     *
+     * @throws InvalidArgumentException
+     *
+     * @param float $cashless
+     * @return self
+     */
+    public function setCashless(float $cashless): self
+    {
+        if ($cashless < 0) {
+            throw new InvalidArgumentException("invalid amount cashless '$cashless'");
         }
+
+        $this->cashless = $cashless;
+        return $this;
+    }
+
+    /**
+     * Получить расчет безначлиными
+     *
+     * @return float
+     */
+    public function getCashless(): float
+    {
+        return $this->cashless;
+    }
+
+    //**********************************************************************
+
+    /**
+     * Установить расчет предоплатой
+     *
+     * @throws InvalidArgumentException
+     *
+     * @param float $prepayment
+     * @return self
+     */
+    public function setPrepayment(float $prepayment): self
+    {
+        if ($prepayment < 0) {
+            throw new InvalidArgumentException("invalid amount prepayment '$prepayment'");
+        }
+
+        $this->prepayment = $prepayment;
+        return $this;
+    }
+
+    /**
+     * Получить расчет предоплатой
+     *
+     * @return float
+     */
+    public function getPrepayment(): float
+    {
+        return $this->prepayment;
+    }
+
+    //**********************************************************************
+
+    /**
+     * Установить расчет постоплатой
+     *
+     * @throws InvalidArgumentException
+     *
+     * @param float $postpayment
+     * @return self
+     */
+    public function setPostpayment(float $postpayment): self
+    {
+        if ($postpayment < 0) {
+            throw new InvalidArgumentException("invalid amount postpayment '$postpayment'");
+        }
+
+        $this->postpayment = $postpayment;
+        return $this;
+    }
+
+    /**
+     * Получить расчет постоплатой
+     *
+     * @return float
+     */
+    public function getPostpayment(): float
+    {
+        return $this->postpayment;
+    }
+
+    //**********************************************************************
+
+    /**
+     * Установить расчет встречным представлением
+     *
+     * @throws InvalidArgumentException
+     *
+     * @param float $barter
+     * @return self
+     */
+    public function setBarter(float $barter): self
+    {
+        if ($barter < 0) {
+            throw new InvalidArgumentException("invalid amount barter '$barter'");
+        }
+
+        $this->barter = $barter;
+        return $this;
+    }
+
+    /**
+     * Получить расчет встречным представлением
+     *
+     * @return float
+     */
+    public function getBarter(): float
+    {
+        return $this->barter;
     }
 
     //######################################################################
     // PRIVATE
     //######################################################################
 
-    private $cash = null;
-    private $cashless = null;
-    private $prepayment = null;
-    private $postpayment = null;
-    private $barter = null;
+    /** @var float */
+    private $cash = 0.0;
+
+    /** @var float */
+    private $cashless = 0.0;
+
+    /** @var float */
+    private $prepayment = 0.0;
+
+    /** @var float */
+    private $postpayment = 0.0;
+
+    /** @var float */
+    private $barter = 0.0;
 }

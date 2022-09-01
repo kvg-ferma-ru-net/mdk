@@ -82,30 +82,6 @@ class Receipt
     //**********************************************************************
 
     /**
-     * Установить группу касс
-     *
-     * @param string $cashbox
-     * @return self
-     */
-    public function setCashbox(string $cashbox): self
-    {
-        $this->cashbox = $cashbox;
-        return $this;
-    }
-
-    /**
-     * Получить группу касс
-     *
-     * @return string
-     */
-    public function getCashbox(): string
-    {
-        return $this->cashbox;
-    }
-
-    //**********************************************************************
-
-    /**
      * Установить идентификатор сайта, если интеграция должна поддерживать мультисайтовость
      *
      * @param string $siteId
@@ -162,85 +138,17 @@ class Receipt
     public function setStatus(ReceiptStatus $receiptStatus): self
     {
         $this->status = $receiptStatus;
-
-        // если чек был принят сервером - помечаем
-        if (
-            $receiptStatus->getCode() == ReceiptStatus::ACCEPTED
-            || $receiptStatus->getCode() == ReceiptStatus::COMPLETED
-        ) {
-            $this->setAccepted(true);
-        }
-
-        // если чек еще не был принят сервером и авторизация не прошла или статусы чека провальные - чек недействителен
-        if (
-            ($this->status->getCode() == ReceiptStatus::UNAUTH && !$this->getAccepted())
-            || $this->status->getCode() == ReceiptStatus::ERROR
-            || $this->status->getCode() == ReceiptStatus::EXPIRED
-        ) {
-            $this->setAvailable(false);
-        } else {
-            $this->setAvailable(true);
-        }
-
         return $this;
     }
 
     /**
      * Получить статус чека
      *
-     * @return ReceiptStatus|null
+     * @return ReceiptStatus
      */
-    public function getStatus(): ?ReceiptStatus
+    public function getStatus(): ReceiptStatus
     {
         return $this->status;
-    }
-
-    //**********************************************************************
-
-    /**
-     * Установить статус принятия сервером
-     *
-     * @param bool $accepted
-     * @return self
-     */
-    public function setAccepted(bool $accepted): self
-    {
-        $this->accepted = $accepted;
-        return $this;
-    }
-
-    /**
-     * Получить статус принятия сервером
-     *
-     * @return bool
-     */
-    public function getAccepted(): bool
-    {
-        return $this->accepted;
-    }
-
-    //**********************************************************************
-
-    /**
-     * Установить действительность чека
-     *
-     * @param bool $available
-     * @return self
-     */
-    public function setAvailable(bool $available): self
-    {
-        $this->available = $available;
-        return $this;
-    }
-
-    /**
-     * Получить действительность чека
-     *
-     * @return bool
-     */
-    public function getAvailable(): bool
-    {
-        return $this->available;
     }
 
     //**********************************************************************
@@ -266,7 +174,7 @@ class Receipt
      */
     public function getType(): ?int
     {
-        return ($this->type ? $this->type->getCode() : null);
+        return ($this->type !== null ? $this->type->getCode() : null);
     }
 
     //**********************************************************************
@@ -292,7 +200,7 @@ class Receipt
      */
     public function getSubType(): ?int
     {
-        return ($this->subType ? $this->subType->getCode() : null);
+        return ($this->subType !== null ? $this->subType->getCode() : null);
     }
 
     //**********************************************************************
@@ -318,7 +226,7 @@ class Receipt
      */
     public function getTaxation(): ?int
     {
-        return ($this->taxation ? $this->taxation->getCode() : null);
+        return ($this->taxation !== null ? $this->taxation->getCode() : null);
     }
 
     //**********************************************************************
@@ -500,33 +408,50 @@ class Receipt
     //**********************************************************************
     // данные запроса
 
+    /** @var ReceiptType */
     private $type = null;
+
+    /** @var Taxation */
     private $taxation = null;
+
+    /** @var Amount */
     private $amount = null;
+
+    /** @var Notify */
     private $notify = null;
+
+    /** @var Customer */
     private $customer = null;
+
+    /** @var ReceiptItemCollection */
     private $items = null;
+
+    /** @var string */
     private $location = '';
+
+    /** @var string */
     private $receiptId = '';
 
     //**********************************************************************
     // идентификационные данные
 
+    /** @var int */
     private $id = 0;
+
+    /** @var ReceiptSubType */
     private $subType = null;
-    private $cashbox = '';
 
     /** @var string */
     private $siteId = '';
 
+    /** @var string */
     private $orderId = '';
 
     //**********************************************************************
     // статусные данные
 
+    /** @var ReceiptStatus */
     private $status = null;
-    private $accepted = false;
-    private $available = false;
 
     //**********************************************************************
     // прочее

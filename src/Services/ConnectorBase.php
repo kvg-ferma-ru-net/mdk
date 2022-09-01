@@ -7,6 +7,7 @@ use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Exceptions\SettingsException;
 use Innokassa\MDK\Exceptions\TransferException;
+use Innokassa\MDK\Exceptions\NetConnectException;
 
 /**
  * Базовая реализация ConnectorInterface
@@ -28,8 +29,13 @@ class ConnectorBase implements ConnectorInterface
     {
         try {
             $response = $this->transfer->getCashBox($settings->extrudeConn($siteId));
+        } catch (NetConnectException $e) {
+            throw new SettingsException(
+                sprintf('Сервер временно недоступен (%d), попробуйте позже', $e->getCode()),
+                $e->getCode()
+            );
         } catch (TransferException $e) {
-            if ($e->getCode() >= 500 || $e->getCode() < 100) {
+            if ($e->getCode() >= 500) {
                 throw new SettingsException(
                     sprintf('Сервер временно недоступен (%d), попробуйте позже', $e->getCode()),
                     $e->getCode()

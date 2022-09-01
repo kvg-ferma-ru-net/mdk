@@ -4,7 +4,9 @@ namespace Innokassa\MDK\Net;
 
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Settings\SettingsConn;
+use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Exceptions\TransferException;
+use Innokassa\MDK\Exceptions\NetConnectException;
 
 /**
  * Трансфер для взаимодействия с сервером фискализации Pangaea API v2
@@ -18,11 +20,12 @@ interface TransferInterface
      * @link https://api.innokassa.ru/v2/doc#c_groups__c_group_id_
      *
      * @throws TransferException
+     * @throws NetConnectException
      *
      * @param SettingsConn $settingsConn
-     * @return object
+     * @return \stdClass
      */
-    public function getCashbox(SettingsConn $settingsConn): object;
+    public function getCashbox(SettingsConn $settingsConn): \stdClass;
 
     /**
      * Отправка чека на фискализацию
@@ -30,23 +33,11 @@ interface TransferInterface
      * @link https://api.innokassa.ru/v2/doc#c_groups__c_group_id__receipts_online_store_agent__receipt_id__post
      *
      * @throws TransferException
+     * @throws NetConnectException
      *
      * @param SettingsConn $settingsConn
      * @param Receipt $receipt
-     * @return Receipt
+     * @return ReceiptStatus
      */
-    public function sendReceipt(SettingsConn $settingsConn, Receipt $receipt): Receipt;
-
-    /**
-     * Получение информации о чеке
-     *
-     * @link https://api.innokassa.ru/v2/doc#c_groups__c_group_id__receipts__receipt_id__get
-     *
-     * @throws TransferException
-     *
-     * @param SettingsConn $settingsConn
-     * @param Receipt $receipt
-     * @return Receipt
-     */
-    public function getReceipt(SettingsConn $settingsConn, Receipt $receipt): Receipt;
+    public function sendReceipt(SettingsConn $settingsConn, Receipt $receipt): ReceiptStatus;
 }

@@ -41,7 +41,7 @@ class LoggerFile implements LoggerInterface
     /**
      * Получить массив последнего сообщения
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getLastMsg(): array
     {
@@ -83,7 +83,10 @@ class LoggerFile implements LoggerInterface
     // PRIVATE
     //######################################################################
 
+    /** @var string */
     private $file = '';
+
+    /** @var array<string, mixed> */
     private $last = [];
 
     //######################################################################
@@ -91,7 +94,7 @@ class LoggerFile implements LoggerInterface
     /**
      * Трассировка стека вызовов
      *
-     * @return array линейный массив строк с вызовами
+     * @return array<string> линейный массив строк с вызовами
      */
     private function stacktrace(): array
     {

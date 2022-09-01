@@ -6,13 +6,14 @@ use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Net\ConverterApi;
 use Innokassa\MDK\Logger\LoggerFile;
 use Innokassa\MDK\Net\NetClientCurl;
-use Innokassa\MDK\Services\PipelineForModule;
+use Innokassa\MDK\Services\PipelineBase;
 use Innokassa\MDK\Logger\LoggerInterface;
 use Innokassa\MDK\Services\AutomaticBase;
 use Innokassa\MDK\Services\ConnectorBase;
 use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Entities\ReceiptAdapterInterface;
+use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryInterface;
 use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
@@ -22,7 +23,7 @@ use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
  * @uses Innokassa\MDK\Net\Transfer
  * @uses Innokassa\MDK\Services\AutomaticBase
  * @uses Innokassa\MDK\Services\ConnectorBase
- * @uses Innokassa\MDK\Services\PipelineForModule
+ * @uses Innokassa\MDK\Services\PipelineBase
  * @uses Innokassa\MDK\Logger\LoggerFile
  */
 class ClientTest extends TestCase
@@ -42,13 +43,14 @@ class ClientTest extends TestCase
         $settings = $this->createMock(SettingsAbstract::class);
         $storage = $this->createMock(ReceiptStorageInterface::class);
         $adapter = $this->createMock(ReceiptAdapterInterface::class);
+        $receiptIdFactory = $this->createMock(ReceiptIdFactoryInterface::class);
 
         $logger = new LoggerFile();
 
         $transfer = new Transfer(new NetClientCurl(), new ConverterApi(), $logger);
 
         $automatic = new AutomaticBase($settings, $storage, $transfer, $adapter, new ReceiptIdFactoryMeta());
-        $pipeline = new PipelineForModule($settings, $storage, $transfer);
+        $pipeline = new PipelineBase($settings, $storage, $transfer, $receiptIdFactory);
         $connector = new ConnectorBase($transfer);
 
         $client = new Client(

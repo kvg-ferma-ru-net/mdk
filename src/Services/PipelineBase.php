@@ -6,21 +6,42 @@ use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Net\TransferInterface;
 use Innokassa\MDK\Settings\SettingsConn;
 use Innokassa\MDK\Storage\ReceiptFilter;
+use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
 use Innokassa\MDK\Exceptions\SettingsException;
 use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Collections\ReceiptCollection;
+use Innokassa\MDK\Exceptions\NetConnectException;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
+use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryInterface;
 
 /**
- * Абстрактный класс с базовой реализацей PipelineInterface.
+ * Класс с базовой реализацей PipelineInterface.
  */
-abstract class PipelineAbstract implements PipelineInterface
+class PipelineBase implements PipelineInterface
 {
     /** Количество выбираемых элементов из БД */
     public const COUNT_SELECT = 50;
 
     //######################################################################
+
+    /**
+     * @param SettingsAbstract $settings
+     * @param ReceiptStorageInterface $receiptStorage
+     * @param TransferInterface $transfer
+     * @param ReceiptIdFactoryInterface $receiptIdFactory
+     */
+    public function __construct(
+        SettingsAbstract $settings,
+        ReceiptStorageInterface $receiptStorage,
+        TransferInterface $transfer,
+        ReceiptIdFactoryInterface $receiptIdFactory
+    ) {
+        $this->receiptStorage = $receiptStorage;
+        $this->transfer = $transfer;
+        $this->settings = $settings;
+        $this->receiptIdFactory = $receiptIdFactory;
+    }
 
     /**
      * @inheritDoc
@@ -39,8 +60,7 @@ abstract class PipelineAbstract implements PipelineInterface
             $receipts = $this->receiptStorage->getCollection(
                 (new ReceiptFilter())
                     ->setId($idLast, ReceiptFilter::OP_GT)
-                    ->setStatus(ReceiptStatus::COMPLETED, ReceiptFilter::OP_NOTEQ)
-                    ->setAvailable(true),
+                    ->setStatus([ReceiptStatus::ACCEPTED, ReceiptStatus::PREPARED]),
                 self::COUNT_SELECT
             );
             $idLast = $this->processing($receipts);
@@ -64,12 +84,6 @@ abstract class PipelineAbstract implements PipelineInterface
         );
         $countAccepted = $this->receiptStorage->count(
             (new ReceiptFilter())->setStatus(ReceiptStatus::ACCEPTED)
-        );
-        $countUnauth = $this->receiptStorage->count(
-            (new ReceiptFilter())->setStatus(ReceiptStatus::UNAUTH)
-        );
-        $countAssume = $this->receiptStorage->count(
-            (new ReceiptFilter())->setStatus(ReceiptStatus::ASSUME)
         );
         $countError = $this->receiptStorage->count(
             (new ReceiptFilter())->setStatus(ReceiptStatus::ERROR)
@@ -106,24 +120,6 @@ abstract class PipelineAbstract implements PipelineInterface
             $durationAccepted = time() - intval(strtotime($minTimeAccepted));
         }
 
-        $minTimeUnauth = $this->receiptStorage->min(
-            (new ReceiptFilter())->setStatus(ReceiptStatus::UNAUTH),
-            $columnStratTime
-        );
-        $durationUnauth = 0;
-        if ($minTimeUnauth !== null) {
-            $durationUnauth = time() - intval(strtotime($minTimeUnauth));
-        }
-
-        $minTimeAssume = $this->receiptStorage->min(
-            (new ReceiptFilter())->setStatus(ReceiptStatus::ASSUME),
-            $columnStratTime
-        );
-        $durationAssume = 0;
-        if ($minTimeAssume !== null) {
-            $durationAssume = time() - intval(strtotime($minTimeAssume));
-        }
-
         $minTimeError = $this->receiptStorage->min(
             (new ReceiptFilter())->setStatus(ReceiptStatus::ERROR),
             $columnStratTime
@@ -150,10 +146,6 @@ abstract class PipelineAbstract implements PipelineInterface
             '# TYPE prepared_duration gauge',
             '# TYPE accepted_count gauge',
             '# TYPE accepted_duration gauge',
-            '# TYPE unauth_count gauge',
-            '# TYPE unauth_duration gauge',
-            '# TYPE assume_count gauge',
-            '# TYPE assume_duration gauge',
             '# TYPE error_count gauge',
             '# TYPE error_duration gauge',
             '# TYPE expired_count gauge',
@@ -167,10 +159,6 @@ abstract class PipelineAbstract implements PipelineInterface
         $content[] = sprintf('prepared_duration %d', $durationPrepared);
         $content[] = sprintf('accepted_count %d', $countAccepted);
         $content[] = sprintf('accepted_duration %d', $durationAccepted);
-        $content[] = sprintf('unauth_count %d', $countUnauth);
-        $content[] = sprintf('unauth_duration %d', $durationUnauth);
-        $content[] = sprintf('assume_count %d', $countAssume);
-        $content[] = sprintf('assume_duration %d', $durationAssume);
         $content[] = sprintf('error_count %d', $countError);
         $content[] = sprintf('error_duration %d', $durationError);
         $content[] = sprintf('expired_count %d', $countExpired);
@@ -192,18 +180,22 @@ abstract class PipelineAbstract implements PipelineInterface
     /** @var TransferInterface */
     protected $transfer = null;
 
+    /** @var SettingsAbstract */
+    protected $settings = null;
+
+    /** @var ReceiptIdFactoryInterface */
+    protected $receiptIdFactory = null;
+
     //######################################################################
 
     /**
-     * Обработка коллекции принятых чеков
+     * Обработка коллекции чеков
      *
      * @param ReceiptCollection $receipts
      * @return integer наибольший идентификатор чека из коллекции
      */
     protected function processing(ReceiptCollection $receipts): int
     {
-        // ошибочные статусы
-        static $errStatuses = [ReceiptStatus::ASSUME];
         $countError = 0;
 
         $idLast = 0;
@@ -211,32 +203,37 @@ abstract class PipelineAbstract implements PipelineInterface
             $idLast = ($receipt->getId() > $idLast ? $receipt->getId() : $idLast);
 
             // если чек не был принят сервером и время фискализации истекло
-            if (!$receipt->getAccepted() && $receipt->isExpired()) {
+            if ($receipt->getStatus()->getCode() == ReceiptStatus::PREPARED && $receipt->isExpired()) {
                 $receipt->setStatus(new ReceiptStatus(ReceiptStatus::EXPIRED));
                 $this->receiptStorage->save($receipt);
                 continue;
             }
 
+            $receiptStatus = new ReceiptStatus(ReceiptStatus::PREPARED);
             try {
-                $receipt = $this->transfer->sendReceipt(
+                $receiptStatus = $this->transfer->sendReceipt(
                     $this->extrudeConn($receipt),
                     $receipt
                 );
             } catch (TransferException $e) {
-            } catch (SettingsException $e) {
-                // TODO
-            } finally {
-                $receiptStatus = $receipt->getStatus();
-                if (!$receiptStatus || array_search($receiptStatus->getCode(), $errStatuses) !== false) {
+                $receiptStatus = new ReceiptStatus($e->getCode());
+                if ($receiptStatus->getCode() == ReceiptStatus::PREPARED) {
+                    $receipt->setReceiptId($this->receiptIdFactory->build($receipt));
                     $countError++;
                 }
-                // в любом случае сохраняем чек
+            } catch (NetConnectException | SettingsException $e) {
+                $receiptStatus = $receipt->getStatus();
+                $countError++;
+            } finally {
+                $receipt->setStatus($receiptStatus);
                 $this->receiptStorage->save($receipt);
             }
         }
 
         return ($countError == $receipts->count() ? 0 : $idLast);
     }
+
+    //######################################################################
 
     /**
      * Извлечь настройки соединения на основании данных чека
@@ -246,5 +243,8 @@ abstract class PipelineAbstract implements PipelineInterface
      * @param Receipt $receipt
      * @return SettingsConn
      */
-    abstract protected function extrudeConn(Receipt $receipt): SettingsConn;
+    protected function extrudeConn(Receipt $receipt): SettingsConn
+    {
+        return $this->settings->extrudeConn($receipt->getSiteId());
+    }
 }

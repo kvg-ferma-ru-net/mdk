@@ -51,12 +51,9 @@ class ConverterStorage extends ConverterAbstract
 
         $a['id'] = $receipt->getId();
         $a['receipt_id'] = $receipt->getReceiptId();
-        $a['cashbox'] = $receipt->getCashbox();
         $a['site_id'] = $receipt->getSiteId();
         $a['order_id'] = $receipt->getOrderId();
         $a['status'] = $receipt->getStatus()->getCode();
-        $a['accepted'] = intval($receipt->getAccepted());
-        $a['available'] = intval($receipt->getAvailable());
         $a['type'] = $receipt->getType();
         $a['subtype'] = $receipt->getSubType();
         $a['items'] = $this->itemsToArray($receipt->getItems());
@@ -87,13 +84,10 @@ class ConverterStorage extends ConverterAbstract
         $fields = [
             'id',
             'subtype',
-            'cashbox',
             'order_id',
             'site_id',
             'receipt_id',
             'status',
-            'accepted',
-            'available',
             'type',
             'items',
             'taxation',
@@ -119,12 +113,9 @@ class ConverterStorage extends ConverterAbstract
             $receipt
                 ->setId($a['id'])
                 ->setReceiptId($a['receipt_id'])
-                ->setCashbox($a['cashbox'])
                 ->setOrderId($a['order_id'])
                 ->setSiteId($a['site_id'])
                 ->setStatus(new ReceiptStatus($a['status']))
-                ->setAccepted($a['accepted'])
-                ->setAvailable($a['available'])
                 ->setType($a['type'])
                 ->setItems($this->itemsFromArray($a['items']))
                 ->setTaxation($a['taxation'])

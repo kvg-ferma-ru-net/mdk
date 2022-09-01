@@ -4,6 +4,9 @@ namespace Innokassa\MDK\Collections;
 
 /**
  * Базовый класс коллекций
+ *
+ * @implements \Iterator<object>
+ * @implements \ArrayAccess<int,object>
  */
 class BaseCollection implements \Countable, \ArrayAccess, \Iterator
 {
@@ -86,6 +89,9 @@ class BaseCollection implements \Countable, \ArrayAccess, \Iterator
     // PROTECTED
     //######################################################################
 
+    /** @var array<object> */
     protected $objects = [];
+
+    /** @var int */
     protected $position = 0;
 }

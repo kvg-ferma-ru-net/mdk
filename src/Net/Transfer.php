@@ -40,7 +40,7 @@ class Transfer implements TransferInterface
     /**
      * @inheritDoc
      */
-    public function getCashbox(SettingsConn $settingsConn): object
+    public function getCashbox(SettingsConn $settingsConn): \stdClass
     {
         $headers = [
             "Authorization: Basic " . base64_encode($settingsConn->getActorId() . ":" . $settingsConn->getActorToken()),
@@ -57,7 +57,7 @@ class Transfer implements TransferInterface
             try {
                 $this->client->send();
             } catch (NetConnectException $e) {
-                throw new TransferException($e->getMessage(), $e->getCode());
+                throw $e;
             }
 
             $responseCode = $this->client->read(NetClientInterface::CODE);
@@ -68,12 +68,12 @@ class Transfer implements TransferInterface
             }
 
             $responseBody = json_decode($responseBody);
-        } catch (TransferException $e) {
+        } catch (TransferException | NetConnectException $e) {
             $this->logger->log(
                 LogLevel::ERROR,
                 'error ' . __METHOD__,
                 [
-                    'exception' => $e->toArray(),
+                    'exception' => $e->__toString(),
                     'url' => $url,
                     'response' => [
                         'code' => $responseCode ?? '',
@@ -102,8 +102,9 @@ class Transfer implements TransferInterface
     /**
      * @inheritDoc
      */
-    public function sendReceipt(SettingsConn $settingsConn, Receipt $receipt): Receipt
+    public function sendReceipt(SettingsConn $settingsConn, Receipt $receipt): ReceiptStatus
     {
+        $receiptStatus = new ReceiptStatus(ReceiptStatus::PREPARED);
         $headers = [
             "Authorization: Basic " . base64_encode($settingsConn->getActorId() . ":" . $settingsConn->getActorToken()),
             "Content-type: application/json; charset=utf-8"
@@ -113,7 +114,6 @@ class Transfer implements TransferInterface
             try {
                 $body = $this->converter->receiptToArray($receipt);
             } catch (ConverterException $e) {
-                $receipt->setStatus(new ReceiptStatus(ReceiptStatus::ERROR));
                 throw new TransferException('converter error: ' . $e->getMessage(), ReceiptStatus::ERROR);
             }
 
@@ -131,25 +131,22 @@ class Transfer implements TransferInterface
             try {
                 $this->client->send();
             } catch (NetConnectException $e) {
-                // проблемы с сетью
-                $receipt->setStatus(new ReceiptStatus(ReceiptStatus::PREPARED));
-                throw new TransferException($e->getMessage(), $e->getCode());
+                throw $e;
             }
 
             $responseCode = $this->client->read(NetClientInterface::CODE);
             $responseBody = $this->client->read(NetClientInterface::BODY);
-
-            $receipt->setStatus(new ReceiptStatus($responseCode));
+            $receiptStatus = new ReceiptStatus($responseCode);
 
             if (!($responseCode == 201 || $responseCode == 202)) {
                 throw new TransferException($responseBody, $responseCode);
             }
-        } catch (TransferException $e) {
+        } catch (TransferException | NetConnectException $e) {
             $this->logger->log(
                 LogLevel::ERROR,
                 'error ' . __METHOD__,
                 [
-                    'exception' => $e->toArray(),
+                    'exception' => $e->__toString(),
                     'receipt' => [
                         'id' => $receipt->getId(),
                         'order' => $receipt->getOrderId(),
@@ -184,82 +181,7 @@ class Transfer implements TransferInterface
             ]
         );
 
-        return $receipt;
-    }
-
-    //**********************************************************************
-
-    /**
-     * @inheritDoc
-     */
-    public function getReceipt(SettingsConn $settingsConn, Receipt $receipt): Receipt
-    {
-        $headers = [
-            "Authorization: Basic " . base64_encode($settingsConn->getActorId() . ":" . $settingsConn->getActorToken()),
-            "Content-type: application/json; charset=utf-8"
-        ];
-
-        try {
-            $url = self::API_URL . "/c_groups/" . $settingsConn->getCashbox() . "/receipts/" . $receipt->getReceiptId();
-            $this->client
-                ->reset()
-                ->write(NetClientInterface::PATH, $url)
-                ->write(NetClientInterface::HEAD, $headers);
-
-            try {
-                $this->client->send();
-            } catch (NetConnectException $e) {
-                $receipt->setStatus(new ReceiptStatus(ReceiptStatus::PREPARED));
-                throw new TransferException($e->getMessage(), $e->getCode());
-            }
-
-            $responseCode = $this->client->read(NetClientInterface::CODE);
-            $responseBody = $this->client->read(NetClientInterface::BODY);
-
-            $receipt->setStatus(new ReceiptStatus($responseCode));
-
-            if ($responseCode != 200 && $responseCode != 202) {
-                throw new TransferException($responseBody, $responseCode);
-            }
-        } catch (TransferException $e) {
-            $this->logger->log(
-                LogLevel::ERROR,
-                'error ' . __METHOD__,
-                [
-                    'exception' => $e->toArray(),
-                    'receipt' => [
-                        'id' => $receipt->getId(),
-                        'order' => $receipt->getOrderId(),
-                        'subType' => $receipt->getsubType()
-                    ],
-                    'url' => $url,
-                    'response' => [
-                        'code' => $responseCode ?? '',
-                        'body' => $responseBody ?? ''
-                    ]
-                ]
-            );
-            throw $e;
-        }
-
-        $this->logger->log(
-            LogLevel::INFO,
-            'success ' . __METHOD__,
-            [
-                'receipt' => [
-                    'id' => $receipt->getId(),
-                    'order' => $receipt->getOrderId(),
-                    'subType' => $receipt->getsubType()
-                ],
-                'url' => $url,
-                'response' => [
-                    'code' => $responseCode,
-                    'body' => $responseBody
-                ]
-            ]
-        );
-
-        return $receipt;
+        return $receiptStatus;
     }
 
     //######################################################################

@@ -5,7 +5,7 @@
 
 **Innokassa MDK (Module Development Kit)** - набор программных средств на PHP для использования API облачной кассы [Pangaea V2](https://api.innokassa.ru/v2/doc) от [Innokassa](https://innokassa.ru/), содержащий в себе всю необходимую логику для фискализации заказов интернет-магазинов (ИМ), с поддержкой мультисайтовости. 
 
-Для работы библиотеки требуется PHP версии не ниже 7.1 с библиотекой curl.
+Для работы библиотеки требуется `PHP` версии не ниже `7.1` с библиотекой `curl`.
 
 Описание:
 * ОО стиль - все есть объект 
@@ -99,7 +99,7 @@ $automatic = new AutomaticBase(
     $adapter,
     $receiptIdFactory
 );
-$pipeline = new PipelineBase($settings, $storage, $transfer);
+$pipeline = new PipelineBase($settings, $storage, $transfer, $receiptIdFactory);
 $connector = new ConnectorBase($transfer);
 
 // создание клиента
@@ -169,7 +169,7 @@ try {
 
 #### Pipeline
 
-Сервер фискализации может не сразу пробить чек по разным причинам, но примет сразу ответив кодом 202. После чего необходимо узнать текущий статус чеков. Эту задачу решает `Pipeline` ([PipelineBase](/src/Services/PipelineBase.php) базовая реализация [PipelineInterface](/src/Services/PipelineInterface.php)), методы которого должны запускаться (каждый в отдельном экземпляре) в планировщике задач (например через `cron`), желательно каждые 10 минут.
+Сервер фискализации может не сразу пробить чек по разным причинам, например ответив кодом 202. После чего необходимо узнать текущий статус чеков. Эту задачу решает `Pipeline` ([PipelineBase](/src/Services/PipelineBase.php) базовая реализация [PipelineInterface](/src/Services/PipelineInterface.php)), методы которого должны запускаться (каждый в отдельном экземпляре) в планировщике задач (например через `cron`), желательно каждые 10 минут.
 
 Существует несколько [статусов чека](/src/Entities/Atoms/ReceiptStatus.php), но все чеки со статусом подлежащим фискализации обработаются вместе.
 
@@ -181,9 +181,11 @@ $pipeline = $mdk->servicePipeline();
 $pipeline->update();
 ```
 
+> `Pipeline` также обрабатывает 50x коды ответов, ответы подобного рода не должны быть, но для предсказуемости введена обработка.
+
 ### Обработка ошибок
 
-Сервисы и компоненты могут выбрасывать исключения, это однозначно означает что **операция не удалась и с теми же данными не пройдет**, за исключением проблем со связью. Каждый объект выбрасывает свойственные ему исключения (подробнее к исходном коде интерфейсов/классов).
+Сервисы и компоненты могут выбрасывать исключения, это однозначно означает что **операция не удалась и с теми же данными не пройдет**, за исключением проблем со связью. Каждый объект выбрасывает свойственные ему исключения (подробнее в исходном коде интерфейсов/классов).
 
 Ответсвенность за обработку исключений ложится на клиентский код.
 
@@ -198,29 +200,26 @@ $pipeline->update();
 
 ## Разработка
 
-> Для разработки потребуется `docker` и `docker-compose`
+> Для разработки потребуется `docker compose`
 
-Репозиторий содержит [docker-compose-dev.yml](/docker-compose-dev.yml) для организации среды разработки `MDK`, состоит из двух контейнеров:
-* `mdk-php-dev` - основан на [php:7.3-cli](https://hub.docker.com/_/php) с модификациями, внутри используется `xdebug` для отладки и `composer` для установки зависимостей разработки
-* `mdk-mysql-dev` - основан [mysql:5.7](https://hub.docker.com/_/mysql) без модификаций (логин:пароль от БД root:root)
+Репозиторий содержит [docker-compose.dev.yml](/docker-compose.dev.yml) для организации среды разработки `MDK`, состоит из двух контейнеров:
+* `mdk-backend` - основан на [php:7.1-cli](https://hub.docker.com/_/php) с модификациями, внутри используется `xdebug` (2.8.1) для отладки и `composer` (2.2) для установки зависимостей разработки
+* `mdk-db` - основан [mysql:5.7](https://hub.docker.com/_/mysql) без модификаций (логин:пароль от БД `root`:`root`)
 
 Запуск контейнеров:
 ```bash
-docker-compose -f docker-compose-dev.yml --force-recreate --build
+./dev.sh
 ```
 
 После запуска будет развернута изолированная среда со всем необходимым ПО для разработки `MDK`.
 
-Для `VS Code` есть вспомогательные инструменты:
-* отладчик [PHP Debug](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-debug), настройки которого можно найти в [launch.json](/.vscode/launch.json) послеовательность действий:
-    * запускается отладчик в редакторе
-    * в `docker` контейнере запускается нужный скрипт, например `docker exec -it mdk-php-dev /bin/bash -c "php -f file.php"`
-    * отладчик в редакторе получает отладочные данные из контейнера
-* задания  [tasks.json](/.vscode/tasks.json) (задания запускаются в `docker` контейнере):
-    * Run unit tests all - запуск всех unit тестов
-    * Run unit test current file - запуск текущего тестового скрипта на тестирование
+Запуск тестов исходного кода `MDK`:
+```bash
+./test.sh
+```
 
 Рекомендуемые расширения для `VS Code` (нужные настройки подгрузятся из конфига в репозитории):
+* [PHP Debug](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-debug)
 * [intelephense](https://marketplace.visualstudio.com/items?itemName=bmewburn.vscode-intelephense-client)
 * [phpcs](https://marketplace.visualstudio.com/items?itemName=ikappas.phpcs)
 * [phpstan](https://marketplace.visualstudio.com/items?itemName=swordev.phpstan)

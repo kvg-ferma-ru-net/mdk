@@ -8,10 +8,10 @@
             "args": [
                 "exec",
                 "-it",
-                "mdk-php",
+                "mdk-backend",
                 "/bin/bash",
                 "-c",
-                "vendor/bin/phpunit --colors=always --coverage-html coverage-report-html --bootstrap tests/Unit/bootstrap.php tests/Unit/"
+                "composer run-script test-unit"
             ],
             "group": "test",
             "presentation": {
@@ -26,7 +26,7 @@
             "args": [
                 "exec",
                 "-it",
-                "mdk-php",
+                "mdk-backend",
                 "/bin/bash",
                 "-c",
                 "vendor/bin/phpunit --colors=always --coverage-html coverage-report-html --bootstrap tests/Unit/bootstrap.php ${relativeFile}"

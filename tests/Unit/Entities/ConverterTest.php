@@ -44,11 +44,11 @@ class ConverterTest extends TestCase
     {
         $amount = new Amount();
         $amount
-            ->set(Amount::CASHLESS, 100)
-            ->set(Amount::CASH, 200)
-            ->set(Amount::PREPAYMENT, 300)
-            ->set(Amount::POSTPAYMENT, 400)
-            ->set(Amount::BARTER, 500);
+            ->setCashless(100)
+            ->setCash(200)
+            ->setPrepayment(300)
+            ->setPostpayment(400)
+            ->setBarter(500);
 
         $this->assertEquals(
             [
@@ -77,11 +77,11 @@ class ConverterTest extends TestCase
             'postpayment' => 400.0,
             'barter' => 500.0,
         ]);
-        $this->assertSame(100.0, $amount->get(Amount::CASHLESS));
-        $this->assertSame(200.0, $amount->get(Amount::CASH));
-        $this->assertSame(300.0, $amount->get(Amount::PREPAYMENT));
-        $this->assertSame(400.0, $amount->get(Amount::POSTPAYMENT));
-        $this->assertSame(500.0, $amount->get(Amount::BARTER));
+        $this->assertSame(100.0, $amount->getCashless());
+        $this->assertSame(200.0, $amount->getCash());
+        $this->assertSame(300.0, $amount->getPrepayment());
+        $this->assertSame(400.0, $amount->getPostpayment());
+        $this->assertSame(500.0, $amount->getBarter());
 
         $this->expectException(ConverterException::class);
         $this->converter->amountFromArray([]);

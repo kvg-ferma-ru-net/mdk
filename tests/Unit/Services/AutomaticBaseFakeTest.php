@@ -18,6 +18,7 @@ use Innokassa\MDK\Entities\Primitives\Customer;
 use Innokassa\MDK\Exceptions\TransferException;
 use Innokassa\MDK\Collections\ReceiptCollection;
 use Innokassa\MDK\Entities\Atoms\ReceiptSubType;
+use Innokassa\MDK\Exceptions\NetConnectException;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Entities\ReceiptAdapterInterface;
 use Innokassa\MDK\Collections\ReceiptItemCollection;
@@ -79,7 +80,7 @@ class AutomaticBaseFakeTest extends TestCase
         $this->transfer = $this->createMock(TransferInterface::class);
         $this->transfer
             ->method('sendReceipt')
-            ->will($this->returnArgument(1));
+            ->will($this->returnValue(new ReceiptStatus(ReceiptStatus::PREPARED)));
 
         $this->storage = $this->createMock(ReceiptStorageInterface::class);
 
@@ -127,7 +128,7 @@ class AutomaticBaseFakeTest extends TestCase
         $this->assertSame(ReceiptType::COMING, $receipt->getType());
         $this->assertSame(ReceiptSubType::PRE, $receipt->getSubType());
         $this->assertSame('s1', $receipt->getSiteId());
-        $this->assertSame(200.0, $receipt->getAmount()->get(Amount::CASHLESS));
+        $this->assertSame(200.0, $receipt->getAmount()->getCashless());
         $this->assertSame('Test', $receipt->getCustomer()->getName());
         $this->assertSame('+79998887766', $receipt->getNotify()->getPhone());
 
@@ -136,7 +137,7 @@ class AutomaticBaseFakeTest extends TestCase
         $this->assertSame(ReceiptType::COMING, $receipt->getType());
         $this->assertSame(ReceiptSubType::PRE, $receipt->getSubType());
         $this->assertSame('', $receipt->getSiteId());
-        $this->assertSame(200.0, $receipt->getAmount()->get(Amount::CASHLESS));
+        $this->assertSame(200.0, $receipt->getAmount()->getCashless());
         $this->assertSame('Test', $receipt->getCustomer()->getName());
         $this->assertSame('+79998887766', $receipt->getNotify()->getPhone());
     }
@@ -168,7 +169,7 @@ class AutomaticBaseFakeTest extends TestCase
         $receipt = $automatic->fiscalize('0', '', ReceiptSubType::FULL);
         $this->assertInstanceOf(Receipt::class, $receipt);
         $this->assertSame(ReceiptSubType::FULL, $receipt->getSubType());
-        $this->assertSame(200.0, $receipt->getAmount()->get(Amount::CASHLESS));
+        $this->assertSame(200.0, $receipt->getAmount()->getCashless());
     }
 
     /**
@@ -243,7 +244,7 @@ class AutomaticBaseFakeTest extends TestCase
         $receipt = $automatic->fiscalize('0');
         $this->assertInstanceOf(Receipt::class, $receipt);
         $this->assertSame(ReceiptSubType::FULL, $receipt->getSubType());
-        $this->assertSame(200.0, $receipt->getAmount()->get(Amount::PREPAYMENT));
+        $this->assertSame(200.0, $receipt->getAmount()->getPrepayment());
     }
 
     /**
@@ -314,7 +315,7 @@ class AutomaticBaseFakeTest extends TestCase
         $receipt = $automatic->fiscalize('0');
         $this->assertInstanceOf(Receipt::class, $receipt);
         $this->assertSame(ReceiptSubType::FULL, $receipt->getSubType());
-        $this->assertSame(200.0, $receipt->getAmount()->get(Amount::CASHLESS));
+        $this->assertSame(200.0, $receipt->getAmount()->getCashless());
     }
 
     //**********************************************************************
@@ -346,6 +347,38 @@ class AutomaticBaseFakeTest extends TestCase
 
         $receipt = $automatic->fiscalize('0');
         $this->assertInstanceOf(Receipt::class, $receipt);
+        $this->assertSame($receipt->getStatus()->getCode(), ReceiptStatus::PREPARED);
+    }
+
+    /**
+     * @covers Innokassa\MDK\Services\AutomaticBase::__construct
+     * @covers Innokassa\MDK\Services\AutomaticBase::fiscalize
+     */
+    public function testFiscalizeNetConnectException()
+    {
+        $this->settings
+            ->method('getScheme')
+            ->willReturn(SettingsAbstract::SCHEME_PRE_FULL);
+
+        $this->storage
+            ->method('getCollection')
+            ->willReturn(new ReceiptCollection());
+
+        $this->transfer
+            ->method('sendReceipt')
+            ->will($this->throwException(new NetConnectException('', 28)));
+
+        $automatic = new AutomaticBase(
+            $this->settings,
+            $this->storage,
+            $this->transfer,
+            $this->adapter,
+            new ReceiptIdFactoryMeta()
+        );
+
+        $receipt = $automatic->fiscalize('0');
+        $this->assertInstanceOf(Receipt::class, $receipt);
+        $this->assertSame($receipt->getStatus()->getCode(), ReceiptStatus::PREPARED);
     }
 
     //######################################################################

@@ -53,7 +53,7 @@ class ConverterApiTest extends TestCase
                     ->setUnit(Unit::DEFAULT)
             )
             ->setTaxation(Taxation::ORN)
-            ->setAmount(new Amount(Amount::CASHLESS, 200.0))
+            ->setAmount((new Amount())->setCashless(200))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
             ->setLocation('http://example.com/');
@@ -101,7 +101,7 @@ class ConverterApiTest extends TestCase
         $receipt
             ->setType(ReceiptType::COMING)
             ->setTaxation(Taxation::ORN)
-            ->setAmount(new Amount(Amount::CASHLESS, 200.0))
+            ->setAmount((new Amount())->setCashless(200))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
             ->setLocation('http://example.com/');
@@ -125,7 +125,7 @@ class ConverterApiTest extends TestCase
                     ->setQuantity(2)
                     ->setName('name')
             )
-            ->setAmount(new Amount(Amount::CASHLESS, 200.0))
+            ->setAmount((new Amount())->setCashless(200))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
             ->setLocation('http://example.com/');
@@ -174,7 +174,7 @@ class ConverterApiTest extends TestCase
                     ->setName('name')
             )
             ->setTaxation(Taxation::ORN)
-            ->setAmount(new Amount(Amount::CASHLESS, 200.0))
+            ->setAmount((new Amount())->setCashless(200))
             ->setCustomer(new Customer('Test'))
             ->setLocation('http://example.com/');
 
@@ -198,7 +198,7 @@ class ConverterApiTest extends TestCase
                     ->setName('name')
             )
             ->setTaxation(Taxation::ORN)
-            ->setAmount(new Amount(Amount::CASHLESS, 200.0))
+            ->setAmount((new Amount())->setCashless(200))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'));
 

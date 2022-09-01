@@ -92,7 +92,8 @@ class ConnectorBaseFakeTest extends TestCase
     {
         $this->client->method('read')
             ->will($this->returnValueMap([
-                [NetClientInterface::CODE, 500]
+                [NetClientInterface::CODE, 500],
+                [NetClientInterface::BODY, ''],
             ]));
 
         $transfer = new Transfer(
@@ -114,10 +115,9 @@ class ConnectorBaseFakeTest extends TestCase
      */
     public function testSettingsFailServer28()
     {
-        $this->client->method('read')
-            ->will($this->returnValueMap([
-                [NetClientInterface::CODE, 28]
-            ]));
+        $this->client
+            ->method('send')
+            ->will($this->throwException(new NetConnectException('', 28)));
 
         $transfer = new Transfer(
             $this->client,
@@ -140,7 +140,8 @@ class ConnectorBaseFakeTest extends TestCase
     {
         $this->client->method('read')
             ->will($this->returnValueMap([
-                [NetClientInterface::CODE, 401]
+                [NetClientInterface::CODE, 401],
+                [NetClientInterface::BODY, ''],
             ]));
 
         $transfer = new Transfer(

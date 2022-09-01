@@ -67,7 +67,7 @@ class ReceiptFilter
     /**
      * Установить статус чека
      *
-     * @param integer|array $status из констант ReceiptStatus
+     * @param integer|array<int> $status из констант ReceiptStatus
      * @param string $op операция сравнения
      * @return self
      */
@@ -107,22 +107,6 @@ class ReceiptFilter
     {
         $this->siteId = [
             'value' => $siteId,
-            'op' => $op
-        ];
-        return $this;
-    }
-
-    /**
-     * Установить действительность чека
-     *
-     * @param bool $available
-     * @param string $op операция сравнения
-     * @return self
-     */
-    public function setAvailable(bool $available, string $op = self::OP_EQ): self
-    {
-        $this->available = [
-            'value' => intval($available),
             'op' => $op
         ];
         return $this;
@@ -172,7 +156,4 @@ class ReceiptFilter
 
     /** @var array<string, int|string> */
     private $siteId = null;
-
-    /** @var array<string, int|string> */
-    private $available = null;
 }

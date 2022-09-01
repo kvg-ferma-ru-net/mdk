@@ -68,7 +68,7 @@ class TransferServerTest extends TestCase
                     ->setItemId('123')
             )
             ->setTaxation(Taxation::USN)
-            ->setAmount(new Amount(Amount::CASHLESS, 200.0))
+            ->setAmount((new Amount())->setCashless(200))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
             ->setLocation('https://example.com/')
@@ -84,33 +84,13 @@ class TransferServerTest extends TestCase
             $this->logger
         );
 
-        $transfer->sendReceipt($this->settingsConn, $receipt);
+        $receiptStatus = $transfer->sendReceipt($this->settingsConn, $receipt);
         $this->assertTrue(
-            $receipt->getStatus()->getCode() == ReceiptStatus::COMPLETED
-            || $receipt->getStatus()->getCode() == ReceiptStatus::ACCEPTED
+            $receiptStatus->getCode() == ReceiptStatus::COMPLETED
+            || $receiptStatus->getCode() == ReceiptStatus::ACCEPTED
         );
 
         return $receipt;
-    }
-
-    /**
-     * @covers Innokassa\MDK\Net\Transfer::getReceipt
-     * @depends testSendReceipt
-     */
-    public function testGetReceiptExists($receipt)
-    {
-        $client = new NetClientCurl();
-        $converter = new ConverterApi();
-        $transfer = new Transfer(
-            $client,
-            $converter,
-            $this->logger
-        );
-        $receipt = $transfer->getReceipt($this->settingsConn, $receipt);
-        $this->assertTrue(
-            $receipt->getStatus()->getCode() == ReceiptStatus::COMPLETED
-            || $receipt->getStatus()->getCode() == ReceiptStatus::ACCEPTED
-        );
     }
 
     //######################################################################
@@ -131,7 +111,7 @@ class TransferServerTest extends TestCase
                     ->setName('name')
             )
             ->setTaxation(Taxation::USN)
-            ->setAmount(new Amount(Amount::CASHLESS, 300.0))
+            ->setAmount((new Amount())->setCashless(300))
             ->setNotify(new Notify('box@domain.zone'))
             ->setCustomer(new Customer('Test'))
             ->setLocation('https://example.com/');
@@ -148,40 +128,7 @@ class TransferServerTest extends TestCase
 
         $this->expectException(TransferException::class);
         $this->expectExceptionCode(400);
-        $receipt = $transfer->sendReceipt($this->settingsConn, $receipt);
-    }
-
-    /**
-     * @covers Innokassa\MDK\Net\Transfer::getReceipt
-     */
-    public function testGetReceiptFailNewUUID()
-    {
-        $client = new NetClientCurl();
-        $converter = new ConverterApi();
-        $transfer = new Transfer(
-            $client,
-            $converter,
-            $this->logger
-        );
-
-        $this->expectException(TransferException::class);
-        $this->expectExceptionCode(404);
-        $receipt = $transfer->getReceipt($this->settingsConn, new Receipt());
-    }
-
-    /**
-     * @covers Innokassa\MDK\Net\Transfer::getReceipt
-     */
-    public function testGetReceiptFailAuth()
-    {
-        $settingsConn = new SettingsConn(0, 0, 0);
-        $client = new NetClientCurl();
-        $converter = new ConverterApi();
-        $transfer = new Transfer($client, $converter, $this->logger);
-
-        $this->expectException(TransferException::class);
-        $this->expectExceptionCode(401);
-        $receipt = $transfer->getReceipt($settingsConn, new Receipt());
+        $transfer->sendReceipt($this->settingsConn, $receipt);
     }
 
     //######################################################################

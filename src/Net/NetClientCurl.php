@@ -99,6 +99,9 @@ class NetClientCurl implements NetClientInterface
     // PRIVATE
     //######################################################################
 
+    /** @var resource */
     private $curl = null;
+
+    /** @var string */
     private $response = '';
 }
