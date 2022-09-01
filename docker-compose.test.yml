@@ -20,8 +20,6 @@ services:
     depends_on: 
       - db
     volumes:
-      - ./coverage-report-html/:/var/www/html/coverage-report-html/
-      - ./logs/:/var/www/html/logs/
       - ./src/:/var/www/html/src/
       - ./tests/:/var/www/html/tests/
       - ./composer.json:/var/www/html/composer.json
