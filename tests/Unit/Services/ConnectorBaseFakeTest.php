@@ -13,7 +13,6 @@ use Innokassa\MDK\Exceptions\SettingsException;
 use Innokassa\MDK\Exceptions\NetConnectException;
 use Innokassa\MDK\Storage\ReceiptStorageInterface;
 use Innokassa\MDK\Exceptions\Services\PrinterException;
-use Innokassa\MDK\Logger\LoggerInterface;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 /**
@@ -33,7 +32,6 @@ class ConnectorBaseFakeTest extends TestCase
     private $client;
     private $converter;
     private $settings;
-    private $logger;
 
     protected function setUp(): void
     {
@@ -58,8 +56,6 @@ class ConnectorBaseFakeTest extends TestCase
             ->willReturn(Taxation::ORN);
         $this->settings->method('getLocation')
             ->willReturn('https://example.com/');
-
-        $this->logger = $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -77,8 +73,7 @@ class ConnectorBaseFakeTest extends TestCase
 
         $transfer = new Transfer(
             $this->client,
-            $this->converter,
-            $this->logger
+            $this->converter
         );
         $connector = new ConnectorBase($transfer);
         $this->assertTrue($connector->testSettings($this->settings));
@@ -98,8 +93,7 @@ class ConnectorBaseFakeTest extends TestCase
 
         $transfer = new Transfer(
             $this->client,
-            $this->converter,
-            $this->logger
+            $this->converter
         );
         $connector = new ConnectorBase($transfer);
         $this->expectException(SettingsException::class);
@@ -121,8 +115,7 @@ class ConnectorBaseFakeTest extends TestCase
 
         $transfer = new Transfer(
             $this->client,
-            $this->converter,
-            $this->logger
+            $this->converter
         );
         $connector = new ConnectorBase($transfer);
         $this->expectException(SettingsException::class);
@@ -146,8 +139,7 @@ class ConnectorBaseFakeTest extends TestCase
 
         $transfer = new Transfer(
             $this->client,
-            $this->converter,
-            $this->logger
+            $this->converter
         );
         $connector = new ConnectorBase($transfer);
         $this->expectException(SettingsException::class);
@@ -168,8 +160,7 @@ class ConnectorBaseFakeTest extends TestCase
 
         $transfer = new Transfer(
             $this->client,
-            $this->converter,
-            $this->logger
+            $this->converter
         );
         $connector = new ConnectorBase($transfer);
         $this->expectException(SettingsException::class);
@@ -191,8 +182,7 @@ class ConnectorBaseFakeTest extends TestCase
 
         $transfer = new Transfer(
             $this->client,
-            $this->converter,
-            $this->logger
+            $this->converter
         );
         $connector = new ConnectorBase($transfer);
         $this->expectException(SettingsException::class);
@@ -214,8 +204,7 @@ class ConnectorBaseFakeTest extends TestCase
 
         $transfer = new Transfer(
             $this->client,
-            $this->converter,
-            $this->logger
+            $this->converter
         );
         $connector = new ConnectorBase($transfer);
         $this->expectException(SettingsException::class);

@@ -4,7 +4,6 @@ use Innokassa\MDK\Net\Transfer;
 use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Settings\SettingsConn;
-use Innokassa\MDK\Logger\LoggerInterface;
 use Innokassa\MDK\Net\NetClientInterface;
 use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Entities\ConverterAbstract;
@@ -37,7 +36,6 @@ class PipelineBaseFakeTest extends TestCase
     private $client;
     private $converter;
     private $storage;
-    private $logger;
     private $settings;
     private $fileLock;
 
@@ -54,7 +52,6 @@ class PipelineBaseFakeTest extends TestCase
 
         $this->converter = $this->createMock(ConverterAbstract::class);
         $this->storage = $this->createMock(ReceiptStorageInterface::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
         $this->receiptIdFactory = $this->createMock(ReceiptIdFactoryInterface::class);
         $this->receiptIdFactory
             ->method('build')
@@ -86,8 +83,7 @@ class PipelineBaseFakeTest extends TestCase
         $this->storage = $this->createMock(ReceiptStorageInterface::class);
         $transfer = new Transfer(
             $this->client,
-            $this->converter,
-            $this->logger
+            $this->converter
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer, $this->receiptIdFactory);
 
@@ -138,8 +134,7 @@ class PipelineBaseFakeTest extends TestCase
 
         $transfer = new Transfer(
             $this->client,
-            $this->converter,
-            $this->logger
+            $this->converter
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer, $this->receiptIdFactory);
         $this->assertTrue($pipeline->update($this->fileLock));
@@ -183,8 +178,7 @@ class PipelineBaseFakeTest extends TestCase
 
         $transfer = new Transfer(
             $this->client,
-            $this->converter,
-            $this->logger
+            $this->converter
         );
 
         $receiptIdFactory = $this->createMock(ReceiptIdFactoryInterface::class);
@@ -235,8 +229,7 @@ class PipelineBaseFakeTest extends TestCase
 
         $transfer = new Transfer(
             $this->client,
-            $this->converter,
-            $this->logger
+            $this->converter
         );
         $pipeline = new PipelineBase($settings, $this->storage, $transfer, $this->receiptIdFactory);
         $this->assertTrue($pipeline->update($this->fileLock));
@@ -276,8 +269,7 @@ class PipelineBaseFakeTest extends TestCase
 
         $transfer = new Transfer(
             $this->client,
-            $this->converter,
-            $this->logger
+            $this->converter
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer, $this->receiptIdFactory);
         $this->assertTrue($pipeline->update($this->fileLock));
@@ -324,8 +316,7 @@ class PipelineBaseFakeTest extends TestCase
 
         $transfer = new Transfer(
             $this->client,
-            $this->converter,
-            $this->logger
+            $this->converter
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer, $this->receiptIdFactory);
         $this->assertTrue($pipeline->update($this->fileLock));
@@ -367,8 +358,7 @@ class PipelineBaseFakeTest extends TestCase
 
         $transfer = new Transfer(
             $this->client,
-            $this->converter,
-            $this->logger
+            $this->converter
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer, $this->receiptIdFactory);
 
@@ -387,8 +377,7 @@ class PipelineBaseFakeTest extends TestCase
         $this->storage = $this->createMock(ReceiptStorageInterface::class);
         $transfer = new Transfer(
             $this->client,
-            $this->converter,
-            $this->logger
+            $this->converter
         );
         $pipeline = new PipelineBase($this->settings, $this->storage, $transfer, $this->receiptIdFactory);
 
