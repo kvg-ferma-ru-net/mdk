@@ -12,12 +12,6 @@ class TransferException extends BaseException
 
     public const CODE_404 = 'Группа касс не существует или недоступна для актора либо чек receipt_id не существует';
 
-    public const CODE_406 = 'Этот запрос невозможен для группы касс с данным типом';
-
-    public const CODE_409 = 'Чек с таким же receipt_id уже существует';
-
-    public const CODE_422 = 'Ошибка ... исключительная ситуация, мы уже работаем над решением';
-
     public const CODE_500 = 'Внутренняя ошибка сервера';
 
     public const CODE_503 = 'Сервер не может обработать запрос в данный момент';
@@ -51,15 +45,6 @@ class TransferException extends BaseException
                 break;
             case 404:
                 $this->message = static::CODE_404;
-                break;
-            case 406:
-                $this->message = static::CODE_406;
-                break;
-            case 409:
-                $this->message = static::CODE_409;
-                break;
-            case 422:
-                $this->message = static::CODE_422;
                 break;
             case 500:
                 $this->message = static::CODE_500;
