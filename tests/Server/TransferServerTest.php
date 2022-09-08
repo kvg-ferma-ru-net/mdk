@@ -7,7 +7,6 @@ use Innokassa\MDK\Net\ConverterApi;
 use Innokassa\MDK\Net\NetClientCurl;
 use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Settings\SettingsConn;
-use Innokassa\MDK\Logger\LoggerInterface;
 use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Entities\Atoms\ReceiptType;
 use Innokassa\MDK\Entities\Primitives\Amount;
@@ -42,12 +41,10 @@ use Innokassa\MDK\Entities\ReceiptId\ReceiptIdFactoryMeta;
  */
 class TransferServerTest extends TestCase
 {
-    protected $logger;
     protected $settingsConn;
 
     protected function setUp(): void
     {
-        $this->logger = $this->createMock(LoggerInterface::class);
         $this->settingsConn = new SettingsConn(TEST_ACTOR_ID, TEST_ACTOR_TOKEN, TEST_CASHBOX_WITHOUT_AGENT);
     }
 
@@ -80,8 +77,7 @@ class TransferServerTest extends TestCase
         $converter = new ConverterApi();
         $transfer = new Transfer(
             $client,
-            $converter,
-            $this->logger
+            $converter
         );
 
         $receiptStatus = $transfer->sendReceipt($this->settingsConn, $receipt);
@@ -122,8 +118,7 @@ class TransferServerTest extends TestCase
         $converter = new ConverterApi();
         $transfer = new Transfer(
             $client,
-            $converter,
-            $this->logger
+            $converter
         );
 
         $this->expectException(TransferException::class);
@@ -142,8 +137,7 @@ class TransferServerTest extends TestCase
         $converter = new ConverterApi();
         $transfer = new Transfer(
             $client,
-            $converter,
-            $this->logger
+            $converter
         );
         $cashbox = $transfer->getCashBox($this->settingsConn);
 
@@ -163,7 +157,7 @@ class TransferServerTest extends TestCase
 
         $client = new NetClientCurl();
         $converter = new ConverterApi();
-        $transfer = new Transfer($client, $converter, $this->logger);
+        $transfer = new Transfer($client, $converter);
 
         $this->expectException(TransferException::class);
         $this->expectExceptionCode(404);

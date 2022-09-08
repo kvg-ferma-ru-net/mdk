@@ -72,7 +72,6 @@ require_once('mdk/src/autoload.php');
 * компонентов (для дополнительного взаимодействия с MDK):
     * [Settings](/src/Settings/SettingsAbstract.php)
     * [Storage](/src/Storage/ReceiptStorageInterface.php)
-    * [Logger](/src/Logger/LoggerInterface.php)
 
 #### Инициализация
 
@@ -82,13 +81,11 @@ require_once('mdk/src/autoload.php');
 $settings = new SettingsConcrete();
 $storage = new ReceiptStorageConcrete(new ConverterStorage());
 $adapter = new ReceiptAdapterConcrete();
-$logger = new LoggerFile();
 $receiptIdFactory = new ReceiptIdFactoryMetaConcrete();
 
 $transfer = new Transfer(
     new NetClientCurl(),
-    new ConverterApi(),
-    $logger
+    new ConverterApi()
 );
 
 // создание сервисов
@@ -108,8 +105,7 @@ $mdk = new Client(
     $storage,
     $automatic,
     $pipeline,
-    $connector,
-    $logger
+    $connector
 );
 ```
 
@@ -136,8 +132,7 @@ try {
     // формирование трансфера с указанием минимальных данных для соединения
     $transfer = new Transfer(
         new NetClientCurl(),
-        new ConverterApi(),
-        new LoggerFile()
+        new ConverterApi()
     );
 
     // создание коннектора и тестирование настроек
@@ -192,11 +187,6 @@ $pipeline->update();
 Рекомендации:
 * при автоматических действиях оповещать пользователя интеграции через email или другими доступными средствами
 
-### Логи
-
-Для логирования используются файловые логи [LoggerFile](/src/Logger/LoggerFile.php) интерфейса [LoggerInterface](/src/Logger/LoggerInterface.php), хранимые в директории `logs`. 
-
-Логи применяются в классе [Transfer](/src/Net/Transfer.php) для хранения истории взаимодействия с сервером фискализации.
 
 ## Разработка
 

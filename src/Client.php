@@ -2,7 +2,6 @@
 
 namespace Innokassa\MDK;
 
-use Innokassa\MDK\Logger\LoggerInterface;
 use Innokassa\MDK\Services\PipelineInterface;
 use Innokassa\MDK\Settings\SettingsAbstract;
 use Innokassa\MDK\Services\AutomaticInterface;
@@ -19,8 +18,7 @@ class Client
         ReceiptStorageInterface $storage,
         AutomaticInterface $atomatic,
         PipelineInterface $pipeline,
-        ConnectorInterface $connector,
-        LoggerInterface $logger
+        ConnectorInterface $connector
     ) {
         $this->settings = $settings;
         $this->storage = $storage;
@@ -28,7 +26,6 @@ class Client
         $this->atomatic = $atomatic;
         $this->pipeline = $pipeline;
         $this->connector = $connector;
-        $this->logger = $logger;
     }
 
     //######################################################################
@@ -85,16 +82,6 @@ class Client
         return $this->storage;
     }
 
-    /**
-     * Получить компонент логирования
-     *
-     * @return LoggerInterface
-     */
-    public function componentLogger(): LoggerInterface
-    {
-        return $this->logger;
-    }
-
     //######################################################################
     // PRIVATE
     //######################################################################
@@ -107,9 +94,6 @@ class Client
 
     /** @var ConnectorInterface */
     private $connector;
-
-    /** @var LoggerInterface */
-    private $logger;
 
     /** @var SettingsAbstract */
     private $settings;

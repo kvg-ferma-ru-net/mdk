@@ -75,18 +75,6 @@ class TransferExceptionTest extends TestCase
         $this->assertSame(404, $exception->getCode());
         $this->assertSame(TransferException::CODE_404, $exception->getMessage());
 
-        $exception = new TransferException('', 406);
-        $this->assertSame(406, $exception->getCode());
-        $this->assertSame(TransferException::CODE_406, $exception->getMessage());
-
-        $exception = new TransferException('', 409);
-        $this->assertSame(409, $exception->getCode());
-        $this->assertSame(TransferException::CODE_409, $exception->getMessage());
-
-        $exception = new TransferException('', 422);
-        $this->assertSame(422, $exception->getCode());
-        $this->assertSame(TransferException::CODE_422, $exception->getMessage());
-
         $exception = new TransferException('', 500);
         $this->assertSame(500, $exception->getCode());
         $this->assertSame(TransferException::CODE_500, $exception->getMessage());

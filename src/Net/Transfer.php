@@ -2,10 +2,8 @@
 
 namespace Innokassa\MDK\Net;
 
-use Innokassa\MDK\Logger\LogLevel;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Settings\SettingsConn;
-use Innokassa\MDK\Logger\LoggerInterface;
 use Innokassa\MDK\Net\NetClientInterface;
 use Innokassa\MDK\Entities\ConverterAbstract;
 use Innokassa\MDK\Entities\Atoms\ReceiptStatus;
@@ -27,12 +25,10 @@ class Transfer implements TransferInterface
 
     public function __construct(
         NetClientInterface $client,
-        ConverterAbstract $converter,
-        LoggerInterface $logger
+        ConverterAbstract $converter
     ) {
         $this->client = $client;
         $this->converter = $converter;
-        $this->logger = $logger;
     }
 
     //######################################################################
@@ -69,32 +65,8 @@ class Transfer implements TransferInterface
 
             $responseBody = json_decode($responseBody);
         } catch (TransferException | NetConnectException $e) {
-            $this->logger->log(
-                LogLevel::ERROR,
-                'error ' . __METHOD__,
-                [
-                    'exception' => $e->__toString(),
-                    'url' => $url,
-                    'response' => [
-                        'code' => $responseCode ?? '',
-                        'body' => $responseBody ?? ''
-                    ]
-                ]
-            );
             throw $e;
         }
-
-        $this->logger->log(
-            LogLevel::INFO,
-            'success ' . __METHOD__,
-            [
-                'url' => $url,
-                'response' => [
-                    'code' => $responseCode,
-                    'body' => $responseBody
-                ]
-            ]
-        );
 
         return $responseBody;
     }
@@ -142,44 +114,8 @@ class Transfer implements TransferInterface
                 throw new TransferException($responseBody, $responseCode);
             }
         } catch (TransferException | NetConnectException $e) {
-            $this->logger->log(
-                LogLevel::ERROR,
-                'error ' . __METHOD__,
-                [
-                    'exception' => $e->__toString(),
-                    'receipt' => [
-                        'id' => $receipt->getId(),
-                        'order' => $receipt->getOrderId(),
-                        'subType' => $receipt->getsubType()
-                    ],
-                    'url' => $url ?? '',
-                    'body' => $sBody ?? '',
-                    'response' => [
-                        'code' => $responseCode ?? '',
-                        'body' => $responseBody ?? ''
-                    ]
-                ]
-            );
             throw $e;
         }
-
-        $this->logger->log(
-            LogLevel::INFO,
-            'success ' . __METHOD__,
-            [
-                'receipt' => [
-                    'id' => $receipt->getId(),
-                    'order' => $receipt->getOrderId(),
-                    'subType' => $receipt->getSubType()
-                ],
-                'url' => $url,
-                'body' => $sBody,
-                'response' => [
-                    'code' => $responseCode,
-                    'body' => $responseBody
-                ]
-            ]
-        );
 
         return $receiptStatus;
     }
@@ -193,7 +129,4 @@ class Transfer implements TransferInterface
 
     /** @var ConverterAbstract */
     private $converter = null;
-
-    /** @var LoggerInterface */
-    private $logger = null;
 }

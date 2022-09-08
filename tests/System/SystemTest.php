@@ -5,7 +5,6 @@ use Innokassa\MDK\Net\Transfer;
 use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Entities\Receipt;
 use Innokassa\MDK\Net\ConverterApi;
-use Innokassa\MDK\Logger\LoggerFile;
 use Innokassa\MDK\Net\NetClientCurl;
 use Innokassa\MDK\Entities\Atoms\Vat;
 use Innokassa\MDK\Entities\ReceiptItem;
@@ -73,9 +72,6 @@ class SystemTest extends TestCase
     /** @var Client */
     protected static $client;
 
-    /** @var LoggerFile */
-    protected static $logger;
-
     public static function setUpBeforeClass(): void
     {
         self::$db = new db('db', 'root', 'root');
@@ -98,12 +94,9 @@ class SystemTest extends TestCase
         );
         self::$adapter = new ReceiptAdapterConcrete(self::$db, self::$settings);
 
-        self::$logger = new LoggerFile();
-
         $transfer = new Transfer(
             new NetClientCurl(),
-            new ConverterApi(),
-            self::$logger
+            new ConverterApi()
         );
 
         $automatic = new AutomaticBase(
@@ -121,8 +114,7 @@ class SystemTest extends TestCase
             self::$storage,
             $automatic,
             $pipeline,
-            $connector,
-            self::$logger
+            $connector
         );
     }
 
@@ -333,8 +325,7 @@ class SystemTest extends TestCase
 
         $transfer = new Transfer(
             new NetClientCurl(),
-            new ConverterApi(),
-            self::$logger
+            new ConverterApi()
         );
         $connector = new ConnectorBase($transfer);
 
@@ -355,8 +346,7 @@ class SystemTest extends TestCase
         ]);
         $transfer = new Transfer(
             new NetClientCurl(),
-            new ConverterApi(),
-            self::$logger
+            new ConverterApi()
         );
         $connector = new ConnectorBase($transfer);
 
@@ -378,8 +368,7 @@ class SystemTest extends TestCase
         ]);
         $transfer = new Transfer(
             new NetClientCurl(),
-            new ConverterApi(),
-            self::$logger
+            new ConverterApi()
         );
         $connector = new ConnectorBase($transfer);
 
