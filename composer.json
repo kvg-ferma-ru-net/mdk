@@ -1,7 +1,7 @@
 {
     "name": "innokassa/mdk",
     "description": "PHP Module Development Kit for Pangaea Server by Innokassa",
-    "version": "2.2.2",
+    "version": "2.2.3",
     "type": "library",
     "license": "MIT",
     "homepage": "https://innokassa.ru/",
