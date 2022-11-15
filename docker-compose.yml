@@ -1,4 +1,4 @@
-version: '3.0'
+version: '3.7'
 
 services:
 
@@ -12,21 +12,23 @@ services:
       - mdk-network
 
   backend:
-    image: registry.git.innokassa.ru/byurrer/docker-images/php7.1-cli:dev
+    build:
+      context: ./.docker/php/
     container_name: mdk-backend
     extra_hosts:
       - "host.docker.internal:172.16.1.1"
     depends_on: 
       - db
     volumes:
+      - ./coverage-report-html/:/var/www/html/coverage-report-html/
+      - ./logs/:/var/log/php/
       - ./src/:/var/www/html/src/
       - ./tests/:/var/www/html/tests/
       - ./composer.json:/var/www/html/composer.json
       - ./phpstan.neon:/var/www/html/phpstan.neon
       - ./phpunit.xml:/var/www/html/phpunit.xml
-      - ./.env/php/test.sh:/usr/bin/test.sh
-      - ./.env/php/wait-db.php:/var/www/html/wait-db.php
-    command: /bin/bash -c "/usr/bin/test.sh"
+      - ./wait-db.php:/var/www/html/wait-db.php
+    command: /bin/bash -c "id && composer install && php -f wait-db.php && while true; do sleep 2; done;"
     networks:
       - mdk-network
 
