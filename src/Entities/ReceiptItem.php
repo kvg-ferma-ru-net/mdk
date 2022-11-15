@@ -200,7 +200,7 @@ class ReceiptItem
      */
     public function getAmount(): float
     {
-        return ($this->amount > 0.0 ? $this->amount : round(($this->price * $this->quantity), 2));
+        return ($this->amount > 0.0 ? $this->amount : round($this->price * $this->quantity, 2));
     }
 
     //**********************************************************************

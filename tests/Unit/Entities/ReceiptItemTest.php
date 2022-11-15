@@ -3,9 +3,10 @@
 use PHPUnit\Framework\TestCase;
 use Innokassa\MDK\Entities\Atoms\Vat;
 use Innokassa\MDK\Entities\Atoms\Unit;
+use Innokassa\MDK\Entities\ReceiptItem;
+use Innokassa\MDK\Entities\ConverterAbstract;
 use Innokassa\MDK\Entities\Atoms\PaymentMethod;
 use Innokassa\MDK\Entities\Atoms\ReceiptItemType;
-use Innokassa\MDK\Entities\ReceiptItem;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
@@ -149,6 +150,15 @@ class ReceiptItemTest extends TestCase
         $this->assertSame($receiptItem, $receiptItem->setAmount(61.8));
         $this->assertSame($receiptItem, $receiptItem->setAmount($receiptItem->getAmount()));
         $this->assertSame(61.8, $receiptItem->getAmount());
+
+        $receiptItem = new ReceiptItem();
+        $receiptItem->setName('asdasd');
+        $receiptItem->setPrice(5.6)
+                    ->setQuantity(90);
+        $this->assertSame(504.0, $receiptItem->getAmount());
+
+        $amountJson = json_encode($receiptItem->getAmount(), JSON_UNESCAPED_UNICODE);
+        $this->assertSame('504', $amountJson);
 
         $this->expectException(InvalidArgumentException::class);
         $receiptItem->setAmount(20.6);
