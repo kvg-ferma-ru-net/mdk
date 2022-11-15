@@ -10,13 +10,13 @@ use Innokassa\MDK\Entities\AtomAbstract;
 class ReceiptStatus extends AtomAbstract
 {
     /** Чек подготовлен, но еще не отправлен */
-    public const PREPARED  = 0;
+    public const PREPARED   = 0;
 
     /** Нет ошибок, чек фискализирован */
     public const COMPLETED  = 1;
 
     /** Нет ошибок, ждем пока чек фискализируется, нужно проверить статус */
-    public const ACCEPTED       = 2;
+    public const ACCEPTED   = 2;
 
     /** Ошибка фискализации */
     public const ERROR      = 5;

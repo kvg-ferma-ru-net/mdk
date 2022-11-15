@@ -3,7 +3,6 @@
 namespace Innokassa\MDK\Entities\Atoms;
 
 use Innokassa\MDK\Entities\AtomAbstract;
-use Innokassa\MDK\Entities\Atoms\Taxation;
 use Innokassa\MDK\Exceptions\Base\InvalidArgumentException;
 
 /**
