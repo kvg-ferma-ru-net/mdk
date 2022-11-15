@@ -120,6 +120,7 @@ class AutomaticBase implements AutomaticInterface
         $receiptStatus = new ReceiptStatus(ReceiptStatus::PREPARED);
         try {
             $receiptStatus = $this->transfer->sendReceipt($this->settings->extrudeConn($siteId), $receipt);
+            $receipt->setStatus($receiptStatus);
         } catch (TransferException $e) {
             $receiptStatus = new ReceiptStatus($e->getCode());
             if ($receiptStatus->getCode() == ReceiptStatus::ERROR) {
